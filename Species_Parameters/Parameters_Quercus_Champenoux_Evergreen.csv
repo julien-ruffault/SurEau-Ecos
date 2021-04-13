@@ -1,0 +1,25 @@
+Name;Value
+Foliage;Evergreen
+P50_VC; -3.4
+Slope_VC;60
+EpsilonSymp;10
+PiFullTurgor;-2.1
+ApoplasmicFrac;0.4
+PsiClose; -2.69
+PsiStartClosing; -2
+LDMC;570
+LMA;106
+kPlantInit;0.62
+SapwoodVolume;0.03
+WoodDensity;570
+CanoStorageParam;1.5
+K;0.5
+Tbase;3
+Fcrit;450
+PTcoeff;1.14
+gmin20;4
+TPhase_gmin;37.5
+Q10_1_gmin;1.2
+Q10_2_gmin;4.8
+DayStart;55
+nbdayLAI;21

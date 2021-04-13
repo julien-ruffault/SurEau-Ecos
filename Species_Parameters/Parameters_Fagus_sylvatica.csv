@@ -1,0 +1,25 @@
+Name;Value
+Foliage;Deciduous
+P50_VC; -3.2
+Slope_VC;100
+EpsilonSymp;8
+PiFullTurgor; -1.5
+ApoplasmicFrac;0.4
+PsiClose; -1.4
+PsiStartClosing; -0.5
+LDMC;500
+LMA;91
+kPlantInit;0.9
+SapwoodVolume;0.03
+WoodDensity;585
+CanoStorageParam;1.5
+K;0.5
+Tbase;1
+Fcrit;250
+PTcoeff;1.05
+gmin20;4
+TPhase_gmin;35
+Q10_1_gmin;1.2
+Q10_2_gmin;4.8
+DayStart;78
+nbdayLAI;21

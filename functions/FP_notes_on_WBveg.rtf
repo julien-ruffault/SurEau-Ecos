@@ -1,0 +1,42 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2513
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\paperw11900\paperh16840\margl1440\margr1440\vieww17860\viewh11520\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf0 \expnd0\expndtw0\kerning0
+In V11-V12:\
+\'95 remove \'ab _n \'bb as well as unneeded intermediates in WBveg (DONE)\
+\'95 move PLC computation out from cavitation (DONE)\
+\'95 put 0 in \'ab waterrelease \'bb  to soil (apparently low impact on computation in the call of UpdateSoilWater.WBsoil in main_SUREAU, but should probably be double checked)\
+\'95 check PAR*10!!!\
+\'95 do a full interpolation of climate (temporary done only on useful variables VDP, T, etc\'85)\
+\'95 include cavitation of trunk and leaf\
+\'95 include refactoring of transpi\
+\'95 include loop on nts small time step\
+\
+\
+in V13 :\
+\'95 correction of PLC prime (should be computed in Psi_mem not Psi_n)\
+\'95 correction of nph for climate and E_nph, Eprime_nph (including factor 0.5 in front of Eprime\'85\
+\'95 IMPORTANT : smoother interpolation of climate (n+1/2)\
+\'95 replaced \'ab\'a0mem\'a0\'bb by \'ab\'a0cav\'a0\'bb much more intuitive (value of psi below which cav starts\'85)\
+\'95 IMPORTANT : cleaning transpiration leads to correction of a bug in WBveg$Eprime (= WBveg$Elim when RegulFact=0, instead of 0)\
+\'95 IMPORTANT : Emin was counted twice (E_n=E0 instead of Elim\
+\'95 loop on different small time steps (1,5\'85) and warnings\
+\
+in V14 :\
+\'95 Now EminT (Nico)\
+\'95 Computation of temporary PsiLapo_tmp based on PsiLapo ksym (new architecture)\
+\'95 fix a bug in time step interpolation (p = (its-0.5)/nts)\
+\'95 fix on initialization and saving after discussing with Julien (current is tt-1 and next is tt in main_SUREAU)\
+\
+\
+in V15 :\
+\'95 adapt to the new scheme with E connected to Psi_Lsym (documentation Equations_SurEau_Implicit_4)\
+\
+in V16: (11-12 avril 2021)\
+\'95 move soil updates to the small time step loop and check the main with Julien (Clim_mid, etc.)\
+\'95 include climV4}
