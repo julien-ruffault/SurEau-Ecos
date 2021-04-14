@@ -8,19 +8,21 @@
 #                  : 26/11/2020 (V1) update create_soil_params to read from file
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
-create.general.params <- function(model_path,
+create.general.params <- function(mainDir,
+                                  model_path,
                                   soil_path,
                                   climate_path,
                                   time_mod,
                                   start_year,
                                   end_year,
                                   species,
+                                  resolutionOutput  = 'subdaily',
+                                  outputType,
                                   fileNameInfo,
                                   addInfotoFileName = F,
                                   lat,
                                   long,
                                   LAImax,
-                                  outputType,
                                   calcul_Emin = T,
                                   calcul_Tleaf = T,
                                   reset_SWC = F,
@@ -33,8 +35,28 @@ create.general.params <- function(model_path,
                                   EboundComp =1
                                   ) {
 
-
-  #
+  if (!resolutionOutput %in% c("subdaily","daily","yearly")) {
+    stop("'resolutionOutput' should be 'subdaily', 'daily' or 'yearly'")
+  }
+  
+  if (missing(outputType)){
+    if (resolutionOutput =='subdaily')
+    {outputType='simple_subdaily'
+    print("'outputType' is not provided and set to default : 'simple_subdaily'. See for other options in manual")}
+    else if (resolutionOutput=='daily'){
+      outputType='simple_daily'
+      print("'outputType' is not provided and set to default : 'simple_daily'. See for other options in manual")}
+    else if(resolutionOutput=='yearly'){
+      outputType=='simple_yearly'
+      print("'outputType' is not provided and set to default : 'simple_yearly'. See for other options in manual")}
+  }
+  
+  
+  
+  if (!is.character(outputType)) {
+    stop(paste0("`outputType` must be character not ", typeof(outputType), "."))
+  }
+  
   if (timeStepForEvapo == "Variable") {
     TIME <- c(6, 10, 12, 14, 18, 24)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")
@@ -44,7 +66,17 @@ create.general.params <- function(model_path,
     stop(paste0("`timeStepForEvap` must be equal to 1,2,4,6,8,12 or 24 (daily) or set to 'variable'"))
   }
 
-
+  if (missing(mainDir)) {
+    stop("'mainDir' is missing.")
+  }
+  
+  if (!is.character(mainDir)) {
+    stop(paste0("`mainDir` must be character not ", typeof(mainDir), "."))
+  }
+  if (!file.exists(mainDir)) {
+    stop(paste0("'mainDir:'", mainDir, "' does not exist or cannot be reached."))
+  }
+  
   if (missing(model_path)) {
     warning("'model_path' is missing and set to 'getwd()' (Default option).")
     model_path=getwd()
@@ -186,6 +218,7 @@ create.general.params <- function(model_path,
     )
   }
   
+  general_params$mainDir   <- mainDir  
   general_params$soil_path <- soil_path
 
   general_params$species <- species
@@ -193,6 +226,7 @@ create.general.params <- function(model_path,
   general_params$lat <- lat
   general_params$long <- long
   general_params$LAImax <- LAImax
+  general_params$resolutionOutput <- resolutionOutput
   general_params$outputType <- outputType
 
   general_params$EboundComp <- EboundComp
