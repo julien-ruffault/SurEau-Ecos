@@ -110,15 +110,15 @@ PLCPrime.comp <- function(PLC , slope) {
 #   (log((1 / plcset) - 1) - a * b) / a
 # }
 
-#Pmin.Comp <- function(Psoil = Psoil, Ktotal = Ktotal, E = E) {
-  if (Ktotal > 0) {
-    Pmin <- Psoil - E / (Ktotal)
-  } else {
-    Pmin <- (-999)
-    # print("Warning conductance is 0 or negative and has been set to 0.0000001")
-  }
-  return(Pmin)
-}
+# #Pmin.Comp <- function(Psoil = Psoil, Ktotal = Ktotal, E = E) {
+#   if (Ktotal > 0) {
+#     Pmin <- Psoil - E / (Ktotal)
+#   } else {
+#     Pmin <- (-999)
+#     # print("Warning conductance is 0 or negative and has been set to 0.0000001")
+#   }
+#   return(Pmin)
+# }
 
 # Minimum water potential
 
