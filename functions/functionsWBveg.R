@@ -451,7 +451,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       fluxEvaporationSoilLargeTimeStep = fluxEvaporationSoilLargeTimeStep + WBsoil_n$E_Soil3/nts
       #WBclim = lapply(seq_along(WBclim_current),function(i) unlist(0.5*(WBclim_current[i])+unlist(WBclim_next[i])))
       WBveg_tmp <- compute.transpiration.WBveg(WBveg_n, WBclim, Nhours) # transpi with climate at nph
-      WBveg_np1 <- implicitTemporalIntegrationAt_np1(WBveg_tmp,  WBsoil_n, dt = Nhours * 3600 / nts, opt = opt)
+      WBveg_np1 <- implicit.temporal.integration.atnp1(WBveg_tmp,  WBsoil_n, dt = Nhours * 3600 / nts, opt = opt)
       WBveg_np1 <- update.kplant.WBveg(WBveg_np1,WBsoil_n)
       WBveg_np1 <- update.capaSym.WBveg(WBveg_np1)
       
@@ -514,7 +514,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
 # Implicit time integration function on small time step dt
 # Notes : np1 means "n+1", nph means "n+1/2" (for n plus half)
 ##################################################################
-implicitTemporalIntegrationAt_np1 <- function(WBveg, WBsoil, dt, opt) {
+implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   # 1. Initializing current time step according to computation options (FP)
   dbxmin = 1e-100 # FP minimal double to avoid 0/0
   Psi_LApo_n = WBveg$Psi_LApo

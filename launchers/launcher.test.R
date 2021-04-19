@@ -52,7 +52,7 @@ run.SurEauR(modeling_options = modeling_options ,
        vegetation_parameters=vegetation_parameters)
 
 
-# for analyses 
+# for analyses / 
   filename  = paste0(mainDir,"/Results_model/.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
@@ -61,9 +61,7 @@ run.SurEauR(modeling_options = modeling_options ,
   lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
   
 
-  
 
-# 
 #  plot(DD,DATA$SWS1)
 
 

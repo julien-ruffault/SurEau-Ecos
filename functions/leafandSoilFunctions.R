@@ -88,17 +88,17 @@ Rs.Comp <- function(PiFT, Esymp, Pmin) {
 #   }
 #   return(Ktotal)
 # }
-
-# Total Conductance = Soil Conductance & Plant COnductance
-PLC.comp <- function(Pmin, slope , P50) {
-  PLC  = 100 / (1 + exp(slope / 25 * (Pmin - P50)))
-  return(PLC)
-}
-
-# This function computes PLCPrime from PLC current value
-PLCPrime.comp <- function(PLC , slope) {
-  return(- slope/25 * PLC/100 * (1 - PLC/100))
-}
+# 
+# # Total Conductance = Soil Conductance & Plant COnductance
+# PLC.comp <- function(Pmin, slope , P50) {
+#   PLC  = 100 / (1 + exp(slope / 25 * (Pmin - P50)))
+#   return(PLC)
+# }
+# 
+# # This function computes PLCPrime from PLC current value
+# PLCPrime.comp <- function(PLC , slope) {
+#   return(- slope/25 * PLC/100 * (1 - PLC/100))
+# }
 
 # Percent loss of conductance based on vulnerability curevs
 # PsiCompVC <- function(plcset, slope, b) {
