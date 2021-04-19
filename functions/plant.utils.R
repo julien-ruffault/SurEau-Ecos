@@ -17,7 +17,6 @@ PLCPrime.comp <- function(PLC , slope) {
   return(- slope/25 * PLC/100 * (1 - PLC/100))
 }
 
-
 calcul.gmin <- function(temperatureLeaf, gmin_20,TPhase, Q10_1, Q10_2) {
   
   # Martin-StPaul N, Ruffault J, Pimont F
