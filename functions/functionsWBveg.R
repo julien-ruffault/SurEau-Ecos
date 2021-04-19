@@ -32,7 +32,7 @@
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # create an "object" WBveg from  veg_params
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-new_WBveg <- function(veg_params) {
+new.WBveg <- function(veg_params) {
   
   WBveg <- list() # initialisation
   
@@ -117,7 +117,7 @@ new_WBveg <- function(veg_params) {
   
   #--------------- pheno-----
   # parameters if deciduous
-  if (veg_params$Foliage == "Deciduous" & general_params$LAImod == T) {
+  if (veg_params$Foliage == "Deciduous") {
     WBveg$LAIpheno       <- 0
     WBveg$sumTemperature <- 0 # temmpeerature sum to determine budburst
     WBveg$budburstDate   <- NA # budburst date
@@ -165,7 +165,7 @@ new_WBveg <- function(veg_params) {
   WBveg$PLCBelow = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$Slope_VC_Below, P50 = WBveg$params$P50_VC_Below)
   
   # initialize capacitance
-  WBveg <- updateCapaSym.WBveg(WBveg) 
+  WBveg <- update.capaSym.WBveg(WBveg) 
   # NB conductance are computed after when soil, pheno, etc are done
   
   return(WBveg)
@@ -174,10 +174,10 @@ new_WBveg <- function(veg_params) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute pheno and LAI for an object WBveg in SUREAU_ECOS
 ### ### ### ### ### ### ### ### ### ### ## ### ### ### ### ### ### ### ### ##
-computePheno.WBveg <- function(.WBveg, temperature, DOY, LAImod = T, LAIpres=F) {
+compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) {
   
   # INPUTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-  #   - .WBveg
+  #   - WBveg
   #   - temperature    :  daily tempeature  (degC)
   #   - DOY            :  day of year
   #  -  LAImod=T
@@ -186,118 +186,114 @@ computePheno.WBveg <- function(.WBveg, temperature, DOY, LAImod = T, LAIpres=F) 
   
   # set to initial parameters at the beginning of the year 
   if (DOY==1){
-    if (.WBveg$params$Foliage == "Evergreen") {
-      .WBveg$LAIpheno <- .WBveg$params$LAImax  # note  : for evergreen this values will remain the same untill the end of the year ! 
+    if (WBveg$params$Foliage == "Evergreen") {
+      WBveg$LAIpheno <- WBveg$params$LAImax  # note  : for evergreen this values will remain the same untill the end of the year ! 
     }
-    else if (.WBveg$params$Foliage == "Deciduous") {
-      .WBveg$LAIpheno <- 0
-      .WBveg$sumTemperature <- 0
-      .WBveg$budburstDate   <- NA
+    else if (WBveg$params$Foliage == "Deciduous") {
+      WBveg$LAIpheno <- 0
+      WBveg$sumTemperature <- 0
+      WBveg$budburstDate   <- NA
     }
-    
-    #.WBveg$CanopyWCdead <- 0 <-- mettre ailleurs  (26/01/2021)
-    #.WBveg$LAIdead <- 0      <-- mettre ailleurs  (26/01/2021)
-    
-    #.WBveg$PLCAbove <- 0   mettre ailleurs  (26/01/2021)
   }
-  if (.WBveg$params$Foliage == "Deciduous" & LAImod == T) # si decidus LAI =fonction(pheno)-defol
+  
+  if (WBveg$params$Foliage == "Deciduous" & LAImod == T) # si decidus LAI =fonction(pheno)-defol
   {
-    if (is.na(.WBveg$budburstDate) == T) # si pas de debourrement
+    if (is.na(WBveg$budburstDate) == T) # si pas de debourrement
     {
-      if (temperature > .WBveg$params$Tbase & DOY >= .WBveg$params$DayStart) {
-        .WBveg$sumTemperature <- .WBveg$sumTemperature + temperature # update SumTemp si T>tbase
+      if (temperature > WBveg$params$Tbase & DOY >= WBveg$params$DayStart) {
+        WBveg$sumTemperature <- WBveg$sumTemperature + temperature # update SumTemp si T>tbase
       }
       
-      if (.WBveg$sumTemperature > .WBveg$params$Fcrit) {
-        .WBveg$budburstDate <- DOY
+      if (WBveg$sumTemperature > WBveg$params$Fcrit) {
+        WBveg$budburstDate <- DOY
       } # budburstday
     }
     
     else if (DOY >= 280) # perte des feuilles au jour 270
     {
-      .WBveg$LAIpheno= max(0,.WBveg$LAI-max(0, .WBveg$params$LAImax / .WBveg$params$nbdayLAI))
+      WBveg$LAIpheno= max(0,WBveg$LAI-max(0, WBveg$params$LAImax / WBveg$params$nbdayLAI))
     }
     
-    else if (is.na(.WBveg$budburstDate) == F) {
-      if (DOY < .WBveg$budburstDate + .WBveg$params$nbdayLAI) # si debourrement et que periode de construction des feuilles
+    else if (is.na(WBveg$budburstDate) == F) {
+      if (DOY < WBveg$budburstDate + WBveg$params$nbdayLAI) # si debourrement et que periode de construction des feuilles
       {
-        .WBveg$LAIpheno <- .WBveg$LAIpheno + max(0, .WBveg$params$LAImax / .WBveg$params$nbdayLAI) #
+        WBveg$LAIpheno <- WBveg$LAIpheno + max(0, WBveg$params$LAImax / WBveg$params$nbdayLAI) #
       }
     }
     
   }
   
   # temporary for now /// 
-  .WBveg$LAI <- .WBveg$LAIpheno
+  WBveg$LAI <- WBveg$LAIpheno
   
   # update LAI-dependent variables 
-  .WBveg$FCC <- (1 - exp(-.WBveg$params$K * .WBveg$LAI))
-  .WBveg$CSC <- 1.5 * .WBveg$LAI
+  WBveg$FCC <- (1 - exp(-WBveg$params$K * WBveg$LAI))
+  WBveg$CSC <- 1.5 * WBveg$LAI
   
   # update water storing capacities of the dead and living canopy
-  .WBveg$DMLiveCanopy <- .WBveg$LAI * .WBveg$params$LMA
-  .WBveg$DMDeadCanopy <- .WBveg$deadLAI * .WBveg$params$LMA
+  WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA
+  WBveg$DMDeadCanopy <- WBveg$deadLAI * WBveg$params$LMA
   
   if (DOY==1)
   {
-    Q_LSym_sat_L <- (1 / (.WBveg$params$LDMC / 1000) - 1) * .WBveg$DMLiveCanopy * (1 - .WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    .WBveg$params$Q_LSym_sat_mmol <- Q_LSym_sat_L*1000000/18
-    .WBveg$Q_LSym_mmol <- .WBveg$params$Q_LSym_sat_mmol
+    Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$params$Q_LSym_sat_mmol <- Q_LSym_sat_L*1000000/18
+    WBveg$Q_LSym_mmol <- WBveg$params$Q_LSym_sat_mmol
     
-    Q_LApo_sat_L <- (1 / (.WBveg$params$LDMC / 1000) - 1) * .WBveg$DMLiveCanopy * (.WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    .WBveg$params$Q_LApo_sat_mmol <- Q_LApo_sat_L*1000000/18
-    .WBveg$Q_LApo_mmol <- .WBveg$params$Q_LApo_sat_mmol
+    Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$params$Q_LApo_sat_mmol <- Q_LApo_sat_L*1000000/18
+    WBveg$Q_LApo_mmol <- WBveg$params$Q_LApo_sat_mmol
     
     Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    .WBveg$params$Q_TSym_sat_mmol <- Q_TSym_sat_L*1000000/18
-    .WBveg$Q_TSym_mmol <- .WBveg$params$Q_TSym_sat_mmol
+    WBveg$params$Q_TSym_sat_mmol <- Q_TSym_sat_L*1000000/18
+    WBveg$Q_TSym_mmol <- WBveg$params$Q_TSym_sat_mmol
     
     Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    .WBveg$params$Q_TApo_sat_mmol <- Q_TApo_sat_L* 1000000/18
-    .WBveg$Q_TApo_mmol <- .WBveg$params$Q_TApo_sat_mmol
+    WBveg$params$Q_TApo_sat_mmol <- Q_TApo_sat_L* 1000000/18
+    WBveg$Q_TApo_mmol <- WBveg$params$Q_TApo_sat_mmol
     
     
   }
   
-  .WBveg$WCCanopySympSat <- (1 / (.WBveg$params$LDMC / 1000) - 1) * .WBveg$DMLiveCanopy * (1 - .WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-  .WBveg$WCCanopyApo <- (1 - .WBveg$PLCAbove / 100) * .WBveg$DMLiveCanopy * (1 / (.WBveg$params$LDMC / 1000) - 1) * (.WBveg$params$ApoplasmicFrac) / 1000
+  WBveg$WCCanopySympSat <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$WCCanopyApo <- (1 - WBveg$PLCAbove / 100) * WBveg$DMLiveCanopy * (1 / (WBveg$params$LDMC / 1000) - 1) * (WBveg$params$ApoplasmicFrac) / 1000
   
   
-  #print(paste0("LAIpheno = " ,.WBveg$LAI))
-  return(.WBveg)
+  #print(paste0("LAIpheno = " ,WBveg$LAI))
+  return(WBveg)
 }
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Rain interception by canopy/ stock of water in the canopy reservoir (one vegetation layer only)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-computeInterception.WBveg <- function(.WBveg, ppt) {
+compute.interception.WBveg <- function(WBveg, ppt) {
   
   # inputs : 
   #   - WB.veg         : object WBveg 
   #   -  ppt          :  precipitation (mm)
   
-  if (ppt * .WBveg$FCC <= (.WBveg$CSC - .WBveg$QR)) # pas de débordement
+  if (ppt * WBveg$FCC <= (WBveg$CSC - WBveg$QR)) # pas de débordement
   {
-    .WBveg$pptsoil <- ppt * (1 - .WBveg$FCC)
-    .WBveg$QR <- .WBveg$QR + (ppt * .WBveg$FCC)
+    WBveg$pptsoil <- ppt * (1 - WBveg$FCC)
+    WBveg$QR <- WBveg$QR + (ppt * WBveg$FCC)
   }
   
-  else if (ppt * .WBveg$FCC > (.WBveg$CSC - .WBveg$QR)) #  debordement
+  else if (ppt * WBveg$FCC > (WBveg$CSC - WBveg$QR)) #  debordement
   {
-    .WBveg$pptsoil <- ppt - (.WBveg$CSC - .WBveg$QR)
-    .WBveg$QR <- .WBveg$CSC
+    WBveg$pptsoil <- ppt - (WBveg$CSC - WBveg$QR)
+    WBveg$QR <- WBveg$CSC
   }
   
-  return(.WBveg)
+  return(WBveg)
 }
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute water stocks in leaves/wood in SUREAU_ECOS (one vegetation layer only)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-computeWaterStorage.WBveg <- function(WBveg, VPD) {
+compute.waterStorage.WBveg <- function(WBveg, VPD) {
   
   # Dead FMC [%]
-  WBveg$DFMC <- DFMC_dedios(VPD)
+  WBveg$DFMC <- compute.DFMC(VPD)
   
   # Water content of dead foliage (l/m2 sol ou mm)
   WBveg$WCCanopyDead <- (WBveg$DFMC / 100) * WBveg$DMDeadCanopy / 1000
@@ -323,7 +319,7 @@ computeWaterStorage.WBveg <- function(WBveg, VPD) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 # Compute evaporation of the water intercepted by the canopy in the SUREAU_ECOS model
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-computeEvapIntercepted.WBveg <- function(WBveg, ETP) {
+compute.evapoIntercepted.WBveg <- function(WBveg, ETP) {
   if (ETP >= 0) {
     if (ETP >= WBveg$QR) { #  all the water intercepted by the canopy is tranpired
       WBveg$ETPr <- ETP - WBveg$QR
@@ -342,7 +338,7 @@ computeEvapIntercepted.WBveg <- function(WBveg, ETP) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # updateKplant - checked FP 11/03/2021
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-updateKplant.WBveg <- function(WBveg,WBsoil) {
+update.kplant.WBveg <- function(WBveg,WBsoil) {
   # calculate kabove and kbelow from "kplant", assuming an equal ksat above and below
   WBveg$kBelowGround <- (2 * WBveg$params$kPlantInit) * (1-WBveg$PLCBelow/100)
   WBveg$kAboveGround <- (2 * WBveg$params$kPlantInit) *  (1-WBveg$PLCAbove/100)
@@ -361,7 +357,7 @@ updateKplant.WBveg <- function(WBveg,WBsoil) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute an up date of plant capacitances (19/02/2021) - checked FP 11/03/2021
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-updateCapaSym.WBveg <- function(WBveg){
+update.capaSym.WBveg <- function(WBveg){
   PsiTlp <- WBveg$params$PsiTlp
   PiFullTurgor <- WBveg$params$PiFullTurgor
   Esymp <- WBveg$params$EpsilonSymp
@@ -397,16 +393,16 @@ updateCapaSym.WBveg <- function(WBveg){
 # #FP this section was cleaned a bit and a bug was corrected in Eprime (when regul=0)
 # TODO check why we have gs and gs_lim with same value
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-computeTranspiration.WBveg <- function(WBveg, WBclim, Nhours) {
-  TGbl_Leaf <- Tleaf(Tair = WBclim$Tair_mean,SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
+compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours) {
+  TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean,SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
                      WS = WBclim$WS,VPD = WBclim$VPD,RH = max(100, WBclim$RHair_mean),gs=WBveg$gs,Einst = max(0.00001, WBveg$SumFluxSoilToCollar))
   WBveg$Tleaf <- TGbl_Leaf [1] # Transpiration/Gs du pas de temps précédent
   # cuticular 
-  WBveg$gmin <- calcul_gmin(temperatureLeaf = WBveg$Tleaf,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
+  WBveg$gmin <- calcul.gmin(temperatureLeaf = WBveg$Tleaf,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- WBveg$gmin * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
   #WBveg$gminTLAI <- WBveg$gminT*TBA unused
   WBveg$EminT <- WBveg$gminT * WBveg$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
-  WBclim$PAR <- WBclim$PAR*10 #TODO check this !!!! A corriger dans climat
+  WBclim$PAR  <- WBclim$PAR*10 #TODO check this !!!! A corriger dans climat
   
   # canopy with no regulation
   WBveg$gs_bound <- calculate_gs_Jarvis(PAR = WBclim$PAR, Tleaf = WBveg$Tleaf)
@@ -418,7 +414,7 @@ computeTranspiration.WBveg <- function(WBveg, WBclim, Nhours) {
   WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
   
   #compute current regulation
-  regul = computeRegulFact(psi = WBveg$Psi_LSym, params= WBveg$params)
+  regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params)
   WBveg$RegulFact = regul$regulFact
   
   # canopy with current regulation 
@@ -433,26 +429,11 @@ computeTranspiration.WBveg <- function(WBveg, WBclim, Nhours) {
   return(WBveg) 
 }
 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# utilitary function to lineary interpolate climate between clim1 and clim2 (p==0=>res = clim1,p==1=>res = clim2)
-# TODO this should be generalized to all usefull clim data...
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-interpClim=function(clim1,clim2,p) {
-  res =  clim1
-  res$Tair_mean  = (1-p)*clim1$Tair_mean  + p*clim2$Tair_mean
-  res$RG         = (1-p)*clim1$RG         + p*clim2$RG
-  res$WS         = (1-p)*clim1$WS         + p*clim2$WS
-  res$VPD        = (1-p)*clim1$VPD        + p*clim2$VPD
-  res$RHair_mean = (1-p)*clim1$RHair_mean + p*clim2$RHair_mean
-  res$ETP        = (1-p)*clim1$ETP + p*clim2$ETP
-  return(res)
-}
-
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute integration over time - checked FP 11/03/2021
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-computePlantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, opt = compOptions) {
+compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, opt = modeling_options$compOptions) {
   
   # A. LOOP ON THE IMPLICIT SOLVER IN PSI, trying different time steps until results are OK
   regulationWellComputed=F;cavitationWellComputed=F; nwhilecomp=0
@@ -465,19 +446,19 @@ computePlantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_
     fluxSoilToCollarLargeTimeStep = 0
     fluxEvaporationSoilLargeTimeStep = 0
     for (its in c(1:nts)) { #INTERNAL LOOP ON SMALL TIME STEPS
-      p = (its-0.5)/nts;WBclim = interpClim(WBclim_current,WBclim_next,p) # climate at nph
-      WBsoil_n <- computeEvaporation_withG.WBsoil(WBsoil = WBsoil_n,ETP = WBveg_n$ETPr,RHair = WBclim$RHair,K = WBveg_n$params$K,LAI = WBveg_n$LAI,Nhours = Nhours/nts)
+      p = (its-0.5)/nts;WBclim = interp.WBclim(WBclim_current,WBclim_next,p) # climate at nph
+      WBsoil_n <- compute.evaporationG.WBsoil(WBsoil = WBsoil_n,ETP = WBveg_n$ETPr,RHair = WBclim$RHair,K = WBveg_n$params$K,LAI = WBveg_n$LAI,Nhours = Nhours/nts)
       fluxEvaporationSoilLargeTimeStep = fluxEvaporationSoilLargeTimeStep + WBsoil_n$E_Soil3/nts
       #WBclim = lapply(seq_along(WBclim_current),function(i) unlist(0.5*(WBclim_current[i])+unlist(WBclim_next[i])))
-      WBveg_tmp <- computeTranspiration.WBveg(WBveg_n, WBclim, Nhours) # transpi with climate at nph
-      WBveg_np1 <- implicitTemporalIntegrationAt_np1(WBveg_tmp,  WBsoil_n, dt = Nhours * 3600 / nts, opt = compOptions)
-      WBveg_np1 <- updateKplant.WBveg(WBveg_np1,WBsoil_n)
-      WBveg_np1 <- updateCapaSym.WBveg(WBveg_np1)
+      WBveg_tmp <- compute.transpiration.WBveg(WBveg_n, WBclim, Nhours) # transpi with climate at nph
+      WBveg_np1 <- implicitTemporalIntegrationAt_np1(WBveg_tmp,  WBsoil_n, dt = Nhours * 3600 / nts, opt = opt)
+      WBveg_np1 <- update.kplant.WBveg(WBveg_np1,WBsoil_n)
+      WBveg_np1 <- update.capaSym.WBveg(WBveg_np1)
       
       # QUANTITIES TO CHECK IF THE RESOLUTION IS OK
       # 1. delta regulation between n and np1
-      regul_np1 = computeRegulFact(psi = WBveg_np1$Psi_LSym, params= WBveg_np1$params)
-      regul_n = computeRegulFact(psi = WBveg_n$Psi_LSym, params= WBveg_n$params)# TODO check why recomputed? should be in WBveg_tmp
+      regul_np1 = compute.regulFact(psi = WBveg_np1$Psi_LSym, params= WBveg_np1$params)
+      regul_n = compute.regulFact(psi = WBveg_n$Psi_LSym, params= WBveg_n$params)# TODO check why recomputed? should be in WBveg_tmp
       deltaRegulMax = max(deltaRegulMax,abs(regul_np1$regulFact-regul_n$regulFact))
       # 2. PLC at n and np1
       #print(c(signif(WBveg_np1$PLCAbove, digits = 5),signif(WBveg_n$PLCAbove, digits = 5),signif(WBveg_np1$PLCBelow, digits = 5),signif(WBveg_n$PLCBelow, digits = 5)))
@@ -490,7 +471,7 @@ computePlantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_
       fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil_n$PsiSoil-WBveg_np1$Psi_TApo)
       # NB the time step for fluxSoilToCollar.C is Nhours/nts!
       WBveg_np1$fluxSoilToCollar.C = ConvertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
-      WBsoil_n <- UpdateSoilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar.C, fluxRelease  = 0) 
+      WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar.C, fluxRelease  = 0) 
       fluxSoilToCollarLargeTimeStep = fluxSoilToCollarLargeTimeStep + fluxSoilToCollar/nts # mean flux over one large time step
     } # end loop small time step
     # TESTS ON RESOLUTION
@@ -511,7 +492,7 @@ computePlantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_
   WBveg = WBveg_np1
   
   #  print(paste0("leaving loop, regulfactnp1,",signif(WBveg_np1$RegulFact, digits = 5)))
-  WBveg <- computeTranspiration.WBveg(WBveg, WBclim_next, Nhours) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
+  WBveg <- compute.transpiration.WBveg(WBveg, WBclim_next, Nhours) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
   #  print(paste0("leaving loop2, regulfactfromtranspi,",signif(WBveg$RegulFact, digits = 5)))
   #  print('')
   # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToCollar.C is used as input in UpdateSoilWater.WBsoil)
@@ -529,21 +510,10 @@ computePlantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_
   return(WBveg)
 }
 
-compOptionsAccurate = list ("nsmalltimesteps"=c(180),"Lsym"=1,"Tsym"=1,"Eord"=1,"Lcav"= 1,"Tcav"= 1,"CLapo"=1,"CTapo"=1)
-compOptionsSpecial = list ("nsmalltimesteps"=c(720),"Lsym"=1,"Tsym"=1,"Eord"=1,"Lcav"= 1,"Tcav"= 1,"CLapo"=1,"CTapo"=1)
-compOptionsNormal = list ("nsmalltimesteps"=c(6,10,20,60),"Lsym"=1,"Tsym"=1,"Eord"=1,"Lcav"= 1,"Tcav"= 1,"CLapo"=1,"CTapo"=1)
-compOptionsFast = list ("nsmalltimesteps"=c(1,6),"Lsym"=1,"Tsym"=1,"Eord"=1,"Lcav"= 1,"Tcav"= 1,"CLapo"=1,"CTapo"=1)
-compOptionsFast1 = list ("nsmalltimesteps"=c(1),"Lsym"=1,"Tsym"=1,"Eord"=1,"Lcav"= 1,"Tcav"= 1,"CLapo"=1,"CTapo"=1)
-#compOptions = compOptionsAccurate
-#compOptions = compOptionsFast1
-compOptions=compOptionsNormal
-#compOptions=compOptionsSpecial
-
 ##################################################################
 # Implicit time integration function on small time step dt
 # Notes : np1 means "n+1", nph means "n+1/2" (for n plus half)
 ##################################################################
-
 implicitTemporalIntegrationAt_np1 <- function(WBveg, WBsoil, dt, opt) {
   # 1. Initializing current time step according to computation options (FP)
   dbxmin = 1e-100 # FP minimal double to avoid 0/0
@@ -664,7 +634,7 @@ implicitTemporalIntegrationAt_np1 <- function(WBveg, WBsoil, dt, opt) {
 # regulFact is regul proportion between 0 and 1
 # regulFactPrime is the first order derivative of regul function in psi
 ##################################################################
-computeRegulFact <- function(psi, params) {
+compute.regulFact <- function(psi, params) {
   if(params$Regul=="Creneau") {
     if (psi > params$PsiStartClosing) {
       stomatalClosure = 0
@@ -694,175 +664,4 @@ computeRegulFact <- function(psi, params) {
   }
   return(list("regulFact"=regulFact,"stomatalClosure"=stomatalClosure,"regulFactPrime"=regulFactPrime))
 }
-
-
-#TODO is it the right place for this IO/initialisation?
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# create list with all species parameters from configuration file
-# ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-### ////  should be changed to separate stand and vegetation parameters ///
-createVegParams <- function(general_params) {
-  file <- paste0("../Species_Parameters/Parameters_", general_params$species, ".csv") # hard coded to avoid
-  
-  if (file.exists(file)) {
-    io <- read.csv(file = file, sep = ";", head = T)
-  } else {
-    stop(paste0("Could not find input parameter file : ", file))
-  }
-  
-  colnames(io) <- c("Name", "Value")
-  
-  
-  .veg_params <- list() # list that contains all the parameters
-  
-  .veg_params$LAImax <- general_params$LAImax
-  
-  # setting commomn params for WB_veg (regardless of the options)
-  
-  params <- c(
-    "P50_VC", # [MPa] / Water potential causing 50% Cavitation in the vulnerability curve
-    "Slope_VC", # [%/MPa]             / Slope of the vulnerability curve
-    "EpsilonSymp", # [MPa]            / Modulus of elasticity in leaves
-    "PiFullTurgor", # [MPa]          / Osmotic Potential at full turgor
-    "ApoplasmicFrac", # [-]           / Apoplasmic Fraction
-    "LDMC", # [mgMS/g]                / Leaf dry matter content (measured for fully watered leaves)
-    "LMA", # [g/m2leaf]                   / Leaf mass per area
-    "K", # [-]                        / Light extinction coefficient of the vegetation layer
-    "SapwoodVolume", # [m3]           / Sapwood volume   / unused [per soil surface ? )
-    "WoodDensity", # [-]                / Wood density    /  unused
-    "kPlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
-    "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
-    "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
-    "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
-    "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin``
-    "CanoStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
-    "PsiClose", # [MPa]
-    "PsiStartClosing" # [MPA]
-  )
-  
-  # "Lv_root", # [m/m3soil]             / Root length per unit soil volume
-  # "r_root" # [m]                      / Root radius
-  
-  
-  
-  for (i in 1:length(params)) {
-    AAA <- which(io$Name == params[i]) ## line number of the variable
-    
-    if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-    {
-      stop(paste0("'", params[i], "' is not provided in input vegetation parameter file, check presence or spelling\n", file))
-    } else if (length(AAA) > 1) {
-      stop(paste0("'", params[i], "' is not provided several times in input vegetation parameter file, correct \n", file))
-    } else if (length(AAA) == 1) {
-      if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-        eval(parse(text = paste0(".veg_params$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
-      } else {
-        stop(paste0(params[i], "must be numeric"))
-      }
-    }
-  }
-  # TODO is it useful to keep this commented lines ? 
-  #
-  #   ##### Stomatal regulation  ####
-  #   AAA <- io[which(io$Name == "StomatalRegModel"), "Value"]
-  #   if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-  #     {
-  #       stop(paste0("'StomatalRegModel' is not provided in input vegetation parameter file, check presence or spelling"))
-  #     } else if (length(AAA) > 1) {
-  #     stop(paste0("'", params[i], "'StomatalRefModel' is provided several times in input vegetation parameter file, correct"))
-  #   } else if (length(AAA) == 1) { # checking that parameter is numeric in input file /stop running otherwise
-  #     .veg_params$StomatalRegModel <- as.character(AAA)
-  #   }
-  #
-  #   if (!.veg_params$StomatalRegModel %in% c("Empirical")) {
-  #     stop("Stomatal regulation  should be 'Empirical'. / Other formulation are not yet implemented")
-  #   }
-  #
-  #   if (.veg_params$StomatalRegModel == "Empirical") {
-  #     params_Stom <- c(
-  #       "PsiClose" # / [MPa]  / Potential at which somatae are fully closed
-  #     )
-  #     for (i in 1:length(params_Stom))
-  #     {
-  #       AAA <- which(io$Name == params_Stom[i]) ## line number of the variable
-  #
-  #       if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-  #         {
-  #           stop(paste0("'", params_Stom[i], "' is not provided in input vegetation parameter file, check presence or spelling"))
-  #         } else if (length(AAA) > 1) {
-  #         stop(paste0("'", params_Stom[i], "' is not provided several times in input vegetation parameter file, correctr"))
-  #       } else if (length(AAA) == 1) {
-  #         if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-  #           eval(parse(text = paste0(".veg_params$", params_Stom[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
-  #         } else {
-  #           stop(paste0(params_Stom[i], "must be numeric"))
-  #         }
-  #       }
-  #     }
-  #   }
-  
-  ##### Foliage Type  ####
-  AAA <- io[which(io$Name == "Foliage"), "Value"]
-  if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-  {
-    stop(paste0("'Foliage' is not provided in input vegetation parameter file, check presence or spelling"))
-  } else if (length(AAA) > 1) {
-    stop(paste0("'", params[i], "'Foliage' is provided several times in input vegetation parameter file, correct"))
-  } else if (length(AAA) == 1) { # checking that parameter is numeric in input file /stop running otherwise
-    .veg_params$Foliage <- as.character(AAA)
-  }
-  
-  if (!.veg_params$Foliage %in% c("Evergreen", "Deciduous")) {
-    stop("'Foliage' should be 'Evergreen' or 'Deciduous' / Check Type of spelling ")
-  }
-  
-  if (.veg_params$Foliage == "Deciduous") {
-    params_Decid <- c("Tbase", "Fcrit", "DayStart", "nbdayLAI")
-    for (i in 1:length(params_Decid))
-    {
-      AAA <- which(io$Name == params_Decid[i]) ## line number of the variable
-      
-      if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-      {
-        stop(paste0("'", params_Decid[i], "' is not provided in input vegetation parameter file, check presence or spelling"))
-      } else if (length(AAA) > 1) {
-        stop(paste0("'", params_Decid[i], "' is not provided several times in input vegetation parameter file, correctr"))
-      } else if (length(AAA) == 1) {
-        if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-          eval(parse(text = paste0(".veg_params$", params_Decid[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
-        } else {
-          stop(paste0(params_Decid[i], "must be numeric"))
-        }
-      }
-    }
-  }
-  
-  
-  
-  # ETP parameters for PT or PM
-  if (general_params$ETP.formulation == "PT") {
-    params_PT <- c("PTcoeff")
-    for (i in 1:length(params_PT))
-    {
-      AAA <- which(io$Name == params_PT[i]) ## line number of the variable
-      
-      if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-      {
-        stop(paste0("'", params_PT[i], "' is not provided in input vegetation parameter file, check presence or spelling"))
-      } else if (length(AAA) > 1) {
-        stop(paste0("'", params_PT[i], "' is not provided several times in input vegetation parameter file, correctr"))
-      } else if (length(AAA) == 1) {
-        if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-          eval(parse(text = paste0(".veg_params$", params_PT[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
-        } else {
-          stop(paste0(params_PT[i], "must be numeric"))
-        }
-      }
-    }
-  }
-  
-  return(.veg_params)
-}
-
-
 

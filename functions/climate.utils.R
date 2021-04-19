@@ -1,73 +1,25 @@
-# 
-# create.clim.files.test <- function(general_params) {
-#   # create a test file from Puechabon study site datasets in SUREAU_ECOS
-#   data <- read.csv(file = paste0(general_params$model_path, "/tests/Climat_Puechabon_1999-2019.csv"), sep = ";")
-#   selec <- data$YEAR %in% seq(general_params$start_year, general_params$end_year)
-#   climate_list <- list(
-#     Tmoy = data[selec, "MeanTair"],
-#     Tmax = data[selec, "MaxTAir"],
-#     Tmin = data[selec, "MinTAir"],
-#     relative_humidity = data[selec, "HRmean"],
-#     RHmin <- data[selec,"
-#     
-#     
-#     ppt = data[selec, "SumPPT"],
-#     global_radiation = data[selec, "SumRg"]
-#   )
-#   climate_list$vpd <- compute.VPDfromRHandT(climate_list$relative_humidity, climate_list$temperature)
-# 
-#   return(climate_list)
-# }
-# 
 
-compute.dailyclim.WBclim <- function(climate_list, general_params, year, DOY) {
-  # select climate data for the year and doy in SUREAU_ECOS
-  output_list <- lapply(climate_list, FUN = function(x) x[year(general_params$time_mod) == year & yday(general_params$time_mod) == DOY])
 
-  output_list$net_radiation <- NA
-  output_list$ETP <- NA
-
-  return(output_list)
-}
-DFMC_dedios <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
-
-  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-  # Authors : Julien Ruffault (julien.ruff@gmail.com)
-  #                       &
-  #           Nicolas MartinStPaul (nicolas.martin@inrae.fr)
-  # Date    : 30/03/2020
-  # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-  # compute FMC for dead fuel following Resco De Dios et al. (2015), AFM ,https://doi.org/10.1016/j.agrformet.2015.01.002
-  # INPUTS
-  #   -VPD : vapor pressure deficit (kPA)
-  #   -FM0 = 5.43 #(minimim FM, %dry weight) -           --> see Resco De Dios et al. (2015)
-  #   -FM1 = 52.91 # (FM0+FM1 : maximum FM, % dryweight) --> see Resco De Dios et al. (2015)
-  #   -m   = 0.64 #(rate of decay)
-  # OUTPUTS
-  #   - FM : fuel moisture (% dry weight)
-  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-  FM <- FM0 + FM1 * exp(-m * VPD)
-
-  return(FM)
-}
-computeVPDfromRHandT <- function(relative_humidity, temperature, air_pressure = 101325) {
+#' compute Vapor pressure deficit from air relative humidity and air temperature
+#'
+#' @param relative_humidity relative humidity of the air (%)
+#' @param temperature air temperature (degC)
+#' @param air_pressure air pressure (Pa)
+#'
+#' @return
+#' return the vapor pressure deficit in kPa
+#' @export
+#' @examples
+#' compute.VPDfromRHandT(relative_humidity = 80 , temperature = 25)
+compute.VPDfromRHandT <- function(relative_humidity, temperature, air_pressure = 101325) {
   ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
   # AUTHORS     :  Julien Ruffault (julien.ruff@gmail.com)
   #                Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
-  # DATE        : 10/06/2020
-  # DESCRIPTION :  calculate VPD from Relative humidity and Temperature s
-  # INPUTS
-  #   -relative_humidity  :  relative humidity (%)
-  #   -temperature        :  air temperature (degC)
-  #   -air_pressure       :  surface pressure (Pa)
-  # OUPUTS
-  #   - VPD               :  vapor pressure deficit (kPa)
-  #   ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
 
   # Constants
-  Mas <- 28.966 # molar weight dry air (g/mol)
-  Mh2o <- 18 # molar weight H20 H2O(g/mol)
-  Rgz <- 8.314472 # pPerfect gaz constant %J/mol/K
+  Mas <- 28.966    # molar weight dry air (g/mol)
+  Mh2o <- 18       # molar weight H20 H2O(g/mol)
+  Rgz <- 8.314472  # pPerfect gaz constant %J/mol/K
 
   Tk <- temperature + 273.15 # conversion of temperature in K
   Dair <- ((air_pressure) / (Rgz * (Tk))) * Mas
@@ -78,7 +30,7 @@ computeVPDfromRHandT <- function(relative_humidity, temperature, air_pressure = 
   return(vpd)
 }
 
-ETP.PT <- function(Tmoy, NetRadiation, PTcoeff = 1.26, G = 0) {
+compute.ETP.PT <- function(Tmoy, NetRadiation, PTcoeff = 1.26, G = 0) {
   ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
   # AUTHORS :  Julien Ruffault (julien.ruff@gmail.com)
   #            Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
@@ -106,24 +58,23 @@ ETP.PT <- function(Tmoy, NetRadiation, PTcoeff = 1.26, G = 0) {
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
-
-#  Returns the proportion of daily radiation corresponding to the input time 
-#  Adapted from the code of M de Caceres, MEDFATE
+#' # Calculated diurnal pattern of temperature assuming a sinusoidal pattern with T = tmin at sunrise
+#  and T = (tmin+tmax)/2 at sunset. From sunset to sunrise follows a linear trend 
+#'#  Adapted from the code of M de Caceres, MEDFATE
 # (https://github.com/cran/medfate/blob/master/src/biophysicsutils.cpp)
-#  
-#  t : time of the day (in seconds from sunrise)
-#  daylength : duration of the day (in seconds)
-#  
-#  B. Y. H. Liu and R. C. Jordan, “The interrelationship and characteristic distribution of direct, diffuse and total solar radiation,” 
-# * Solar Energy, vol. 4, no. 3, pp. 1–19, 1960. 
-
-radiationDiurnalPattern <- function(timeoftheday, daylength) {
+# #  B. Y. H. Liu and R. C. Jordan, “The interrelationship and characteristic distribution of direct, diffuse and total solar radiation,” 
+# * Solar Energy, vol. 4, no. 3, pp. 1–19, 1960.
+#' @param timeoftheday a numeric value of vector indicating the time of the day (in seconds)
+#' @param daylength a numeric value indicating the duration of the day (in seconds)
+#' @return
+#' @export
+#' @examples
+calculate.radiationDiurnalPattern <- function(timeoftheday, daylength) {
   ws <- (daylength / 3600.0) * (pi / 24.0) # sunrise
   w <- ws - (timeoftheday / daylength) * (ws * 2.0)
   prop <- ((pi / 24.0) * (cos(w) - cos(ws))) / (sin(ws) - ws * cos(ws))
   return(prop / 3600.0)
 }
-
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 # #  Adapted from the code of M de Caceres, package medfate
@@ -138,8 +89,7 @@ radiationDiurnalPattern <- function(timeoftheday, daylength) {
 #   McMurtrie, R. E., D. A. Rook, and F. M. Kelliher. 1990. 
 #   Modelling the yield of Pinus radiata on a site limited by water and nitrogen. 
 #   Forest Ecology and Management 30:381–413.
-
-temperatureDiurnalPattern <- function(timeoftheday, tmin, tmax, tminPrev, tmaxPrev, tminNext, daylength) {
+calculate.temperatureDiurnalPattern <- function(timeoftheday, tmin, tmax, tminPrev, tmaxPrev, tminNext, daylength) {
   if ((timeoftheday < 0.0) | (timeoftheday > daylength)) {
     tfin <- 86400.0 - daylength
     if (timeoftheday < 0.0) {
@@ -157,13 +107,13 @@ temperatureDiurnalPattern <- function(timeoftheday, tmin, tmax, tminPrev, tmaxPr
 }
 
 # Calculate diurnal pattern of relative humidity from temperature 
-rhDiurnalPattern <- function(temperature, rhmin, rhmax, tmin, tmax) {
+calculate.rhDiurnalPattern <- function(temperature, rhmin, rhmax, tmin, tmax) {
   rh <- rhmax + ((temperature - tmin) / (tmax - tmin)) * (rhmin - rhmax)
   return(rh)
 }
 
 
-Tleaf <- function(Tair, SWR, WS, VPD, RH, gs, Einst, leaf_size=50, leaf_angle=45) 
+compute.Tleaf <- function(Tair, SWR, WS, VPD, RH, gs, Einst, leaf_size=50, leaf_angle=45) 
   {
   # SWR  // short-wave radiation    (W/m2)
   # WS   // windspeed    (m/s)
@@ -250,60 +200,14 @@ Tleaf <- function(Tair, SWR, WS, VPD, RH, gs, Einst, leaf_size=50, leaf_angle=45
 
   return(c(T_Leaf, g_bl))
 }
-# 
-#  #Pour test de la fonction Tleaf
-#   #computeVPDfromRHandT(30,35)
-# count=0
-# A=NULL
-# for (PP in  seq(0,0.5,0.01))
-# {
-# count=count+1
-# A[count]   = Tleaf(Tair=35,SWR=800,WS=1,VPD=3.94,RH=30,leaf_size=36,leaf_angle=20,Einst=PP)
-# }
-# plot(seq(0,0.5,0.01),A-35,xlab ='E (mol/m2/s)',ylab='deltaT (degC)')
-# mtext(side=3,'Tair=35,SWR=800,WS=1,VPD=3.94,RH=30,leaf_size=36,leaf_angle=20',font=2)
-# 
-# 
-# 
-
-
-#Calculates leaf temperature
-# Campbell & Norman 1998 (eqns. 14.1 & 14.3)
-#airTemperature - Air temperature (in ºC)
-# absRad - Absorbed long- and short-wave radiation (in W*m^-2)
-# E - Transpiration flow (in mmol H20 * m^-2 * s^-1) one sided leaf area basis
-# leafWidth - Leaf width (here in cm)
-# u - wind speed above the leaf boundary layer (in m/s)
-#/
-#  
-# Tleafbis <- function(absRad,airTemperature,u,E,leafWidth=1) # Caceres et al/ Medfate
-# {
-#  u=max(u,0.1) # force minimum wind speed to avoid excessive heating 
-#  gHa = 0.189*pow(u/(leafWidth*0.0072), 0.5)
-#  
-#  
-#  }
-# 
-# double leafTemperature(double absRad, double airTemperatur,e, double u, double E, double leafWidth = 1.0) {
-#   double lambda = meteoland::utils_latentHeatVaporisationMol(airTemperature);
-#   u = std::max(u, 0.1);//Force minimum wind speed to avoid excessive heating
-#   double gHa = 0.189*pow(u/(leafWidth*0.0072), 0.5);
-#   double gr = 4.0*0.97*SIGMA_W*pow(273.16+airTemperature,3.0)/Cp_Jmol;
-#   double deltaTemp = (absRad- (0.97*SIGMA_W*pow(273.16+airTemperature,4.0)) - (lambda*(E/2000.0)))/(Cp_Jmol*(gr+gHa));
-#   return(airTemperature+deltaTemp);
-# }
-# 
-# 
-# 
 
 
 PPFD_umol.to.Rg_Watt <- function (PPFD, J_to_mol = 4.6, frac_PAR = 0.5) 
-{
+
+  {
   Rg <- PPFD/frac_PAR/J_to_mol
   return(Rg)
 }
-
-
 Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5) 
 {
   PPFD <- Rg * frac_PAR * J_to_mol
@@ -321,10 +225,3 @@ Rg_MJday.to.RgWatt <-  function(Rg)
 }
 
 
-
-
-
-
-
-# 
-# 

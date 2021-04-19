@@ -1,69 +1,83 @@
-
-
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Launcher to run SUREAU-ECOS (V4.1) on Champenoux for validation 
-# Authors : Julien Ruffault (julien.ruff@gmail.com)
-#                       &
-#           Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
-#                       &
-#           Francois Pimont (francois.pimont@inrae.fr)            
+# Test Launcher to run SurEau-ECOS (V4.1) on Champenoux and compute the reference output
+# Authors : <Julien Ruffault (julien.ruff@gmail.com)>
+#           <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
+#           <Francois Pimont (francois.pimont@inrae.fr)>
 # date   :  V1  : 11/01/2021    
-#           V2  : 14/04/2021 (JR) / change output management and writing .  cleaned the code  
+#           V2  : 14/04/2021 (JR) / change output management and writing .  cleaned the code
+#           V3  : 16/04/2021 (JR) / change input  parameters (major update involving creating new Script and modifying  the main program) 
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-# Initialization --------------------------------------------------------
+# notes (JR, 18/04/2021)
+#  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting 
+#  - separate output parameters from simulation parameters  ?
+#  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405)
+# - voir pour le parameter WBveg$TBA et gminT--W move as a parameters ? 
+# -  gCrown0=45 #TODO gCrown0 hardcoded (WBveg)
+# - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
+
+# Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
 gc()            # Clear memory
-library(profvis)
 
-# get directories 
-mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path)) # TODO remove this when modifying inputs /set main directory as the directory of this r script (launcher directory)
 
-# Source functions and libraries for SurEau-Ecos -------------------------------
-source(paste0(mainDir,"/functions/loadFunctionsSurEau_Ecos.R"))
+# User Parametrization ---------------------------------------------------------
+mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
+source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                              # do not modify 
 
-# Define general parameters ----------------------------------------------------
-general_params <- create.general.params(start_year         = 1990,                            # starting year  //note entire years only
-                                        end_year           = 1990,
-                                        mainDir            = mainDir,
-                                        soil_path          = 'Soil_Champenoux.xlsx',          # name of the file  / must be stored /Soil_Parameters
-                                        climate_path       = 'Constant/Climat_constant.csv',  # name of the file / must be stored in Clim_data 
-                                        species            = 'Quercus_champenoux_Evergreen',  # Species Name  / should be located in  file Species_Parameters
-                                        fileNameInfo       = 'Champenoux_tests_climat_cst',   # Name of the output csv file // to add metadata addInfotoFileName = T (default =F)
-                                        timeStepForEvapo   =  2,                          # timeStep for the evapotranspiration module (default = 1)
-                                        lat                = 48.73,                           # site lattitude for daylength
-                                        long               = 6.23 ,                           # site longitude for daylength  
-                                        LAImax             = 6,
-                                        constantClimate    = T,                               #  if   (Constant climate) (default=T)
-                                        EboundComp         = 2,
-                                        LAImod = F)                                           #  LAI max of the stand /     "LAImax", # [m2leaf/m2soil]
+climateData_path          <- paste0(mainDir,'/datasets/test_data/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
+soilParameters_path       <- paste0(mainDir,'/datasets/test_data/Soil_test_champenoux.csv')
+vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
+#standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
+        
+modeling_options      <- create.modeling.options(constantClimate=T)                      # <-- indicate  modeling options 
+simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,     # <-- indicate here simulation parameters
+                                                             endYearSimulation=1990,
+                                                             mainDir=mainDir,
+                                                             outputFileName='test')
 
-# load climate data -------------------------------------------------------
-climate_data <- readClimateData(general_params)
-# Load soil parameters ---------------------------------------------------------
-soil_params <- createSoilParams(general_params,depths = c(0.373333 ,0.746666,1.119))  #  here is peculiar case to match with SUREAU.C version 
-# load vegetation parameters ---------------------------------------------------
-veg_params  <- createVegParams(general_params)
 
-# run SUREAU -------------------------------------------------------------------
-tic('running sureau')
-WB_MAIN(climate_data = climate_data,general_params = general_params, soil_params = soil_params,veg_params = veg_params)
-toc()
+### Create input files and run SurEau-Ecos--------------------------------------
+climate_data <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
+stand_parameters <- create.stand.parameters(LAImax=6, lat=48.73, lon=6.23)
+soil_parameters <- create.soil.parameters(filePath=soilParameters_path,depths = c(0.373333 ,0.746666,1.119)) 
+vegetation_parameters <- create.vegetation.parameters(filePath =vegetationParameters_path, stand_parameters = stand_parameters, modeling_options = modeling_options)
 
-#profvis({WB_MAIN(climate_data = climate_data,general_params = general_params, soil_params = soil_params,veg_params = veg_params)})
+run.SurEauR(modeling_options = modeling_options ,
+        simulation_parameters = simulation_parameters, 
+       climate_data =climate_data,
+       stand_parameters =stand_parameters, 
+       soil_parameters = soil_parameters,
+       vegetation_parameters=vegetation_parameters)
 
-# running time : tstep : 2 (22.34s) 13/04/2021 : initial version from FP and NM (before changes in output and all) 
-# running time : tstep : 2  / with new version for output added by JR (14/04/2021) : 5.59s s
 
-# warnings()
- filename  = paste0("../Results_model/Champenoux_tests_climat_cst.csv");
- DATA = fread(filename)
- DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+# for analyses 
+  filename  = paste0(mainDir,"/Results_model/.csv")
+  DATA = read.csv(filename,header=T, dec='.',sep="")
+  DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+  
+  plot(DATA$DD,DATA$Psi_LSym,type='l',col='red')
+  lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
+  
+  
+  
+  
 
- plot(DD,DATA$SWS1)
+# 
+#  plot(DD,DATA$SWS1)
+
+
+
+#  filename  = paste0("../Results_model/Champenoux_tests_climat_cst.csv");
+#  DATA = fread(filename)
+#  DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+# 
+#  plot(DD,DATA$SWS1)
  
  
+
+
+
  
  # datmax=max(DATA$Time)
 # datmin=min(DATA$Time)
@@ -74,7 +88,7 @@ toc()
 #   quartz()
 #   plot(DATA$Psi_LSym, type='l', ylim=c(-5,0), col=1, lty=1, main=paste("time step =",tstep, "h"), ylab="Psi", xlab="time")
 #   #lines(DATA$Psi_LApo_temp, type='l', col=adjustcolor(2, 4), lty=2)
-#   
+# 
 #   #lines(DATA$Psi_LSym, type='l', col=adjustcolor(2, 0.4), lty=2)
 #   lines(DATA$Psi_TApo, type='l', col=adjustcolor(3, 0.8))
 #   #lines(DATA$Psi_TSym~DATA$Time, type='l', ylim=c(-8,0), col=4, lty=2)
@@ -82,16 +96,16 @@ toc()
 #   lines(DATA$PsiSoil1, col="brown", type='l')
 #   lines(DATA$PsiSoil2, col="brown", type='l')
 #   lines(DATA$PsiSoil3, col="brown", type='l')
-#   
-#   
-#   
+# 
+# 
+# 
 #   quartz()
 #   plot(DATA$Psi_LApo[1:24], type='l', ylim=c(-3,0), col=1, lty=1, main=paste("time step =",tstep, "h"), ylab="Psi", xlab="time")
 #   lines(DATA$Psi_LSym[1:24], type='l', col=adjustcolor(2, 0.7))
 #   quartz()
 #   plot(DATA$Psi_TApo[1:24], type='l', ylim=c(-3,0), col=1, lty=1, main=paste("time step =",tstep, "h"), ylab="Psi", xlab="time")
 #   lines(DATA$Psi_TSym[1:24], type='l', col=adjustcolor(2, 0.7))
-#   
+# 
 #   quartz()
 #   plot(DATA$gs_lim [1:24], type='l', col=1, lty=1, main=paste("time step =",tstep, "h"), ylab="Psi", xlab="time")
 #   lines(DATA$gcanopy_lim [1:24], type='l', col=adjustcolor(2, 0.7))
@@ -114,7 +128,7 @@ toc()
 #   #plot(DATA$Diag_nwhile_cavit~DATA$Time,   type='b', ylab="", ylim=c(1,5))
 #   #plot(DATA$Diag_deltaRegulMax~DATA$Time,   type='b', ylab="deltaRegulMax", ylim=c(0,0.25))
 #   #plot(DATA$Diag_deltaPLCMax~DATA$Time,   type='b', ylab="deltaPLCMax(%)", ylim=c(0,1))
-#   
+# 
 #   #itmin=24/tstep*20+1;itmax=24/tstep*24
 #   itmin=24/tstep*30+1;itmax=24/tstep*34
 #   #itmin=24/tstep*0+1;itmax=24/tstep*4
@@ -125,7 +139,7 @@ toc()
 #   lines(DATA$Psi_AllSoil[itmin:itmax]~DATA$Time[itmin:itmax], col=5, type='l', yaxt="n", ylab="", lwd=2)
 #   text(x=DATA$Time[20], y=-4, paste("Survie=",DD, "days"), cex=0.7)
 #   #text(x=DATA$Time[250], y=-5, paste("C_Apo,T_Symp, No Cavit"), cex=1)
-#   
+# 
 #   #plot(DATA$Diag_nwhile_cavit[1:itmax]~DATA$Time[1:itmax],   type='b', ylab="", ylim=c(1,5))
 #   plot(DATA$Diag_timeStepInHours[1:itmax]~DATA$Time[1:itmax],   type='b', ylab="time step (h)",log="y")
 #   #plot(DATA$Diag_deltaRegulMax[itmin:itmax]~DATA$Time[itmin:itmax],   type='b', ylab="deltaRegulMax", ylim=c(0,0.25))

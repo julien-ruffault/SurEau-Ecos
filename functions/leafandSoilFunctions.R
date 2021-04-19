@@ -12,23 +12,44 @@
 
 # RWCs symplastic relative water content:=(RWC ??? af)/(100-af)
 
-# Turgor pressure
-Pturg.Comp <- function(PiFT, Esymp, Rstemp) {
-  A <- -PiFT - Esymp * Rstemp
-  return(A)
-}
+# # Turgor pressure
+# Pturg.Comp <- function(PiFT, Esymp, Rstemp) {
+#   A <- -PiFT - Esymp * Rstemp
+#   return(A)
+# }
+# 
+# # Osmotic potential
+# Osmo.Comp <- function(PiFT, Rstemp) {
+#   A <- PiFT / (1 - Rstemp)
+#   return(A)
+# }
+# 
+# # Total potential
+# PsiTotal.Comp <- function(PiFT, Esymp, Rstemp) {
+#   A <- Comp.Pturg(PiFT = PiFT, Esymp = Esymp, Rstemp = Rstemp) + Comp.Osmo(PiFT = PiFT, Rstemp = Rstemp)
+#   return(A)
+# }
 
-# Osmotic potential
-Osmo.Comp <- function(PiFT, Rstemp) {
-  A <- PiFT / (1 - Rstemp)
-  return(A)
-}
 
-# Total potential
-PsiTotal.Comp <- function(PiFT, Esymp, Rstemp) {
-  A <- Comp.Pturg(PiFT = PiFT, Esymp = Esymp, Rstemp = Rstemp) + Comp.Osmo(PiFT = PiFT, Rstemp = Rstemp)
-  return(A)
-}
+#------
+# P.volume.comp <- function(G, ApFrac, Emax, Nhours = 10, LA, LMA = F, LFMC = F) {
+#   # xylem.volume.comp computes the volume of xylem in the plant.
+#   # Occupied by water this volume contributes to the stream flow when water potential decrease cause cavitation
+#   # G is ratio of daily transpired over storage water
+#   # We use the apoplasmic fraction to compute xylem volume
+# 
+#   Emaxday <- Emax * LA * Nhours * 3600 * 18 / 1000 / 1000
+# 
+# 
+#   if (LMA & LFMC) {
+#     LWS <- LMA * LA * LFMC / 1000 # Leaf water storage (g)
+# 
+#     G <- Emaxday / LWS # G for the Leaf compartment
+#   }
+# 
+#   return(Emaxday * G * ApFrac)
+# }
+#
 
 # compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
 Rs.Comp <- function(PiFT, Esymp, Pmin) {
@@ -36,25 +57,7 @@ Rs.Comp <- function(PiFT, Esymp, Pmin) {
   return(A)
 }
 
-#------
-P.volume.comp <- function(G, ApFrac, Emax, Nhours = 10, LA, LMA = F, LFMC = F) {
-  # xylem.volume.comp computes the volume of xylem in the plant.
-  # Occupied by water this volume contributes to the stream flow when water potential decrease cause cavitation
-  # G is ratio of daily transpired over storage water
-  # We use the apoplasmic fraction to compute xylem volume
 
-  Emaxday <- Emax * LA * Nhours * 3600 * 18 / 1000 / 1000
-
-
-  if (LMA & LFMC) {
-    LWS <- LMA * LA * LFMC / 1000 # Leaf water storage (g)
-
-    G <- Emaxday / LWS # G for the Leaf compartment
-  }
-
-  return(Emaxday * G * ApFrac)
-}
-#
 
 
 #----------------------------------------------------------------------------
@@ -70,12 +73,12 @@ P.volume.comp <- function(G, ApFrac, Emax, Nhours = 10, LA, LMA = F, LFMC = F) {
 # So far there is only 2 resistances consider : soil and plant. In the future several resitances can be implemented.
 #---
 
-updateKwithCavitation<- function(Kinit, PLC){
-  if(PLC<0 | PLC>1){warning("PLC non compris entre 0 et 1");print(PLC)}
-  # Plant Conductance
-  K=Kinit * (1 - PLC)
-  return(K)
-}
+# updateKwithCavitation<- function(Kinit, PLC){
+#   if(PLC<0 | PLC>1){warning("PLC non compris entre 0 et 1");print(PLC)}
+#   # Plant Conductance
+#   K=Kinit * (1 - PLC)
+#   return(K)
+# }
 
 # Ktotal.comp <- function(...) {  # A Recoder si utile
 #   if (Kplant > 0) {
@@ -173,209 +176,183 @@ E.Empiric.comp <- function(Emax = Emax, Tpress = Tpress, TpRESSUREMax = TpRESSUR
   # Ajout d'une r?gulation empirique
 }
 
-#----------------------------------------------------------------------------
-#-------------------------         SOIL         ----------------------------
-#----------------------------------------------------------------------------
-# Functions and parameter for Soil water content and conductance
-# Also computes soil parameters based on soil texture, depth, stone content & according to different models
-#----------------------------------------------------------------------------
-
-# K at saturation Ksat (mol/m/s/Mpa)
-# REW
-REW.Comp <- function(WR = WR, SV = SV, TetaWilt = TetaWilt, TetaSat = TetaSat) {
-
-  # TetaAct (????, unitless): Actual relative water content or -- according to Van Genutchen formulaiton-- water content at matric potential ??,
-  # TetaWilt (??r, unitless): relative water content at wilting point or -- residual water content -- usually fitted to measured data.
-  # TetaSat (??s, unitless): relative water content at saturation -- usually taken as the measured total porosity (i.e. the water content at a matric potential of 0)
-  # WR (kg/m?? or mm) :  Water Reserve ( in Kg or mm, from water budget module)
-  # SV (m3): Soil Volume cvomputable from soil paramters such as depth, stone fraction...
-
-  # Soil water holding capacity
-  RelSWHC <- TetaSat - TetaWilt
-
-  # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
-  TetaAct <- WR / SV / 1000
-
-  return(max(0, (TetaAct - TetaWilt) / RelSWHC))
-}
-
-# Psoil
-Psoil.Comp <- function(REW = REW, alfa = alfa, n = n, psie, SWStemp, tsc, b_camp, method = "VG") {
-
-  #---------------------------------------------------------------------------------------------------------------------------
-  # DESCRIPTION
-  # Psoil.comp() permit to compute soil matrix water potential from soil water content and a set of soil parameters according
-  # to the formulation from Van Genuchten 1980
-  # (later I'll include another formalation from Campbell et al 1985)
-  #---------------------------------------------------------------------------------------------------------------------------
-
-  #---------------------------------------------------------------------------------------------------------------------------
-  # PARAMETERS
-  # alfa (unitless): shape paramter (0.015 in Sur_eau)
-  # n (unitless): shape paramter (1.253 in Sur_eau)
-  # m (unitless): shape parameter usually computed from n as m=(1-1/n)
-  #---------------------------------------------------------------------------------------------------------------------------
-
-  #---------------------------------------------------------------------------------------------------------------------------
-  # Computes basics required parameters
-  #---------------------------------------------------------------------------------------------------------------------------
-
-  #---------------------------------------------------------------------------------------------------------------------------
-  # Computation of soil water potential, from Van Genuchten 1980
-  if (method == "VG") {
-    m <- (1 - 1 / n)
-    return((
-      -1 * ((((1 / REW)^(1 / m)) - 1)^(1 / n)) / alfa / 10000
-    ))
-  }
-  #---------------------------------------------------------------------------------------------------------------------------
-
-  #-----------------------------------------  
-  # Campbell
-  if (method == "Camp") {
-    return(psie * ((SWStemp / tsc)^-b_camp))
-  } # A ajouter...
-  #-----------------------------------------  
-}
-
-
-# Teta
-
-
-
-TetaPsi.comp    <- function(TetaWilt = TetaWilt, TetaSat = TetaSat, Psoil = Psoil, alfa = alfa, n = n) {
-  m <- (1 - 1 / n)
-  teta <- TetaWilt + ((TetaSat - TetaWilt) / ((1 + abs(alfa * Psoil)^n)^m))
-  return(teta)
-}
-
-computePsi.WBsoil <- function(method) {
-  # compute soil matrix water potential from soil water contents
-  # formulation from Van Genuchten 1980 or Campebell
-
-  # PARAMETERS Van Genuchten
-  # alfa (unitless): shape paramter (0.015 in Sur_eau)
-  # n (unitless): shape paramter (1.253 in Sur_eau)
-  # m (unitless): shape parameter usually computed from n as m=(1-1/n)
-  # thethaSC :  Soil watr content at staturation
-  # thetaRes :  Residual soil Water content
-  # PARAMETERS Campbell
-  #  pise    : air entry potential
-  # thethaSC : Soil watr content at saaturation
-  # b_camp   : shape parameter of the campbel equation
-
-  # Computation of soil water potential, from Van Genuchten 1980
-  if (method == "VG") {
-    TotalAvailWater <- (tsc - twp)
-    ActualAvailWater <- (SWS - twp)
-    REW <- max(0.000000001, ActualAvailWater / TotalAvailWater)
-    m <- (1 - 1 / n)
-    Psoil <- -1 * ((((1 / REW)^(1 / m)) - 1)^(1 / n)) / alfa / 10000
-  }
-  #-----------------------------------------  
-  # Campbell
-  if (method == "Camp") {
-    Psoil <- -1 * (psie * ((SWS / tsc)^-b_camp))
-  }
-return(Psoil)  
-}
-  
-compute.KSoil   <- function(method)  {
-  # compute soil conductance from soil water content 
-
-  # Compute soil conductivity (mmol/m/s/MPa)
-  # Soil Ks (mmol/m/s/MPa) computed from Ksat and the conductance factor (cond fac)
-  # CondFac upscaling factors at the rhizophere with roots dimensions
-  # CondFac depends on b (root radius) r (distance between roots) and La (root length per area)
-  # Generic conductance factor for upsacling conductivity to rhizophere (gardner cowan 1960 model)
-
-  CondFac <- 1000 * La * 2 * 3.14 / log(b / r) # Soil Ks (mmol/m/s/MPa)
-  Ks <- Ksat * CondFac
-  # Compute soil hydraulic conductivity with Van Genuchten
-  if (method == "VG") {
-    TotalAvailWater <- (tsc - twp)
-    ActualAvailWater <- (SWS - twp)
-    REW <- max(0.000000001, ActualAvailWater / TotalAvailWater)
-    m <- (1 - 1 / n)
-    ksoil <- REW^(I) * (1 - (1 - REW^(1 / m))^m)^2
-  }
-  # Compute soil hydraulic conductivity with campbell
-  if (method == "Camp") {
-    ksoil <- (SWS / tsc)^(b_camp * 2 + 2)
-  }
-  # Compute Rhizosphere conductance
-  Ksoil <- Ks * ksoil
-
-return(Ksoil)
-}
-
-
-
+# #----------------------------------------------------------------------------
+# #-------------------------         SOIL         ----------------------------
+# #----------------------------------------------------------------------------
+# # Functions and parameter for Soil water content and conductance
+# # Also computes soil parameters based on soil texture, depth, stone content & according to different models
+# #----------------------------------------------------------------------------
 # 
-# calculate_ET_Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0.036) {
+# # K at saturation Ksat (mol/m/s/Mpa)
+# # REW
+# # REW.Comp <- function(WR = WR, SV = SV, TetaWilt = TetaWilt, TetaSat = TetaSat) {
+# # 
+# #   # TetaAct (????, unitless): Actual relative water content or -- according to Van Genutchen formulaiton-- water content at matric potential ??,
+# #   # TetaWilt (??r, unitless): relative water content at wilting point or -- residual water content -- usually fitted to measured data.
+# #   # TetaSat (??s, unitless): relative water content at saturation -- usually taken as the measured total porosity (i.e. the water content at a matric potential of 0)
+# #   # WR (kg/m?? or mm) :  Water Reserve ( in Kg or mm, from water budget module)
+# #   # SV (m3): Soil Volume cvomputable from soil paramters such as depth, stone fraction...
+# # 
+# #   # Soil water holding capacity
+# #   RelSWHC <- TetaSat - TetaWilt
+# # 
+# #   # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
+# #   TetaAct <- WR / SV / 1000
+# # 
+# #   return(max(0, (TetaAct - TetaWilt) / RelSWHC))
+# # }
+# 
+# 
+# 
+# # Psoil
+# Psoil.Comp <- function(REW = REW, alfa = alfa, n = n, psie, SWStemp, tsc, b_camp, method = "VG") {
+# 
+#   #---------------------------------------------------------------------------------------------------------------------------
+#   # DESCRIPTION
+#   # Psoil.comp() permit to compute soil matrix water potential from soil water content and a set of soil parameters according
+#   # to the formulation from Van Genuchten 1980
+#   # (later I'll include another formalation from Campbell et al 1985)
+#   #---------------------------------------------------------------------------------------------------------------------------
+# 
+#   #---------------------------------------------------------------------------------------------------------------------------
+#   # PARAMETERS
+#   # alfa (unitless): shape paramter (0.015 in Sur_eau)
+#   # n (unitless): shape paramter (1.253 in Sur_eau)
+#   # m (unitless): shape parameter usually computed from n as m=(1-1/n)
+#   #---------------------------------------------------------------------------------------------------------------------------
+# 
+#   #---------------------------------------------------------------------------------------------------------------------------
+#   # Computes basics required parameters
+#   #---------------------------------------------------------------------------------------------------------------------------
+# 
+#   #---------------------------------------------------------------------------------------------------------------------------
+#   # Computation of soil water potential, from Van Genuchten 1980
+#   if (method == "VG") {
+#     m <- (1 - 1 / n)
+#     return((
+#       -1 * ((((1 / REW)^(1 / m)) - 1)^(1 / n)) / alfa / 10000
+#     ))
+#   }
+#   #---------------------------------------------------------------------------------------------------------------------------
+# 
+#   #-----------------------------------------  
+#   # Campbell
+#   if (method == "Camp") {
+#     return(psie * ((SWStemp / tsc)^-b_camp))
+#   } # A ajouter...
+#   #-----------------------------------------  
+# }
+# 
+# 
+# # Teta
+# TetaPsi.comp    <- function(TetaWilt = TetaWilt, TetaSat = TetaSat, Psoil = Psoil, alfa = alfa, n = n) {
+#   m <- (1 - 1 / n)
+#   teta <- TetaWilt + ((TetaSat - TetaWilt) / ((1 + abs(alfa * Psoil)^n)^m))
+#   return(teta)
+# }
+
+# computePsi.WBsoil <- function(method) {
+#   # compute soil matrix water potential from soil water contents
+#   # formulation from Van Genuchten 1980 or Campebell
+# 
+#   # PARAMETERS Van Genuchten
+#   # alfa (unitless): shape paramter (0.015 in Sur_eau)
+#   # n (unitless): shape paramter (1.253 in Sur_eau)
+#   # m (unitless): shape parameter usually computed from n as m=(1-1/n)
+#   # thethaSC :  Soil watr content at staturation
+#   # thetaRes :  Residual soil Water content
+#   # PARAMETERS Campbell
+#   #  pise    : air entry potential
+#   # thethaSC : Soil watr content at saaturation
+#   # b_camp   : shape parameter of the campbel equation
+# 
+#   # Computation of soil water potential, from Van Genuchten 1980
+#   if (method == "VG") {
+#     TotalAvailWater <- (tsc - twp)
+#     ActualAvailWater <- (SWS - twp)
+#     REW <- max(0.000000001, ActualAvailWater / TotalAvailWater)
+#     m <- (1 - 1 / n)
+#     Psoil <- -1 * ((((1 / REW)^(1 / m)) - 1)^(1 / n)) / alfa / 10000
+#   }
+#   #-----------------------------------------  
+#   # Campbell
+#   if (method == "Camp") {
+#     Psoil <- -1 * (psie * ((SWS / tsc)^-b_camp))
+#   }
+# return(Psoil)  
+# }# computePsi.WBsoil <- function(method) {
+#   # compute soil matrix water potential from soil water contents
+#   # formulation from Van Genuchten 1980 or Campebell
+# 
+#   # PARAMETERS Van Genuchten
+#   # alfa (unitless): shape paramter (0.015 in Sur_eau)
+#   # n (unitless): shape paramter (1.253 in Sur_eau)
+#   # m (unitless): shape parameter usually computed from n as m=(1-1/n)
+#   # thethaSC :  Soil watr content at staturation
+#   # thetaRes :  Residual soil Water content
+#   # PARAMETERS Campbell
+#   #  pise    : air entry potential
+#   # thethaSC : Soil watr content at saaturation
+#   # b_camp   : shape parameter of the campbel equation
+# 
+#   # Computation of soil water potential, from Van Genuchten 1980
+#   if (method == "VG") {
+#     TotalAvailWater <- (tsc - twp)
+#     ActualAvailWater <- (SWS - twp)
+#     REW <- max(0.000000001, ActualAvailWater / TotalAvailWater)
+#     m <- (1 - 1 / n)
+#     Psoil <- -1 * ((((1 / REW)^(1 / m)) - 1)^(1 / n)) / alfa / 10000
+#   }
+#   #-----------------------------------------  
+#   # Campbell
+#   if (method == "Camp") {
+#     Psoil <- -1 * (psie * ((SWS / tsc)^-b_camp))
+#   }
+# return(Psoil)  
+# }
+  
+# compute.KSoil   <- function(method)  {
+#   # compute soil conductance from soil water content 
+# 
+#   # Compute soil conductivity (mmol/m/s/MPa)
+#   # Soil Ks (mmol/m/s/MPa) computed from Ksat and the conductance factor (cond fac)
+#   # CondFac upscaling factors at the rhizophere with roots dimensions
+#   # CondFac depends on b (root radius) r (distance between roots) and La (root length per area)
+#   # Generic conductance factor for upsacling conductivity to rhizophere (gardner cowan 1960 model)
+# 
+#   CondFac <- 1000 * La * 2 * 3.14 / log(b / r) # Soil Ks (mmol/m/s/MPa)
+#   Ks <- Ksat * CondFac
+#   # Compute soil hydraulic conductivity with Van Genuchten
+#   if (method == "VG") {
+#     TotalAvailWater <- (tsc - twp)
+#     ActualAvailWater <- (SWS - twp)
+#     REW <- max(0.000000001, ActualAvailWater / TotalAvailWater)
+#     m <- (1 - 1 / n)
+#     ksoil <- REW^(I) * (1 - (1 - REW^(1 / m))^m)^2
+#   }
+#   # Compute soil hydraulic conductivity with campbell
+#   if (method == "Camp") {
+#     ksoil <- (SWS / tsc)^(b_camp * 2 + 2)
+#   }
+#   # Compute Rhizosphere conductance
+#   Ksoil <- Ks * ksoil
+# 
+# return(Ksoil)
+# }
+
+# calculate_ET_Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
 #   ET_Granier <- pmax(0, ETP * (a * LAI^2 + b * LAI + c))
 #   return(ET_Granier)
 # }
 
 
-calculate_ET_Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
-  ET_Granier <- pmax(0, ETP * (a * LAI^2 + b * LAI + c))
-  return(ET_Granier)
-}
 
 
 
-#' calcul_gmin
-#'
-#' @param temperatureLeaf 
-#' @param gmin_20 
-#' @param TPhase 
-#' @param Q10_1 
-#' @param Q10_2 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-#' 
-calcul_gmin <- function(temperatureLeaf, gmin_20,TPhase, Q10_1, Q10_2) {
-  
-  # Martin-StPaul N, Ruffault J, Pimont F
-  # calculate minimum conductance from formulae by  Cochard (2019)
-  # ATTENTION : VOIR POUR MUTLIPER gminn par 2 en fonction de la signifcationn de gmin_20 (Par LAI (surface projeté), ou par surface totale (les deux faces des feuilles)
-  #warning("Indiquer les unités")
-  #warning("VOIR POUR MUTLIPER gmin par 2 en fonction de la signifcationn de gmin_20")
-  # Tleaf_A  / Tleaf tmeparature (in degC)
-  # TP       / Temperature for phase transition of gmin
-  # Q10_1    /  Q10 values for gcuti = f(T) below Tphase
-  # Q10_2    / Q10 values for gcuti = f(T) below  Tphase
-  
-  if (temperatureLeaf<= TPhase) {
-    gmin <- gmin_20 *Q10_1^((temperatureLeaf - 20) / 10)
-  } else if (temperatureLeaf> TPhase) {
-    gmin <- gmin_20 *Q10_1^((TPhase - 20) / 10) * Q10_2^((temperatureLeaf- TPhase) / 10)
-  }
-  return(gmin)
-}
 
 
-calcul_Emin         <- function(gmin,vpd, air_temperature, relative_humidity, air_pressure) {
-  # calculate minimal 
-  # if vpd is not provided it is calculated from Air_Temperature and Relative humidity
-  # Air_Temperature              : Air temperature (degC)
-  # Relative_Humidity            : Relative humidity of the air (%)
-  # Air_Pressure (optionnal)     : Air_pressure (Pa)
-  if (is.missing(vpd)) {
-    if (missing(air_pressure)) {
-      air_presssure <- 101325
-    }
-    vpd <- compute.VPDfromRHandT(relative_humidity = relative_humidity, temperature = Air_temperature, air_pressure = air_pressure)
-  }
-  # calculate E_min
-  E_min <- g_min * vpd / 100 # mmol/m2/s
-  
-  return(E_min)
-}
+
+
 
 #// convert flux in mm to mol/m2/s : x(mm) , timestep(hours) ,LAI(m2/m2)
 ConvertFluxFrom_mm_To_mmolm2s <- function(x, timeStep, LAI) {
@@ -391,7 +368,6 @@ ConvertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
   y <- x * (LAI * timeStep * 3600 * 18) / 10^6
   return(y)
 }
-
 
 calculate_gs_Jarvis <- function(PAR, Tleaf, option=1, gsMax = 200, Ca = 400, gsNight = 20, JarvisPAR = 0.006, Tgs_sens=17, Tgs_optim=25)
 {
@@ -413,7 +389,6 @@ calculate_gs_Jarvis <- function(PAR, Tleaf, option=1, gsMax = 200, Ca = 400, gsN
   #print(gs_Jarvis)
   return(gs_Jarvis)
 }
-
 
 calculate_ET_Gs <- function(VPD, windSpeed, gmin, gs, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
 {
@@ -450,11 +425,26 @@ calculate_ET_Gs <- function(VPD, windSpeed, gmin, gs, gCrown0=45, gBL, PsiStartC
   return(c(E0, Eprime, gs_Bound, gs_lim, g_crown, gcanopy_bound, gcanopy_lim))
 }
 
-
+# utilities 
+convert.FtoV <- function(x, .rock_fragment_content, .layer_thickness) {
+  # . rockfragmentcontent (%)
+  # .layer_thickness (m)
+  # x :  (cm3.cm3.).
+  # y : (mm)
+  
+  y <- x * (1 - (.rock_fragment_content / 100)) * .layer_thickness * 1000
+  
+  return(y)
+}
 
 #Function to sum in series 2 k
-#kseriesum<-function(k1,k2) {return((k1*k2)/(k1+k2))}
 kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
+
+
+
+
+
+
 
 
 
