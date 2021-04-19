@@ -43,8 +43,8 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation=1990, 
 
 ### Create input files and run SurEau-Ecos--------------------------------------
 climate_data <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
-stand_parameters <- create.stand.parameters(LAImax=6, lat=48.73, lon=6.23)
-soil_parameters <- create.soil.parameters(filePath=soilParameters_path,depths = c(0.373333 ,0.746666,1.119)) 
+stand_parameters <- create.stand.parameters(LAImax=6, lat = 48.73, lon=6.23)
+soil_parameters <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
 vegetation_parameters <- create.vegetation.parameters(filePath =vegetationParameters_path, stand_parameters = stand_parameters, modeling_options = modeling_options)
 
 run.SurEauR(modeling_options = modeling_options ,

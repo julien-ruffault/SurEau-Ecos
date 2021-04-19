@@ -1,5 +1,16 @@
 
 
+#' create a list with soil parameters to run SureauR
+#'
+#' @param filePath 
+#' @param depths 
+#' @param default_soil 
+#' @param method 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil = F, method = "vg"){
   
    # note : warning("if run on puechabon : add an Offset  on psisoil (-0.3) to match observations --> / modify  in function 'computeSoilConductanceAndPsi.WBsoil'  ") 
@@ -153,7 +164,6 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     
     .soilParams$b <- 1 / sqrt(pi * .soilParams$Lv)
     .soilParams$B_GC <- .soilParams$La * 2 * 3.14 / (log(.soilParams$b / .soilParams$r)) # B du modele de Gardnar-Cowen
-    .soilParams$Ks <- .soilParams$Ksat_vg * .soilParams$B_GC
     
     
     #

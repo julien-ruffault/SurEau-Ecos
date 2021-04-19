@@ -10,8 +10,7 @@
 # - RHair_mean : mean relative humidity of the day (%)
 # - WS_mean    : mean wind speed of the day (m/s)
 
-
-#' Create a climate data.frame that can be used as an input in run_SurEau-Ecos.
+#' Create a climate data.frame to run SureauR
 #' read input climate data /selec the desired period and put it in the right
 #' format to run SurEau_Ecos Also check data consistency and input variables
 #' according to modeling_options and simulation parameters created in
@@ -26,10 +25,9 @@
 #'
 #' @examples
 #' # create the list of modeling options
-#' create_SurEau_modeling_options()
+#' create.modeling.options()
 #' # create  the list of simulation parameters
-#' create_Sureau_simulation_parameters(startYearSimulation = 1990, endYearSimulation = 1990)
-#' 
+#' create.simulation.parameters(startYearSimulation = 1990, endYearSimulation = 1990)
 create.climate.data <- function(filePath,modeling_options,simulation_parameters)
 {
   # Read file if it exists, error otherwise

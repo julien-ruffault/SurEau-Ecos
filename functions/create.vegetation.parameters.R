@@ -2,11 +2,11 @@
 # create list with all species parameters from configuration file
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-#' Title
+#' create a list wit the vegetation parameters to run SureauR
 #'
-#' @param filePath 
-#' @param stand_parameters 
-#' @param modeling_options 
+#' @param filePath path to a csv file containing parameter values (add a link for details) 
+#' @param stand_parameters  a list containing stand parameters created with \code{create.stand.parameters} 
+#' @param modeling_options  a list containing modeling options created with \code{create.modeling.options} 
 #'
 #' @return
 #' @export

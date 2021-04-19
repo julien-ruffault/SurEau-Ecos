@@ -1,17 +1,11 @@
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-# Authors : Julien Ruffault (julien.ruff@gmail.com)
-#       date   : 12/03/2021 (V0) / minor update  09/04/2021
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-# functions to load stand parameters for SurEau-Ecos
-
 #' create stand parameters to run SureauR 
 #'
-#' @param file 
-#' @param LAImax 
-#' @param lat 
-#' @param lon 
-#'
+#' @param file a path to a csv file with the input parameters (see details for how to format this file in help 
+#' @param LAImax a numerical value indicating the maximum leaf area index of the stand (m2/m2) 
+#' @param lat a numerical value indicating the latitude of the stand 
+#' @param lon a numerical value indicating the longitude of the stand 
 #' @return
+#' a list with stand parameters that can be used as in input in \code{run.SureauR}
 #' @export
 #'
 #' @examples

@@ -204,8 +204,7 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
   }
   # Compute soil hydraulic conductivity with campbell
   if (WBsoil$params$method == "camp") {
-    condFac <- 1000 * WBsoil$params$La * 2 * 3.14 / log(WBsoil$params$b / WBsoil$params$r) # Soil Ks (mmol/m/s/MPa)
-    Ks <- WBsoil$params$Ksat_camp * condFac
+    Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC
     kSoil <- (WBsoil$SoilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
     PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$SoilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
     REW <- NA

@@ -1,22 +1,16 @@
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Authors : <Julien Ruffault (julien.ruff@gmail.com)>
-#           <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
-#           <Francois Pimont (francois.pimont@inrae.fr)>
-# Date    : V0 (17/06/2020, JR)
-#           V1 (21/12/2020, JR) // general cleaning //  update code for the choice of the temporal resolution
-#           V2 (20/01/2021, JR) // V2.1 (running version)
-#           V3 (16/04/2021, JR) // update outoput managmement
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-
-# Main function for Sureau_Ecos
-# INPUTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-#   - simulation_parameters :  simulation parameters for Sureau-Ecos
-#   - modeling_options      :  modeling options for SurEau-Ecos
-#   - climate_data          :  climate data created by
-#   - stand_parameters      :  stand parameters for SurEau-Ecos
-#   - soil_parameters       :  soil parameters for SurEau-Ecos
-#   - vegetation_parameters :  vegetation parameters for SurEau-Ecos
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+#' Main function to run SureauR
+#'
+#' @param modeling_options a list with modeling options created by  \code{create.modeling.options}
+#' @param simulation_parameters a list with simulation parameters created by  \code{create.simulation_parameters}
+#' @param climate_data a data.frame with the input climate data created by  \code{create.climate.data}
+#' @param soil_parameters a list with soil parameters created by  \code{create.soil.parameters}
+#' @param vegetation_parameters a list with stand parameters created by  \code{create.vegetation/parameters}
+#' @param stand_parameters a list with stand parameters created by  \code{create.stand.parameters}
+#'
+#' @return
+#' @export
+#'
+#' @examples
 
 run.SurEauR <- function(modeling_options, simulation_parameters, climate_data,soil_parameters, vegetation_parameters, stand_parameters) { # start loop on years
   
