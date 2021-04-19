@@ -9,14 +9,17 @@
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # notes (JR, 18/04/2021)
-#  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting 
+# Remove DSStore files from github 
+#  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting  --> Julien 
+#  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
-#  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405)
+#  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
 # - voir pour le parameter WBveg$TBA et gminT--W move as a parameters ? 
 # -  gCrown0=45 #TODO gCrown0 hardcoded (WBveg)
 # - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
 #  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
 #  Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ?? 
+#  voir pour implmenter avoidSoilTransfertBetweenSoilLayers 
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment

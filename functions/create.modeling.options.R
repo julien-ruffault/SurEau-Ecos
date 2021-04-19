@@ -3,13 +3,13 @@
 #'
 #' @param timeStepForEvapo a numerical value (1,2,3,4 or 8) indicating the time
 #'   step for the main evapotranspiration loop (in hours). Should be one of the
-#'   following (default =1)
+#'   following (default = 1)
 #' @param resetSWC a logical value indicating whether soil layers should be
 #'   refilled at the beginning of each year of the simulation (default=F)
 #' @param avoidWaterSoilTransfer a logical value indicating whether the transfer of water between soil layers should be avoided by disconnecting the soil layers that get refilled from the soil-plant system (default =F)
 #' @param ETPFormulation  the formulation of ETP to be used, either 'PT' (Priestley-Taylor) or 'PM' (penmman). Default is 'PT'(Priestley Taylor)
-#' @param RnFormulation the method to be used to calculate net radiation from global radiation 
-#' @param constantClimate  a logical value indicating whether the c
+#' @param RnFormulation the method to be used to calculate net radiation from global radiation
+#' @param constantClimate  a logical value indicating whether the climate should be considered constant or not (default = F)
 #' @param compOptionsForEvapo the option to be used for ... (voir avec Francois) 
 #'
 #' @return
