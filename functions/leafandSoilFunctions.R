@@ -101,17 +101,16 @@ PLCPrime.comp <- function(PLC , slope) {
 }
 
 # Percent loss of conductance based on vulnerability curevs
+# PsiCompVC <- function(plcset, slope, b) {
+#   # return the Psi for a given PLC and VC parameters
+#   # a parameter of the VC
+#   # b abs(P50)
+#   a <- slope / 25
+# 
+#   (log((1 / plcset) - 1) - a * b) / a
+# }
 
-PsiCompVC <- function(plcset, slope, b) {
-  # return the Psi for a given PLC and VC parameters
-  # a parameter of the VC
-  # b abs(P50)
-  a <- slope / 25
-
-  (log((1 / plcset) - 1) - a * b) / a
-}
-
-Pmin.Comp <- function(Psoil = Psoil, Ktotal = Ktotal, E = E) {
+#Pmin.Comp <- function(Psoil = Psoil, Ktotal = Ktotal, E = E) {
   if (Ktotal > 0) {
     Pmin <- Psoil - E / (Ktotal)
   } else {
@@ -123,58 +122,58 @@ Pmin.Comp <- function(Psoil = Psoil, Ktotal = Ktotal, E = E) {
 
 # Minimum water potential
 
-Ecrit.Turg.comp <- function(Emax = Emax, Tpress = Tpress, TpRESSUREMax = TpRESSUREMax, Ecuti = Ecuti) {
-  # EcritT is a function that computes transpiration if stomatal closure is limited (linearly) by turgor pressure
-  # It returns the amount of transpiration in mmol/s/m?? assuming
-
-  # Parameters:
-  # Emax
-  # Tpress: turgor pressure
-  # TpRESSUREMax: : Maximum turgor pressure
-  # Ecuti: residual transpiration
-  Tr <- min(Emax * Tpress / TpRESSUREMax, Emax)
-  return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax)))
-}
+# Ecrit.Turg.comp <- function(Emax = Emax, Tpress = Tpress, TpRESSUREMax = TpRESSUREMax, Ecuti = Ecuti) {
+#   # EcritT is a function that computes transpiration if stomatal closure is limited (linearly) by turgor pressure
+#   # It returns the amount of transpiration in mmol/s/m?? assuming
+# 
+#   # Parameters:
+#   # Emax
+#   # Tpress: turgor pressure
+#   # TpRESSUREMax: : Maximum turgor pressure
+#   # Ecuti: residual transpiration
+#   Tr <- min(Emax * Tpress / TpRESSUREMax, Emax)
+#   return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax)))
+# }
 # EcritT is a function that computes transpiration if stomatal closure is limited (linearly) by turgor pressure
 # It returns the amount of transpiration in mmol/s/m?? assuming
 
-Ecrit.Cav.comp <- function(Ktotal = Ktotal, Psoil = Psoil, Pset = Pset, Ecrit.saf = Ecrit.saf, Emax = Emax, Ecuti = Ecuti) {
-  # EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
-  # it returns the amount a transpiration in mmol/s/m?? assuming
+# Ecrit.Cav.comp <- function(Ktotal = Ktotal, Psoil = Psoil, Pset = Pset, Ecrit.saf = Ecrit.saf, Emax = Emax, Ecuti = Ecuti) {
+#   # EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
+#   # it returns the amount a transpiration in mmol/s/m?? assuming
+# 
+# 
+#   # Parameters:
+#   # Ktotal
+#   # Psoil
+#   # Pset
+#   # Ecrit.saf
+#   # Emax
+#   # Ecuti
+#   Tr <- min((Ktotal) * (Psoil - Pset) * (1 - Ecrit.saf), Emax)
+#   return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax), Tr))
+# }
+# # EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
+# # it returns the amount a transpiration in mmol/s/m?? assuming
+# 
+# Ecrit.Cav.comp2 <- function(Ktotal = Ktotal, Psoil = Psoil, Pset = Pset, Ecrit.saf = Ecrit.saf, Emax = Emax, Ecuti = Ecuti) {
+#   # EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
+#   # It returns the amount a transpiration in mmol/s/m?? assuming
+# 
+#   # Parameters:
+#   # Ktotal
+#   # Psoil
+#   # Pset
+#   # Ecrit.saf
+#   # Emax
+#   # Ecuti
+#   Tr <- min((Ktotal) * (Psoil - Pmin) * (1 - Ecrit.saf), Emax)
+#   return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax), Tr))
+# }
 
 
-  # Parameters:
-  # Ktotal
-  # Psoil
-  # Pset
-  # Ecrit.saf
-  # Emax
-  # Ecuti
-  Tr <- min((Ktotal) * (Psoil - Pset) * (1 - Ecrit.saf), Emax)
-  return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax), Tr))
-}
-# EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
-# it returns the amount a transpiration in mmol/s/m?? assuming
-
-Ecrit.Cav.comp2 <- function(Ktotal = Ktotal, Psoil = Psoil, Pset = Pset, Ecrit.saf = Ecrit.saf, Emax = Emax, Ecuti = Ecuti) {
-  # EcritCav is a function that computes transpiration if stomatal closure adjusts in order to avoid Pmin<pcav
-  # It returns the amount a transpiration in mmol/s/m?? assuming
-
-  # Parameters:
-  # Ktotal
-  # Psoil
-  # Pset
-  # Ecrit.saf
-  # Emax
-  # Ecuti
-  Tr <- min((Ktotal) * (Psoil - Pmin) * (1 - Ecrit.saf), Emax)
-  return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax), Tr))
-}
-
-
-E.Empiric.comp <- function(Emax = Emax, Tpress = Tpress, TpRESSUREMax = TpRESSUREMax, Ecuti = Ecuti) {
-  # Ajout d'une r?gulation empirique
-}
+# E.Empiric.comp <- function(Emax = Emax, Tpress = Tpress, TpRESSUREMax = TpRESSUREMax, Ecuti = Ecuti) {
+#   # Ajout d'une r?gulation empirique
+# }
 
 # #----------------------------------------------------------------------------
 # #-------------------------         SOIL         ----------------------------

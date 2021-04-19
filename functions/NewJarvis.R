@@ -20,9 +20,6 @@ calculate_gs_Jarvis <- function(PAR,Tleaf, option=1,gsMax =200, Ca=400,gsNight=2
   return(gs_Jarvis)
 }
 
-
-
-
 calculate_ET_Jarvis <- function(VPD, PAR, windSpeed, gsMax =100, gsNight=20, JarvisPAR = 0.006, gCrown0=45,gBL)
 {
   if(windSpeed<0.1){windSeed <- 0.1}
@@ -33,27 +30,25 @@ calculate_ET_Jarvis <- function(VPD, PAR, windSpeed, gsMax =100, gsNight=20, Jar
   return(Ebound)
 }
 
-
-
-VPD=WBclim$VPD
-PAR=WBclim$PAR
-windSpeed=WBclim$WS
-gBL
-PsiStartClosing=WBveg$params$PsiStartClosing
-PsiClose=WBveg$params$PsiClose
-Psi=PsiCanopy0
-gmin=    WBveg$gmin
-
-gs_Jarvis=calculate_gs_Jarvis(VPD, PAR, gsMax =100, gsNight=20, JarvisPAR = 0.006)
+# VPD=WBclim$VPD
+# PAR=WBclim$PAR
+# windSpeed=WBclim$WS
+# gBL
+# PsiStartClosing=WBveg$params$PsiStartClosing
+# PsiClose=WBveg$params$PsiClose
+# Psi=PsiCanopy0
+# gmin=    WBveg$gmin
+# 
+# gs_Jarvis=calculate_gs_Jarvis(VPD, PAR, gsMax =100, gsNight=20, JarvisPAR = 0.006)
 
 calculate_gs_Jarvis <- function(VPD, PAR, windSpeed, gsMax =100, gsNight=20, JarvisPAR = 0.006, gCrown0=45){
   gs_Jarvis =   gsNight + (gsMax-gsNight)*(1-exp(-JarvisPAR*PAR))
   return(gs_Jarvis)
 }
 
-
-calculate_ET_Jarvis(VPD,PAR,windSpeed, gmin, gs=gs_Jarvis, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
-
+# 
+# calculate_ET_Jarvis(VPD,PAR,windSpeed, gmin, gs=gs_Jarvis, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
+# 
 calculate_ET_Gs <- function(VPD, PAR, windSpeed, gmin, gs=gs_Jarvis, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
 {
  

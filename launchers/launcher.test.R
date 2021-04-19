@@ -15,6 +15,8 @@
 # - voir pour le parameter WBveg$TBA et gminT--W move as a parameters ? 
 # -  gCrown0=45 #TODO gCrown0 hardcoded (WBveg)
 # - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
+#  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
+#  Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ?? 
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
@@ -31,11 +33,10 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
         
 modeling_options      <- create.modeling.options(constantClimate=T)                      # <-- indicate  modeling options 
-simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,     # <-- indicate here simulation parameters
+simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,          # <-- indicate here simulation parameters
                                                              endYearSimulation=1990,
                                                              mainDir=mainDir,
                                                              outputFileName='test')
-
 
 ### Create input files and run SurEau-Ecos--------------------------------------
 climate_data <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
@@ -59,8 +60,7 @@ run.SurEauR(modeling_options = modeling_options ,
   plot(DATA$DD,DATA$Psi_LSym,type='l',col='red')
   lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
   
-  
-  
+
   
 
 # 

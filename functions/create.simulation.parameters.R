@@ -82,8 +82,6 @@ create.simulation.parameters <- function(mainDir,
 
 
   
-  
-  
   if (missing(startYearSimulation) & missing(timeDateSimulation)) {
     stop("'startYearSimulation' and 'refDateSimulation' are missing, at least one of the two must be entered.")
   }

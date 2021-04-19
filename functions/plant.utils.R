@@ -1,4 +1,23 @@
 
+
+# compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
+Rs.Comp <- function(PiFT, Esymp, Pmin) {
+  A <- max((-1 * (Pmin + PiFT - Esymp) - sqrt((Pmin + PiFT - Esymp)^2 + 4 * (Pmin * Esymp))) / (2 * Esymp), 1 - PiFT / Pmin)
+  return(A)
+}
+
+# Total Conductance = Soil Conductance & Plant COnductance
+PLC.comp <- function(Pmin, slope , P50) {
+  PLC  = 100 / (1 + exp(slope / 25 * (Pmin - P50)))
+  return(PLC)
+}
+
+# This function computes PLCPrime from PLC current value
+PLCPrime.comp <- function(PLC , slope) {
+  return(- slope/25 * PLC/100 * (1 - PLC/100))
+}
+
+
 calcul.gmin <- function(temperatureLeaf, gmin_20,TPhase, Q10_1, Q10_2) {
   
   # Martin-StPaul N, Ruffault J, Pimont F
