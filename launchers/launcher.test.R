@@ -9,25 +9,30 @@
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # notes (JR, 18/04/2021)
-# -  Creer un script de diagnostic avec un 'output diagnostic' et un fichier reference de test + un script de comparaison et de plot du diag 
+# -  un script de comparaison et de plot de la simulation reference 
 # - Remove DSStore files from github (Ju)
-#  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting  --> Julien 
 #  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
 #  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
-# - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
-#  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
-#  Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ?? 
-#  voir pour implmenter avoidSoilTransfertBetweenSoilLayers 
-#  Voir avec Nico pour proposer les variables à ajouter à simple_subdaily puis faire deux scripts de test. Un premier qui utilise les sorties du test.launcher pour compiler des graphics 
-#  Ajouter l'effet de la cavitation sur le LAI (leaf shedding) 
-# dans params changer l'intiatilisation des capacitances dans params en capacitance specifique 
-# Ajouter une option pour la defoliation avec Psi_LSym
-# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy a 0 
+#  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
+
+
+# Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ??  -->Julien 
+# voir pour implmenter avoidSoilTransfertBetweenSoilLayers 
 # Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
-# Changer le temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
-# faire un output diagnostic pour genere un diagnostic complet des variables (presque complet)
-# faire un browser(in ...atnp1) pour voir si changement dans les objet WBveg, WBvegtemp, WBveg_n et WBveg_n1
+# Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
+
+ # sur le TEST 
+# LAI leaf shedding --> pheno + changement conductance + option 
+# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy 
+# Revoir initialisation du sol 
+
+
+# ENSUITE : 
+# faire tourner avec climat non constantet autre vegetation 
+
+
+
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
@@ -50,7 +55,7 @@ modeling_options  <- create.modeling.options(constantClimate=T,
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
-                                                      outputType = 'diagnostic_subdaily_temp',
+                                                      outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -72,13 +77,32 @@ run.SurEauR(modeling_options = modeling_options ,
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
   
-  plot(DATA$DD,DATA$Psi_LSym,type='l',col='red',ylim=c(-8,0))
-  lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
+  plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
+  lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
+  
+  lines(DATA$DD,DATA$Psi_TSym,type='l',col='blue',ylim=c(-8,0))
+  lines(DATA$DD,DATA$Psi_TApo,type='l',col='lightblue')
+  
+  lines(DATA$DD,DATA$Psi_AllSoil,type='l',lwd=2)
+  
+  
+  
+  # plot des conductances 
+  plot(DATA$DD,DATA$k_Root1,type='l',ylim=c(0,4),lwd=1.5)
+  lines(DATA$DD,DATA$k_Root2,col='green',lwd=1.5)
+  lines(DATA$DD,DATA$k_Root3,col='red',lwd=1.5)
+  lines(DATA$DD,DATA$k_TL,col='blue',lwd=1.5)
+  lines(DATA$DD,DATA$k_LSym,col='pink',lwd=1.5)
+  lines(DATA$DD,DATA$k_TSym,col='grey30',lwd=1.5)
 
+  plot(DATA$kSoil1)
+  plot(DATA$DD,DATA$PLC_Root)  
+  lines(DATA$DD,DATA$PLC_TL)
 
   
   
-
+  
+  
 #  filename  = paste0("../Results_model/Champenoux_tests_climat_cst.csv");
 #  DATA = fread(filename)
 #  DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")

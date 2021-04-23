@@ -24,7 +24,8 @@ modeling_options  <- create.modeling.options(constantClimate=T,
 simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                         # <-- indicate here simulation parameters
                                                       endYearSimulation=1990,
                                                       mainDir=mainDir,
-                                                      outputType='diagnostic_subdaily_temp',       
+                                                      outputType='diagnostic_subdaily',
+                                                      overWrite=F,
                                                       outputPath=output_path)
 
 ### Create input files and run SurEau-Ecos--------------------------------------
