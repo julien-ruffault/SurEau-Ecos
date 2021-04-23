@@ -1,4 +1,5 @@
 #load functions and libraries for SurEau-Ecos 
+#Should be deleted for packaging 
 
 # Required libraries----------------------------------------------------------
 library(insol)

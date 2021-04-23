@@ -69,7 +69,7 @@ create.simulation.parameters <- function(mainDir,
     if (!is.character(outputFileName)) {
       stop(paste0("`fileNameInfo' must be character not ", typeof(fileNameInfo), "."))
     }
-    simulation_parameters$OutputFileName <- outputFileName
+    simulation_parameters$outputFileName <- outputFileName
   } else {
     stop("'outputFileName' is missing with no default value ")
   }

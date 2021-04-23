@@ -20,13 +20,21 @@
 #  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
 #  Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ?? 
 #  voir pour implmenter avoidSoilTransfertBetweenSoilLayers 
+#  Voir avec Nico pour proposer les variables à ajouter à simple_subdaily puis faire deux scripts de test. Un premier qui utilise les sorties du test.launcher pour compiler des graphics 
+#  Ajouter l'effet de la cavitation sur le LAI (leaf shedding) 
+# dans params changer l'intiatilisation des capacitances dans params en capacitance specifique 
+# Ajouter une option pour la defoliation avec Psi_LSym
+# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy a 0 
+# Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
+# voir comment est calculé gminT (pour l'instant set to 0 dans new.WBveg)
+# Changer le temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
 gc()            # Clear memory
 
 
-# User Parametrization ---------------------------------------------------------
+# User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                              # do not modify 
 
@@ -35,8 +43,9 @@ soilParameters_path       <- paste0(mainDir,'/datasets/test_data/Soil_test_champ
 vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
         
-modeling_options      <- create.modeling.options(constantClimate=T)                      # <-- indicate  modeling options 
-simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,          # <-- indicate here simulation parameters
+modeling_options      <- create.modeling.options(constantClimate=T,
+                                                 stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
+simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                         # <-- indicate here simulation parameters
                                                              endYearSimulation=1990,
                                                              mainDir=mainDir,
                                                              outputFileName='test')
@@ -56,14 +65,12 @@ run.SurEauR(modeling_options = modeling_options ,
 
 
 # for analyses / 
-  filename  = paste0(mainDir,"/Results_model/.csv")
+  filename  = paste0(mainDir,"/Results_model/test.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
   
-  plot(DATA$DD,DATA$Psi_LSym,type='l',col='red')
+  plot(DATA$DD,DATA$Psi_LSym,type='l',col='red',ylim=c(-8,0))
   lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
-  
-
 
 #  plot(DD,DATA$SWS1)
 

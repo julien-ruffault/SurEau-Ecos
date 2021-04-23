@@ -67,40 +67,40 @@
 # 
 
 
-ComputeCapaSymp <- function(Q_LSym_sat_mmol, PiFullTurgor, EpsilonSymp, Psi)
-{
-  
-  PsiTlp <- PiFullTurgor*EpsilonSymp/(PiFullTurgor+EpsilonSymp)
-  dbxmin = 1e-100 # NM minimal double to avoid-INF
-  Psi=Psi-dbxmin
-  Rs1 <- (-1 * (Psi + PiFullTurgor - EpsilonSymp) - sqrt((Psi + PiFullTurgor - EpsilonSymp)^2 + 4 * (Psi * EpsilonSymp))) / (2 * EpsilonSymp)
-  Rs2 <- 1 - PiFullTurgor / Psi
-  
-  Rs1[Rs1<Rs2]<-Rs2[Rs1<Rs2]
-  #plot((1-Rs1)~x)
-  
-  RWC_LSym <- 1 - Rs1 # Relative water content (unitless)
-  #----Compute the derivative of the relative water content of the symplasm----
-  RWC_LSym_prime1 = RWC_LSym/(-PiFullTurgor- Psi- EpsilonSymp+2*EpsilonSymp*RWC_LSym)
-  RWC_LSym_prime2 = -(PiFullTurgor)/Psi^2
-  #Compute the leaf capacitance (mmol/MPa/m2_sol)
-  RWC_LSym_prime1[Psi<PsiTlp]<-RWC_LSym_prime2[Psi<PsiTlp]
-  
-  C_LSym <- Q_LSym_sat_mmol*RWC_LSym_prime1
-  return(list("C_LSym"=C_LSym, "RWC_LSym_prime1"=RWC_LSym_prime1,"RWC_LSym"=RWC_LSym))
-  
-}
-
-
-ComputeCapaSymp(Q_LSym_sat_mmol=10000, PiFullTurgor=-2, EpsilonSymp=8, Psi=-1)
-
-x=seq(0,-6, -0.1)
-CapaSym=ComputeCapaSymp(Q_LSym_sat_mmol=10000, PiFullTurgor=-2, EpsilonSymp=10, Psi=x)
-quartz()
-par(las=1, tck=0.01, mar=c(4.1,4.1,4.1,4.1))
-plot(CapaSym$C_LSym~x, type='b', ylab="Capa_Symp (mmol/m2/s/MPa)")
-par(new=T, las=1, tck=0.01)
-plot(CapaSym$RWC_LSym~x, type='l', lwd=2, col=2, ylab="", yaxt="n")
-axis(4, col=2, col.axis=2)
-mtext("RWC", 4, line=1.5, col=2, adj=0.5)
-?mtext
+# ComputeCapaSymp <- function(Q_LSym_sat_mmol, PiFullTurgor, EpsilonSymp, Psi)
+# {
+#   
+#   PsiTlp <- PiFullTurgor*EpsilonSymp/(PiFullTurgor+EpsilonSymp)
+#   dbxmin = 1e-100 # NM minimal double to avoid-INF
+#   Psi=Psi-dbxmin
+#   Rs1 <- (-1 * (Psi + PiFullTurgor - EpsilonSymp) - sqrt((Psi + PiFullTurgor - EpsilonSymp)^2 + 4 * (Psi * EpsilonSymp))) / (2 * EpsilonSymp)
+#   Rs2 <- 1 - PiFullTurgor / Psi
+#   
+#   Rs1[Rs1<Rs2]<-Rs2[Rs1<Rs2]
+#   #plot((1-Rs1)~x)
+#   
+#   RWC_LSym <- 1 - Rs1 # Relative water content (unitless)
+#   #----Compute the derivative of the relative water content of the symplasm----
+#   RWC_LSym_prime1 = RWC_LSym/(-PiFullTurgor- Psi- EpsilonSymp+2*EpsilonSymp*RWC_LSym)
+#   RWC_LSym_prime2 = -(PiFullTurgor)/Psi^2
+#   #Compute the leaf capacitance (mmol/MPa/m2_sol)
+#   RWC_LSym_prime1[Psi<PsiTlp]<-RWC_LSym_prime2[Psi<PsiTlp]
+#   
+#   C_LSym <- Q_LSym_sat_mmol*RWC_LSym_prime1
+#   return(list("C_LSym"=C_LSym, "RWC_LSym_prime1"=RWC_LSym_prime1,"RWC_LSym"=RWC_LSym))
+#   
+# # }
+# 
+# 
+# ComputeCapaSymp(Q_LSym_sat_mmol=10000, PiFullTurgor=-2, EpsilonSymp=8, Psi=-1)
+# 
+# x=seq(0,-6, -0.1)
+# CapaSym=ComputeCapaSymp(Q_LSym_sat_mmol=10000, PiFullTurgor=-2, EpsilonSymp=10, Psi=x)
+# quartz()
+# par(las=1, tck=0.01, mar=c(4.1,4.1,4.1,4.1))
+# plot(CapaSym$C_LSym~x, type='b', ylab="Capa_Symp (mmol/m2/s/MPa)")
+# par(new=T, las=1, tck=0.01)
+# plot(CapaSym$RWC_LSym~x, type='l', lwd=2, col=2, ylab="", yaxt="n")
+# axis(4, col=2, col.axis=2)
+# mtext("RWC", 4, line=1.5, col=2, adj=0.5)
+# ?mtext

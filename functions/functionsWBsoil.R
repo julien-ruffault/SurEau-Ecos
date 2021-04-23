@@ -4,9 +4,9 @@ new.WBsoil <- function(soil_params, initialisation = "Full") {
   WBsoil$params <- soil_params # add parameters 
 
   if (initialisation == "Full") {
-    WBsoil$SoilWaterStock <- soil_params$V_field_capacity
+    WBsoil$soilWaterStock <- soil_params$V_field_capacity
   }
-  WBsoil$SoilWaterStock <- soil_params$V_field_capacity
+  WBsoil$soilWaterStock <- soil_params$V_field_capacity
   WBsoil$PsiSoil <- numeric(3)
   WBsoil$kSoil <- numeric(3)
   WBsoil$REW <- numeric(3)
@@ -26,19 +26,19 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
  
   gamma  = WBsoil$params$gamma * Nhours/24
   
-  Wdef <- max((WBsoil$params$V_field_capacity[1] - WBsoil$SoilWaterStock[1]), 0) # water deficit first layer
+  Wdef <- max((WBsoil$params$V_field_capacity[1] - WBsoil$soilWaterStock[1]), 0) # water deficit first layer
   tfict <- (Wdef / gamma)^2
   enumax <- gamma*((sqrt(tfict + 1)) - (sqrt(tfict)))
   etpnu <- ETP * exp(-K * LAI)
   evsonu <- min(enumax, etpnu)
-  evsonu <- min(evsonu, WBsoil$SoilWaterStock[1])
+  evsonu <- min(evsonu, WBsoil$soilWaterStock[1])
   evsonuPL <- evsonu * WBsoil$params$Fact_Rich
 
 
   # Update soil parameters
   for (nl in 1:3)
   {
-    WBsoil$SoilWaterStock[nl] <- WBsoil$SoilWaterStock[nl] - (evsonuPL[nl])
+    WBsoil$soilWaterStock[nl] <- WBsoil$soilWaterStock[nl] - (evsonuPL[nl])
   }
 
   WBsoil$Evaporation <- evsonuPL
@@ -82,7 +82,7 @@ compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil=20, Nhours, gSoil0 
   #print(paste0('E_Soil3=',E_Soil3))
   
   WBsoil$EvaporationSum <- sum(WBsoil$Evaporation)  
-  WBsoil$SoilWaterStock[1] <- WBsoil$SoilWaterStock[1] - WBsoil$Evaporation
+  WBsoil$soilWaterStock[1] <- WBsoil$soilWaterStock[1] - WBsoil$Evaporation
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
 
 return(WBsoil)  
@@ -95,7 +95,7 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
   # initialising variables
   #--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
-  LALA <- WBsoil # SoilWaterStock/potential/Drainage
+  LALA <- WBsoil # soilWaterStock/potential/Drainage
 
   # Output
 
@@ -109,38 +109,38 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
   Dsurc <- numeric(1) # drainage du à l'infiltration immediate
 
   #--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-  # Updata SoilWaterStocks in the three soil layer  (before precipitation)
+  # Updata soilWaterStocks in the three soil layer  (before precipitation)
   #--- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
 
   # ecoulement entre la première et la deuxième couche
-  if (LALA$SoilWaterStock[1] > LALA$params$V_field_capacity[1]) {
-    transfert[1] <- cstinfil * (LALA$SoilWaterStock[1] - LALA$params$V_field_capacity[1])
+  if (LALA$soilWaterStock[1] > LALA$params$V_field_capacity[1]) {
+    transfert[1] <- cstinfil * (LALA$soilWaterStock[1] - LALA$params$V_field_capacity[1])
   } else {
     transfert[1] <- 0
   }
 
-  SWStemp[1] <- LALA$SoilWaterStock[1] - transfert[1]
-  LALA$SoilWaterStock[2] <- LALA$SoilWaterStock[2] + transfert[1]
+  SWStemp[1] <- LALA$soilWaterStock[1] - transfert[1]
+  LALA$soilWaterStock[2] <- LALA$soilWaterStock[2] + transfert[1]
 
 
   # ecoulement entre la deuxième et la troisième couche
-  if (LALA$SoilWaterStock[2] > LALA$params$V_field_capacity[2]) {
-    transfert[2] <- cstinfil * (LALA$SoilWaterStock[2] - LALA$params$V_field_capacity[2])
+  if (LALA$soilWaterStock[2] > LALA$params$V_field_capacity[2]) {
+    transfert[2] <- cstinfil * (LALA$soilWaterStock[2] - LALA$params$V_field_capacity[2])
   } else {
     transfert[2] <- 0
   }
 
-  SWStemp[2] <- LALA$SoilWaterStock[2] - transfert[2]
-  LALA$SoilWaterStock[3] <- LALA$SoilWaterStock[3] + transfert[2]
+  SWStemp[2] <- LALA$soilWaterStock[2] - transfert[2]
+  LALA$soilWaterStock[3] <- LALA$soilWaterStock[3] + transfert[2]
 
   # drainage profond (Decoul)
-  if (LALA$SoilWaterStock[3] > LALA$params$V_field_capacity[3]) {
-    transfert[3] <- cstinfil * (LALA$SoilWaterStock[3] - LALA$params$V_field_capacity[3])
+  if (LALA$soilWaterStock[3] > LALA$params$V_field_capacity[3]) {
+    transfert[3] <- cstinfil * (LALA$soilWaterStock[3] - LALA$params$V_field_capacity[3])
   } else {
     transfert[3] <- 0
   }
 
-  SWStemp[3] <- LALA$SoilWaterStock[3] - transfert[3]
+  SWStemp[3] <- LALA$soilWaterStock[3] - transfert[3]
   Decoul <- transfert[3]
 
   # Updating water stocks (after precipitation)
@@ -173,7 +173,7 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
 
   # Drainage
   LALA$Drainage <- Decoul + Dsurc
-  LALA$SoilWaterStock <- SWST1
+  LALA$soilWaterStock <- SWST1
 
   LALA <- compute.soilConductanceAndPsi.WBsoil(LALA)
 
@@ -189,7 +189,7 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
     totalavailwater <- (WBsoil$params$V_saturation_capacity_vg - WBsoil$params$V_residual_capacity_vg)
 
     # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
-    actualavailwater <- (WBsoil$SoilWaterStock - WBsoil$params$V_residual_capacity_vg)
+    actualavailwater <- (WBsoil$soilWaterStock - WBsoil$params$V_residual_capacity_vg)
 
     REW <- actualavailwater / totalavailwater  #/ numeric [ncouches
     REW[REW <= 0.001] <- 0.001
@@ -205,8 +205,8 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
   # Compute soil hydraulic conductivity with campbell
   if (WBsoil$params$method == "camp") {
     Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC
-    kSoil <- (WBsoil$SoilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
-    PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$SoilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
+    kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
+    PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
     REW <- NA
   }
 
@@ -220,11 +220,11 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
 
 # Update soil water reservoirs, potential and psi according to fluxes
 update.soilWater.WBsoil <- function(WBsoil, fluxEvap, fluxRelease) {
-  WBsoil$SoilWaterStock <- WBsoil$SoilWaterStock - fluxEvap
-  WBsoil$SoilWaterStock[1] <- WBsoil$SoilWaterStock[1] + fluxRelease # release occur in 1st soil layer only
+  WBsoil$soilWaterStock <- WBsoil$soilWaterStock - fluxEvap
+  WBsoil$soilWaterStock[1] <- WBsoil$soilWaterStock[1] + fluxRelease # release occur in 1st soil layer only
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
 
-  WBsoil$REWt =(sum(WBsoil$SoilWaterStock-WBsoil$params$V_residual_capacity_vg)) / (sum(WBsoil$params$V_saturation_capacity_vg -WBsoil$params$V_residual_capacity_vg))
+  WBsoil$REWt =(sum(WBsoil$soilWaterStock-WBsoil$params$V_residual_capacity_vg)) / (sum(WBsoil$params$V_saturation_capacity_vg -WBsoil$params$V_residual_capacity_vg))
   
   
   return(WBsoil)
@@ -233,7 +233,7 @@ update.soilWater.WBsoil <- function(WBsoil, fluxEvap, fluxRelease) {
 # set soil water content to its field capacity 
 set.SWCtoFieldCapacity.WBsoil <- function(WBsoil)
 {
-  WBsoil$SoilWaterStock <- WBsoil$params$V_field_capacity
+  WBsoil$soilWaterStock <- WBsoil$params$V_field_capacity
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
   return(WBsoil)
 }

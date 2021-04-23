@@ -4,19 +4,17 @@ kSoilToCollar2;WBveg;kSoilToCollar;2
 kSoilToCollar3;WBveg;kSoilToCollar;3
 kAllSoilToCollar;WBveg;kAllSoilToCollar;1
 KAllSoilToCanopy;WBveg;KAllSoilToCanopy;1
-kAboveGround;WBveg;kAboveGround;1
-kBelowGround;WBveg;kBelowGround;1
 kRoot1;WBveg;kRoot;1
 kRoot2;WBveg;kRoot;2
 kRoot3;WBveg;kRoot;3
-K_LSym;WBveg;K_LSym;1
-K_TSym;WBveg;K_TSym;1
+k_LSym;WBveg;k_LSym;1
+k_TSym;WBveg;k_TSym;1
 C_LSym;WBveg;C_LSym;1
 C_TSym;WBveg;C_TSym;1
 C_LApo;WBveg;C_LApo;1
 C_TApo;WBveg;C_TApo;1
-PLCAbove;WBveg;PLCAbove;1
-PLCBelow;WBveg;PLCBelow;1
+PLC_Root;WBveg;PLC_Root;1
+PLC_TL;WBveg;PLC_TL;1
 F_L_Cav;WBveg;F_L_Cav;1
 F_T_Cav;WBveg;F_T_Cav;1
 Delta_Q_LApo_mmol_diag;WBveg;Delta_Q_LApo_mmol_diag;1
@@ -40,7 +38,7 @@ gcanopy_Bound;WBveg;gcanopy_Bound;1
 gcanopy_lim;WBveg;gcanopy_lim;1
 gBL;WBveg;gBL;1
 g_crown;WBveg;g_crown;1
-RegulFact;WBveg;RegulFact;1
+regulFact;WBveg;regulFact;1
 E0;WBveg;E0;1
 Eprime;WBveg;Eprime;1
 Emin;WBveg;Emin;1
@@ -51,14 +49,14 @@ Emin.C;WBveg;Emin.C;1
 fluxCollarToCanopy.C;WBveg;fluxCollarToCanopy.C;1
 fluxSoilToCollar.C1;WBveg;fluxSoilToCollar.C;1
 fluxSoilToCollar.C2;WBveg;fluxSoilToCollar.C;2
-fluxSoilToCollar.C1;WBveg;fluxSoilToCollar.C;3
-TotalTranspiration_mm;WBveg;TotalTranspiration_mm;1
-Tleaf;WBveg;Tleaf;1
+fluxSoilToCollar.C3;WBveg;fluxSoilToCollar.C;3
+totalTranspiration_mm;WBveg;totalTranspiration_mm;1
+leafTemperature;WBveg;leafTemperature;1
 LAI;WBveg;LAI;1
 LAIpheno;WBveg;LAIpheno;1
-CSC;WBveg;CSC;1
-pptsoil;WBveg;pptsoil;1
-QR;WBveg;QR;1
+canopyStorageCapacity ;WBveg;canopyStorageCapacity ;1
+pptSoil;WBveg;pptSCSCoil;1
+interceptedWaterAmount ;WBveg;interceptedWaterAmount ;1
 evaporationIntercepted;WBveg;evaporationIntercepted;1
 ETPr;WBveg;ETPr;1
 deadLAI;WBveg;deadLAI;1
@@ -70,9 +68,9 @@ PsiSoil3;WBsoil;PsiSoil;3
 REW1;WBsoil;REW;1
 REW2;WBsoil;REW;2
 REW3;WBsoil;REW;3
-SWS1;WBsoil;SoilWaterStock;1
-SWS2;WBsoil;SoilWaterStock;2
-SWS3;WBsoil;SoilWaterStock;3
+SWS1;WBsoil;soilWaterStock;1
+SWS2;WBsoil;soilWaterStock;2
+SWS3;WBsoil;soilWaterStock;3
 kSoil1;WBsoil;kSoil;1
 kSoil2;WBsoil;kSoil;2
 kSoil3;WBsoil;kSoil;3

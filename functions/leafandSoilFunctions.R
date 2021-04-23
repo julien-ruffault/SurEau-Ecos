@@ -368,19 +368,18 @@ ConvertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
   return(y)
 }
 
-calculate_gs_Jarvis <- function(PAR, Tleaf, option=1, gsMax = 200, Ca = 400, gsNight = 20, JarvisPAR = 0.006, Tgs_sens=17, Tgs_optim=25)
+calculate_gs_Jarvis <- function(PAR, leafTemperature, option=1, gsMax = 200, Ca = 400, gsNight = 20, JarvisPAR = 0.006, Tgs_sens=17, Tgs_optim=25)
 {
   
-
   if (option==1) # temeperature effect on gs 
   {
-    gsMax2    = max(0,gsMax/(1+((Tleaf-Tgs_optim)/Tgs_sens)^2))
-    gsNight2  = max(0,gsNight/(1+((Tleaf-Tgs_optim)/Tgs_sens)^2))
+    gsMax2    = max(0,gsMax/(1+((leafTemperature-Tgs_optim)/Tgs_sens)^2))
+    gsNight2  = max(0,gsNight/(1+((leafTemperature-Tgs_optim)/Tgs_sens)^2))
   }
   
   
   #if (option==7){
-  # gsMax2 = (gsMax*(1 + gs_CO2_sens/100*(Ca-300)/100))/(1+pow((Tleaf-Tgs_optim)/Tgs_sens,2))  # 
+  # gsMax2 = (gsMax*(1 + gs_CO2_sens/100*(Ca-300)/100))/(1+pow((leafTemperature-Tgs_optim)/Tgs_sens,2))  # 
   # gsNight2 = (gs_night* (1 + gs_CO2_sens/100*(Ca-300)/100))/(1+pow((T_Leaf-Tgs_optim)/Tgs_sens,2));
   #}
   

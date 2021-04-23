@@ -1,5 +1,4 @@
 
-
 # compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
 Rs.Comp <- function(PiFT, Esymp, Pmin) {
   A <- max((-1 * (Pmin + PiFT - Esymp) - sqrt((Pmin + PiFT - Esymp)^2 + 4 * (Pmin * Esymp))) / (2 * Esymp), 1 - PiFT / Pmin)
@@ -17,22 +16,22 @@ PLCPrime.comp <- function(PLC , slope) {
   return(- slope/25 * PLC/100 * (1 - PLC/100))
 }
 
-calcul.gmin <- function(temperatureLeaf, gmin_20,TPhase, Q10_1, Q10_2) {
+calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
   
   # Martin-StPaul N, Ruffault J, Pimont F
   # calculate minimum conductance from formulae by  Cochard (2019)
   # ATTENTION : VOIR POUR MUTLIPER gminn par 2 en fonction de la signifcationn de gmin_20 (Par LAI (surface projeté), ou par surface totale (les deux faces des feuilles)
   #warning("Indiquer les unités")
   #warning("VOIR POUR MUTLIPER gmin par 2 en fonction de la signifcationn de gmin_20")
-  # Tleaf_A  / Tleaf tmeparature (in degC)
+  # leafTemperature / Tleaf tmeparature (in degC)
   # TP       / Temperature for phase transition of gmin
   # Q10_1    /  Q10 values for gcuti = f(T) below Tphase
   # Q10_2    / Q10 values for gcuti = f(T) below  Tphase
   
-  if (temperatureLeaf<= TPhase) {
-    gmin <- gmin_20 *Q10_1^((temperatureLeaf - 20) / 10)
-  } else if (temperatureLeaf> TPhase) {
-    gmin <- gmin_20 *Q10_1^((TPhase - 20) / 10) * Q10_2^((temperatureLeaf- TPhase) / 10)
+  if (leafTemperature<= TPhase) {
+    gmin <- gmin_20 *Q10_1^((leafTemperature - 20) / 10)
+  } else if (leafTemperature> TPhase) {
+    gmin <- gmin_20 *Q10_1^((TPhase - 20) / 10) * Q10_2^((leafTemperature- TPhase) / 10)
   }
   return(gmin)
 }
@@ -75,3 +74,17 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
   
   return(FM)
 }
+
+
+
+distribute.conductances <- function(kPlantInit,Lv=c(7000,3000,3000))
+{
+  k_TLInit = 1/(0.2/kPlantInit)
+  k_LSymInit = 1/(0.4/kPlantInit)
+  k_RootInit   = 1 /( 0.4 / kPlantInit) *Lv/sum(Lv)
+  return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RootInit=k_RootInit))
+}
+
+# compute.conductanceFromConductivity()
+# {}
+

@@ -35,7 +35,7 @@ new.WBoutput <- function(simulation_parameters) {
   contingencyTable <- outputref[outputref[, 1] %in% outputvar, ]
 
   if (simulation_parameters$addInfotoFileName == T) {
-    filename <- paste0(mainDir,"/Results_model/", simulation_parameters$OutputFileName, "_Results_model_", outputVersion, "_", paste0(format(Sys.time(), "%Y-%m-%d_%H-%M"), ".csv"))
+    filename <- paste0(mainDir,"/Results_model/", simulation_parameters$outputFileName, "_Results_model_", outputVersion, "_", paste0(format(Sys.time(), "%Y-%m-%d_%H-%M"), ".csv"))
   } else {
     filename <- paste0(mainDir,"/Results_model/", simulation_parameters$outputFileName, ".csv")
   }

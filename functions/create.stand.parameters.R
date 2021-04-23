@@ -20,7 +20,7 @@ create.stand.parameters <- function(file, LAImax, lat, lon) {
     if (file.exists(file)) {
       io <- read.csv(file = file, sep = ";", head = T)
       colnames(io) <- c("Name", "Value")
-      params <- c("P50_VC", "Slope_VC", "EpsilonSymp")
+      params <- c("LAImax", "lat", "lon")
       for (i in 1:length(params))
       {
         AAA <- which(io$Name == params[i]) ## line number of the variable
