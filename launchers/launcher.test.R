@@ -9,12 +9,12 @@
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # notes (JR, 18/04/2021)
+# -  Creer un script de diagnostic avec un 'output diagnostic' et un fichier reference de test + un script de comparaison et de plot du diag 
 # - Remove DSStore files from github (Ju)
 #  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting  --> Julien 
 #  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
 #  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
-# -  gCrown0=45 #TODO gCrown0 hardcoded (WBveg)
 # - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
 #  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
 #  Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ?? 
@@ -25,7 +25,6 @@
 # Ajouter une option pour la defoliation avec Psi_LSym
 # Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy a 0 
 # Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
-# voir comment est calculé gminT (pour l'instant set to 0 dans new.WBveg)
 # Changer le temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
 # faire un output diagnostic pour genere un diagnostic complet des variables (presque complet)
 # faire un browser(in ...atnp1) pour voir si changement dans les objet WBveg, WBvegtemp, WBveg_n et WBveg_n1
@@ -43,13 +42,17 @@ climateData_path          <- paste0(mainDir,'/datasets/test_data/Climat_constant
 soilParameters_path       <- paste0(mainDir,'/datasets/test_data/Soil_test_champenoux.csv')
 vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
-        
-modeling_options      <- create.modeling.options(constantClimate=T,
+output_path               <- paste0(mainDir,'/Results_model/test.csv')        
+
+
+modeling_options  <- create.modeling.options(constantClimate=T,
                                                  stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
-simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                         # <-- indicate here simulation parameters
-                                                             endYearSimulation=1990,
-                                                             mainDir=mainDir,
-                                                             outputFileName='test')
+simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
+                                                      endYearSimulation = 1990,
+                                                      mainDir= mainDir,
+                                                      outputType = 'diagnostic_subdaily_temp',
+                                                      overWrite = T,
+                                                      outputPath = output_path)
 
 ### Create input files and run SurEau-Ecos--------------------------------------
 climate_data <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
@@ -64,11 +67,6 @@ run.SurEauR(modeling_options = modeling_options ,
        soil_parameters = soil_parameters,
        vegetation_parameters=vegetation_parameters)
 
-
-
-
-
-
 # for analyses / 
   filename  = paste0(mainDir,"/Results_model/test.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")
@@ -77,9 +75,9 @@ run.SurEauR(modeling_options = modeling_options ,
   plot(DATA$DD,DATA$Psi_LSym,type='l',col='red',ylim=c(-8,0))
   lines(DATA$DD,DATA$Psi_LApo,type='l',col='green')
 
-#  plot(DD,DATA$SWS1)
 
-
+  
+  
 
 #  filename  = paste0("../Results_model/Champenoux_tests_climat_cst.csv");
 #  DATA = fread(filename)

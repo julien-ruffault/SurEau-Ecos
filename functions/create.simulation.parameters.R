@@ -19,9 +19,9 @@ create.simulation.parameters <- function(mainDir,
                                          startYearSimulation,
                                          endYearSimulation,
                                          resolutionOutput = "subdaily",
+                                         overWrite=F,
                                          outputType,
-                                         outputFileName,
-                                         addInfotoFileName = F) {
+                                         outputPath) {
   simulation_parameters <- list()
 
   if (!missing(mainDir)) {
@@ -61,27 +61,24 @@ create.simulation.parameters <- function(mainDir,
     if (!is.character(outputType)) {
       stop(paste0("`outputType` must be character not ", typeof(outputType), "."))
     } else {
-      simulation_parameters$ouputType <- outputType
+      simulation_parameters$outputType <- outputType
     }
   }
 
-  if (!missing(outputFileName)) {
-    if (!is.character(outputFileName)) {
-      stop(paste0("`fileNameInfo' must be character not ", typeof(fileNameInfo), "."))
+  if (!missing(outputPath)) {
+    if (!is.character(outputPath)) {
+      stop(paste0("`outputPath' must be character not ", typeof(fileNameInfo), "."))
     }
-    simulation_parameters$outputFileName <- outputFileName
+    simulation_parameters$outputPath <- outputPath
   } else {
-    stop("'outputFileName' is missing with no default value ")
+    stop("'outputPath' is missing with no default value ")
   }
-
-  if (!is.logical(addInfotoFileName)) {
-    stop(" 'addTimetoFileName' must be 'T' or 'F'.")
-  }
-
-  simulation_parameters$addInfotoFileName <- addInfotoFileName
-
-
   
+  if (!is.logical(overWrite)) {
+    stop(paste0("'overWrite' must be logical not ", typeof(overWrite), "."))}
+  if(overWrite==F & file.exists(outputPath)){stop("file already exists and 'overWrite' option is set to False, change 'outputPath' or set 'overWrite' to T.")}
+  
+
   if (missing(startYearSimulation) & missing(timeDateSimulation)) {
     stop("'startYearSimulation' and 'refDateSimulation' are missing, at least one of the two must be entered.")
   }

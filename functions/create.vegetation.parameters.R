@@ -47,7 +47,8 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
     "gmin_T",
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
-    "k_TSymInit"
+    "k_TSymInit",
+    "gCrown0"
   )
   
   for (i in 1:length(params)) {

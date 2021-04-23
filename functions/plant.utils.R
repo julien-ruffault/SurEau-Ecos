@@ -18,6 +18,7 @@ PLCPrime.comp <- function(PLC , slope) {
 
 calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
   
+
   # Martin-StPaul N, Ruffault J, Pimont F
   # calculate minimum conductance from formulae by  Cochard (2019)
   # ATTENTION : VOIR POUR MUTLIPER gminn par 2 en fonction de la signifcationn de gmin_20 (Par LAI (surface projeté), ou par surface totale (les deux faces des feuilles)
@@ -84,6 +85,12 @@ distribute.conductances <- function(kPlantInit,Lv=c(7000,3000,3000))
   k_RootInit   = 1 /( 0.4 / kPlantInit) *Lv/sum(Lv)
   return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RootInit=k_RootInit))
 }
+
+
+compute.gCrown <- function(gCrown0,windSpeed){
+  return(gCrown0*windSpeed^0.6)
+  }
+
 
 # compute.conductanceFromConductivity()
 # {}

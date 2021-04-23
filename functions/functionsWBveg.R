@@ -73,12 +73,12 @@ new.WBveg <- function(veg_params) {
   WBveg$gcanopy_Bound <- NA
   WBveg$gcanopy_lim <- NA
   WBveg$gBL <- NA
-  WBveg$g_crown <- NA
+  WBveg$gCrown <- NA
   WBveg$regulFact <- 0.01 # 
   warning("why initiliazed to 1 value (JR, 22/04/2021)")
   
   # Fluxes
-  WBveg$E0 = 0
+  #WBveg$E0 = 0
   WBveg$Eprime = 0
   WBveg$Emin <- 0
   WBveg$EminT <- 0
@@ -86,7 +86,6 @@ new.WBveg <- function(veg_params) {
   WBveg$Elim <- 0
   WBveg$AET.C <- 0
   WBveg$Emin.C <- 0
-  WBveg$fluxCollarToCanopy.C <- 0
   WBveg$fluxSoilToCollar.C <- numeric(3)
   
   # LAI and LAI-dependent variables
@@ -107,7 +106,7 @@ new.WBveg <- function(veg_params) {
   
   # Cavitation
   WBveg$PLC_Root     <- 0  # percent loss of conductivity [%]/ below part of the platn
-  WBveg$PLC_TL     <- 0  # percent loss of conductivity [%] /  Above part of the plant
+  WBveg$PLC_TL       <- 0  # percent loss of conductivity [%] /  Above part of the plant
   
   # leaf temp
   WBveg$leafTemperature <- NA
@@ -152,7 +151,6 @@ new.WBveg <- function(veg_params) {
   WBveg$Delta_Q_LApo_mmol_diag <- 0
   #---------------------#
 
-  
   WBveg$PLC_TL  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_TL, P50 = WBveg$params$P50_VC_TL)
   WBveg$PLC_Root = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Root, P50 = WBveg$params$P50_VC_Root)
   
@@ -398,9 +396,9 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) 
   WBveg$gs_bound <- calculate_gs_Jarvis(PAR = WBclim$PAR, leafTemperature = WBveg$leafTemperature)
   gCrown0=45 #TODO gCrown0 hardcoded
   windSpeed = max(0.1, WBclim$WS)
-  WBveg$g_crown  = gCrown0*windSpeed^0.6
+  WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = windSpeed)
   WBveg$gBL = TGbl_Leaf[2]
-  WBveg$gcanopy_Bound  = 1/(1/WBveg$g_crown+1/WBveg$gs_bound+ 1/WBveg$gBL)
+  WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
   WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
   
   #compute current regulation
@@ -410,12 +408,12 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) 
   # canopy with current regulation 
   WBveg$gs_lim = WBveg$gs_bound * WBveg$regulFact
   WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
-  WBveg$gcanopy_lim = 1/(1/WBveg$g_crown+1/WBveg$gs_lim + 1/WBveg$gBL) # NB: gcanopy_lim =0 when gs_lim=0 (1/(1+1/0)=0 in R)
+  WBveg$gcanopy_lim = 1/(1/WBveg$gCrown+1/WBveg$gs_lim + 1/WBveg$gBL) # NB: gcanopy_lim =0 when gs_lim=0 (1/(1+1/0)=0 in R)
   WBveg$Elim = WBveg$gcanopy_lim * WBclim$VPD / 101.3   
-  WBveg$E0 = WBveg$Emin + WBveg$Elim
+  #WBveg$E0 = WBveg$Emin + WBveg$Elim
   gs_lim_prime = WBveg$gs_bound * regul$regulFactPrime
   dbxmin = 1e-100
-  WBveg$Eprime = WBveg$Elim * gs_lim_prime /(WBveg$gs_lim*(1+WBveg$gs_lim*(1/WBveg$g_crown+1/WBveg$gBL))+dbxmin)
+  WBveg$Eprime = WBveg$Elim * gs_lim_prime /(WBveg$gs_lim*(1+WBveg$gs_lim*(1/WBveg$gCrown+1/WBveg$gBL))+dbxmin)
   return(WBveg) 
 }
 

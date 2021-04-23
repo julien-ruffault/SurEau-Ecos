@@ -34,11 +34,9 @@ new.WBoutput <- function(simulation_parameters) {
 
   contingencyTable <- outputref[outputref[, 1] %in% outputvar, ]
 
-  if (simulation_parameters$addInfotoFileName == T) {
-    filename <- paste0(mainDir,"/Results_model/", simulation_parameters$outputFileName, "_Results_model_", outputVersion, "_", paste0(format(Sys.time(), "%Y-%m-%d_%H-%M"), ".csv"))
-  } else {
-    filename <- paste0(mainDir,"/Results_model/", simulation_parameters$outputFileName, ".csv")
-  }
+ 
+  filename <-  simulation_parameters$outputPath
+
 
   file.create(filename) # create file
   testcon <- file(description = filename, open = "a+b") # open connection (Kept opened while model is running)
@@ -56,7 +54,7 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
-    #print(i) #// for debugging only
+    #print(WBoutput$contingencyTable[i,]) #// for debugging only
     df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)

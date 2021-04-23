@@ -388,40 +388,40 @@ calculate_gs_Jarvis <- function(PAR, leafTemperature, option=1, gsMax = 200, Ca 
   return(gs_Jarvis)
 }
 
-calculate_ET_Gs <- function(VPD, windSpeed, gmin, gs, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
-{
-  
-  # Il faudrait remplacer :  PsiStartClosing, PsiClose & Psi Par le type de régulation de Psi
-  
-  if(windSpeed<0.1) {windSeed <- 0.1}
-  
-  gs_Bound = gs
-  gs_lim = gs * (Psi - PsiClose)/(PsiStartClosing - PsiClose)
-  g_crown = gCrown0*windSpeed^0.6
-  
-  gcanopy_bound = 1/((1/g_crown)+(1/gs_Bound) + (1/gBL))
-  gcanopy_lim = 1/((1/g_crown)+(1/gs_lim) + (1/gBL))
-  
-  if(Psi > PsiStartClosing){
-    Eprime =  0
-    E0 =   gmin*VPD/101.3  + gcanopy_bound*VPD/101.3
-    
-  } else if(Psi < PsiClose)
-  {
-    Eprime =  0
-    E0 =   gmin*VPD/101.3 
-    
-  } else if(Psi > PsiClose & Psi<PsiStartClosing)
-  {
-    
-    Eprime =  gcanopy_bound*VPD/101.3/(PsiStartClosing - PsiClose)
-    
-    E0 =  gmin*VPD/101.3 + gcanopy_lim*VPD/101.3
-    
-  }  
-  
-  return(c(E0, Eprime, gs_Bound, gs_lim, g_crown, gcanopy_bound, gcanopy_lim))
-}
+# calculate_ET_Gs <- function(VPD, windSpeed, gmin, gs, gCrown0=45, gBL, PsiStartClosing, PsiClose, Psi)
+# {
+#   
+#   # Il faudrait remplacer :  PsiStartClosing, PsiClose & Psi Par le type de régulation de Psi
+#   
+#   if(windSpeed<0.1) {windSeed <- 0.1}
+#   
+#   gs_Bound = gs
+#   gs_lim = gs * (Psi - PsiClose)/(PsiStartClosing - PsiClose)
+#   gCcrown = gCrown0*windSpeed^0.6
+#   
+#   gcanopy_bound = 1/((1/g_crown)+(1/gs_Bound) + (1/gBL))
+#   gcanopy_lim = 1/((1/g_crown)+(1/gs_lim) + (1/gBL))
+#   
+#   if(Psi > PsiStartClosing){
+#     Eprime =  0
+#     E0 =   gmin*VPD/101.3  + gcanopy_bound*VPD/101.3
+#     
+#   } else if(Psi < PsiClose)
+#   {
+#     Eprime =  0
+#     E0 =   gmin*VPD/101.3 
+#     
+#   } else if(Psi > PsiClose & Psi<PsiStartClosing)
+#   {
+#     
+#     Eprime =  gcanopy_bound*VPD/101.3/(PsiStartClosing - PsiClose)
+#     
+#     E0 =  gmin*VPD/101.3 + gcanopy_lim*VPD/101.3
+#     
+#   }  
+#   
+#   return(c(E0, Eprime, gs_Bound, gs_lim, g_crown, gcanopy_bound, gcanopy_lim))
+# }
 
 # utilities 
 convert.FtoV <- function(x, .rock_fragment_content, .layer_thickness) {
