@@ -44,7 +44,8 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
     "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
-    "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin``
+    "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
+    "gmin_T",
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
     "k_TSymInit"
   )

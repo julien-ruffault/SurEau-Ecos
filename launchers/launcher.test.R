@@ -9,12 +9,11 @@
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # notes (JR, 18/04/2021)
-# Remove DSStore files from github 
+# - Remove DSStore files from github (Ju)
 #  - avoid overwriting existing output file by checking existence first / add an option to allow overwriting  --> Julien 
 #  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
 #  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
-# - voir pour le parameter WBveg$TBA et gminT--W move as a parameters ? 
 # -  gCrown0=45 #TODO gCrown0 hardcoded (WBveg)
 # - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
 #  - rename and comment Rs.Comp PLC.Comp and PLCPrime.Comp in plant.utils
@@ -28,6 +27,8 @@
 # Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
 # voir comment est calculé gminT (pour l'instant set to 0 dans new.WBveg)
 # Changer le temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
+# faire un output diagnostic pour genere un diagnostic complet des variables (presque complet)
+# faire un browser(in ...atnp1) pour voir si changement dans les objet WBveg, WBvegtemp, WBveg_n et WBveg_n1
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
@@ -62,6 +63,10 @@ run.SurEauR(modeling_options = modeling_options ,
        stand_parameters =stand_parameters, 
        soil_parameters = soil_parameters,
        vegetation_parameters=vegetation_parameters)
+
+
+
+
 
 
 # for analyses / 

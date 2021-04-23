@@ -42,7 +42,7 @@ new.WBveg <- function(veg_params) {
   WBveg$Psi_TSym = 0 
   WBveg$Psi_LApo_cav = 0 # FP replaced "mem" by "cav" (when cavitation starts)
   WBveg$Psi_TApo_cav = 0
-  
+  WBveg$Psi_AllSoil = 0
   #----Conductance & capacitance (mmol/m2/s/MPa) Here on leaf area basis but they are to be updated as a function symplasm conductance and leaf area
   # hydraulic conductances
   WBveg$k_LSym <-  WBveg$params$k_LSymInit  # constant value during simulation   
@@ -63,7 +63,7 @@ new.WBveg <- function(veg_params) {
   
   # Leaf and canopy conductance
   WBveg$gmin <- NA #Gmin for leaves
-  WBveg$gminT <- 0 #Gmin for trunk and branches
+  WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
   
   warning("WBveg$TBA is hard coded in new.WBveg")
 
@@ -391,7 +391,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) 
   WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- WBveg$gmin * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
   #WBveg$gminTLAI <- WBveg$gminT*TBA unused
-  WBveg$EminT <- WBveg$gminT * WBveg$params$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
+  WBveg$EminT <- WBveg$gmin_T * WBveg$params$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
   WBclim$PAR  <- WBclim$PAR*10 #TODO check this !!!! A corriger dans climat
   
   # canopy with no regulation
@@ -449,6 +449,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       WBveg_np1 <- update.kplant.WBveg(WBveg_np1,WBsoil_n)
       WBveg_np1 <- update.capaSym.WBveg(WBveg_np1)
       
+      #browser()
       # QUANTITIES TO CHECK IF THE RESOLUTION IS OK
       # 1. delta regulation between n and np1
       regul_np1 = compute.regulFact(psi = WBveg_np1$Psi_LSym, params = WBveg_np1$params,regulationType=modeling_options$stomatalRegulationType)
