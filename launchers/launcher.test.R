@@ -97,6 +97,7 @@ run.SurEauR(modeling_options = modeling_options ,
   plot(DATA$C_TApo)
   plot(DATA$C_TSym)
   
+  plot(DATA$Psi_LSym,DATA$C_LSym)
   
   
   
