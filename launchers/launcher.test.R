@@ -1,36 +1,30 @@
-# ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Test Launcher to run SurEau-ECOS (V4.1) on Champenoux and compute the reference output
+# ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### #
+# Test Launcher to run SurEau-ECOS (V4.0) on Champenoux
 # Authors : <Julien Ruffault (julien.ruff@gmail.com)>
 #           <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
 #           <Francois Pimont (francois.pimont@inrae.fr)>
-# date   :  V1  : 11/01/2021    
-#           V2  : 14/04/2021 (JR) / change output management and writing .  cleaned the code
-#           V3  : 16/04/2021 (JR) / change input  parameters (major update involving creating new Script and modifying  the main program) 
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-# notes (JR, 18/04/2021)
+# -  check capacitances 
 # -  un script de comparaison et de plot de la simulation reference 
-# - Remove DSStore files from github (Ju)
 #  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
 #  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
 #  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
+#  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers 
+#  - Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
+#  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
 
-
-# Voir fonctions de Jarvis dans NewJarvis -- ne sont pas utilises /. quelle version de ces fonctions utiliser ? ??  -->Julien 
-# voir pour implmenter avoidSoilTransfertBetweenSoilLayers 
-# Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
-# Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
-
- # sur le TEST 
+# Principaux développements à faire : 
 # LAI leaf shedding --> pheno + changement conductance + option 
 # Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy 
 # Revoir initialisation du sol 
 
-
 # ENSUITE : 
-# faire tourner avec climat non constantet autre vegetation 
-
+# 1. faire tourner avec climat non constant 
+# 2. Faire tourner sur autre vegetation pour tests 
+# 3. sites fluxnet et comparaison aux données 
+# 4. essai d'inversion pour la RU 
 
 
 
@@ -95,10 +89,13 @@ run.SurEauR(modeling_options = modeling_options ,
   lines(DATA$DD,DATA$k_LSym,col='pink',lwd=1.5)
   lines(DATA$DD,DATA$k_TSym,col='grey30',lwd=1.5)
 
-  plot(DATA$kSoil1)
   plot(DATA$DD,DATA$PLC_Root)  
   lines(DATA$DD,DATA$PLC_TL)
 
+  plot(DATA$C_LSym,type='l')
+  plot(DATA$C_LApo)
+  plot(DATA$C_TApo)
+  plot(DATA$C_TSym)
   
   
   
