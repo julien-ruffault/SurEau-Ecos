@@ -28,7 +28,7 @@
 #' create.modeling.options()
 #' # create  the list of simulation parameters
 #' create.simulation.parameters(startYearSimulation = 1990, endYearSimulation = 1990)
-create.climate.data <- function(filePath,modeling_options,simulation_parameters)
+create.climate.data <- function(filePath, modeling_options, simulation_parameters)
 {
   # Read file if it exists, error otherwise
   if (file.exists(filePath)) {
@@ -49,10 +49,6 @@ create.climate.data <- function(filePath,modeling_options,simulation_parameters)
   }
   
 
- 
-  
-  
-  
   # checks NA's
   if (sum(is.na(climate_data)) > 1) {
     stop(paste0("remove NAs in file  : ", paste0("../", filePath), "' "))
@@ -97,14 +93,17 @@ create.climate.data <- function(filePath,modeling_options,simulation_parameters)
           stop("variable DATE is not in the right format in the input climate file, should be as 'dd/mm/yyyy' : e.g. '01/01/1999'")
         }
         else {
+          climate_data$DATE <- as.Date(climate_data$DATE, format = "%d/%m/%Y")
           climate_data$Doy <- yday(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
           climate_data$Day <- day(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
           climate_data$Month <- month(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
           climate_data$Year <- year(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
         }
       
-        io = match(climate_data$DATE,simulation_parameters$timeDateSimulation)
+       # io = match(climate_data$DATE, simulation_parameters$timeDateSimulation)
+        io = climate_data$DATE %in% simulation_parameters$timeDateSimulation
         climate_data = climate_data[io,]
+      #  na.omit(climate_data)
         
         } else {
         stop(paste("no variable 'DATE' in the input file!"))

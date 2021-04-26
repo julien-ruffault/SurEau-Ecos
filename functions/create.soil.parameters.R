@@ -170,6 +170,7 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
     .soilParams$V_saturation_capacity_vg <- convert.FtoV(.soilParams$saturation_capacity_vg, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
     .soilParams$V_saturation_capacity_camp <- convert.FtoV(.soilParams$saturation_capacity_camp, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
+    warning("Developer note (NM, 05/01/2021); Saturation capacity camp is not provided'")
     .soilParams$V_residual_capacity_vg <- convert.FtoV(.soilParams$residual_capacity_vg, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
     .soilParams$V_wilting_point <- convert.FtoV(.soilParams$wilting_point, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
     .soilParams$V_saturation_capacity <- .soilParams$V_saturation_capacity_vg
