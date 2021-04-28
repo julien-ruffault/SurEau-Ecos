@@ -32,7 +32,7 @@ create.climate.data <- function(filePath, modeling_options, simulation_parameter
 {
   # Read file if it exists, error otherwise
   if (file.exists(filePath)) {
-    climate_data <- read.csv(filePath, dec = ",", sep = ";", header = T, stringsAsFactors = F)
+    climate_data <- read.csv(filePath, dec = ".", sep = ";", header = T, stringsAsFactors = F)
   }else{stop(paste0("file : ", filePath), "' does not exist, check presence or spelling")}
   
   # check that the climate_data contains all necessary variables and that they are all numeric ('needccol' can be adjusted according to  modeling_options)

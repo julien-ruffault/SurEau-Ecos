@@ -14,9 +14,8 @@
 #' @examples
 create.vegetation.parameters <- function(filePath, stand_parameters, modeling_options) {
 
-   filePath= paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
   if (file.exists(filePath)) {
-    io <- read.csv(file = filePath, sep = ";", dec=',',head = T)
+    io <- read.csv(file = filePath, sep = ";", dec='.',head = T)
   } else {
     stop(paste0("Could not find input parameter file : ", filePath))
   }

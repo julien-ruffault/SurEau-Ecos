@@ -18,7 +18,7 @@ create.stand.parameters <- function(file, LAImax, lat, lon) {
   stand_params <- list()
   if (!missing(file)) {
     if (file.exists(file)) {
-      io <- read.csv(file = file, sep = ";", head = T)
+      io <- read.csv(file = file, sep = ";",dec=".", head = T)
       colnames(io) <- c("Name", "Value")
       params <- c("LAImax", "lat", "lon")
       for (i in 1:length(params))

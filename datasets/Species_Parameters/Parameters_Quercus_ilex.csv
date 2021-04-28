@@ -8,9 +8,9 @@ kPlantInit;1.2
 k_TSymInit;0.26
 gCrown0;45
 PsiStartClosing;-2
-PsiClose; -3.1
-P12_gs; -2.0
-P88_gs; -3.3
+PsiClose;-3.1
+P12_gs;-2.0
+P88_gs;-3.3
 gmin20;3
 TPhase_gmin;45
 Q10_1_gmin;1.2
@@ -28,5 +28,3 @@ K;0.5
 Tbase;5
 Fcrit;500
 PTcoeff;1.14
-DayStart;55
-nbdayLAI;21

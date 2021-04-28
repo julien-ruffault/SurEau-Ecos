@@ -3,14 +3,14 @@ new.WBoutput <- function(simulation_parameters) {
 
   # Read output files / (can be built by the user)
   if (file.exists(paste0(simulation_parameters$mainDir,"/functions/output_types/", simulation_parameters$outputType, ".csv"))) {
-    outputvar <- read.csv(paste0(simulation_parameters$mainDir,"/functions/output_types/", simulation_parameters$outputType, ".csv"), dec = ",", sep = ";", header = F, stringsAsFactors = F)
+    outputvar <- read.csv(paste0(simulation_parameters$mainDir,"/functions/output_types/", simulation_parameters$outputType, ".csv"), dec = ".", sep = ";", header = F, stringsAsFactors = F)
   } else {
     stop(paste0("ouput type: ", simulation_parameters$outputType, "' does not exist, check presence or spelling"))
   }
 
   # Read references type (saved in output_ref; note : should be modified by the developers only)
   if (file.exists(paste0(simulation_parameters$mainDir,"/functions/output_ref.csv"))) {
-    outputref <- read.table(paste0(simulation_parameters$mainDir,"/functions/output_ref.csv"), dec = ",", sep = ";", header = T, stringsAsFactors = F)
+    outputref <- read.table(paste0(simulation_parameters$mainDir,"/functions/output_ref.csv"), dec = ".", sep = ";", header = T, stringsAsFactors = F)
   } else {
     stop(paste0("Developper issue : the reference file : ", paste0(simulation_parameters$mainDir,'/functions/output_ref.csv'), "' does not exist"))
   }

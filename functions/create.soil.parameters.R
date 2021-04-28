@@ -78,7 +78,7 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     if (default_soil == F) #
     {
       if (file.exists(filePath)) {
-        io <- data.frame(read.csv(filePath,header=T,sep=';',dec=','))
+        io <- data.frame(read.csv(filePath,header=T,sep=';',dec='.'))
       } else {
         stop(paste0("Could not find input soil parameter file : ", filePath))
       }

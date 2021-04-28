@@ -5,33 +5,10 @@
 #           <Francois Pimont (francois.pimont@inrae.fr)>
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-# -  check capacitances 
-# -  un script de comparaison et de plot de la simulation reference 
-#  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
-#  - separate output parameters from simulation parameters  ?
-#  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
-#  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
-#  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers 
-#  - Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (JR)
-#  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire 
-
-# Principaux développements à faire : 
-# LAI leaf shedding --> pheno + changement conductance + option 
-# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy 
-# Revoir initialisation du sol 
-
-# ENSUITE : 
-# 1. faire tourner avec climat non constant 
-# 2. Faire tourner sur autre vegetation pour tests 
-# 3. sites fluxnet et comparaison aux données 
-# 4. essai d'inversion pour la RU 
-
-
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
 gc()            # Clear memory
-
 
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
