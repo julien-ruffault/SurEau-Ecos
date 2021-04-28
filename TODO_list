@@ -1,14 +1,13 @@
 
 # TODO list for SurEau  (mise à jout le 28/04/2021 par JR) 
 
-# -  Remplacer  le format des csv par du dec . pour tous les inputs files 
 # -  un script de comparaison et de plot de la simulation reference 
 #  - faire la lecture du time a partir du climate.data et et ne pas specifier 2 fois la commande --> Julien 
 #  - separate output parameters from simulation parameters  ?
 #  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
 #  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ? 
 #  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers 
-#  - Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (Julien)
+#  - Ajouter une gestion de conditions sur les boucles temporelles sur la base de ma version 3.3 (Julien) --> implementer une option  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options 
 #  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (julien)
 
 # Principaux développements à faire : 

@@ -14,6 +14,10 @@
 
 run.SurEauR <- function(modeling_options, simulation_parameters, climate_data,soil_parameters, vegetation_parameters, stand_parameters) { # start loop on years
   
+  if (!nargs() ==6){stop('One of several input parameters were missing')}
+  
+  
+  
   soil_var_list <- new.WBsoil(soil_parameters) #  create soil from input parameters
   veg_var_list  <- new.WBveg(vegetation_parameters) #  create vegetation from vegetation parameters
   model_output  <- new.WBoutput(simulation_parameters) #  create output file and parameters
@@ -28,7 +32,7 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data,so
       soil_var_list <- set.SWCtoFieldCapacity.WBsoil(soil_var_list)
     }
 
-    for (DAY in yday(simulation_parameters$timeDateSimulation[year(simulation_parameters$timeDateSimulation) == YEAR])) # Loop on days ####
+    for (DAY in climate_data$Doy[climate_data$Year == YEAR])# Loop on days ####
     {
       print(paste0("day=", DAY))
       

@@ -12,9 +12,10 @@ gc()            # Clear memory
 
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
-source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                              # do not modify 
+source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 
 
 climateData_path          <- paste0(mainDir,'/datasets/test_data/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
+
 soilParameters_path       <- paste0(mainDir,'/datasets/test_data/Soil_test_champenoux.csv')
 vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
@@ -31,15 +32,15 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990
                                                       outputPath = output_path)
 
 ### Create input files and run SurEau-Ecos--------------------------------------
-climate_data <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
+climate_data     <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
 stand_parameters <- create.stand.parameters(LAImax=6, lat = 48.73, lon=6.23)
-soil_parameters <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
+soil_parameters  <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
 vegetation_parameters <- create.vegetation.parameters(filePath =vegetationParameters_path, stand_parameters = stand_parameters, modeling_options = modeling_options)
 
 run.SurEauR(modeling_options = modeling_options ,
         simulation_parameters = simulation_parameters, 
-       climate_data =climate_data,
-       stand_parameters =stand_parameters, 
+       climate_data = climate_data,
+       stand_parameters = stand_parameters, 
        soil_parameters = soil_parameters,
        vegetation_parameters=vegetation_parameters)
 

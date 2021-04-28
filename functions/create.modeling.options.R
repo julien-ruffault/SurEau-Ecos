@@ -1,5 +1,5 @@
 #' Create a list containing modeling options that can be used as an input  
-#' run_SurEau_Ecos
+#' in \code{run.SurEauR} 
 #'
 #' @param timeStepForEvapo a numerical value (1,2,3,4 or 8) indicating the time
 #'   step for the main evapotranspiration loop (in hours). Should be one of the

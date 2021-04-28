@@ -1,21 +1,26 @@
 
-#' create simulation parameters for SureauR
+#' Create a list with simulation parameters to run SureauEcos. Can be used as an
+#' input in 
 #'
-#' @param mainDir 
-#' @param timeDateSimulation a vector with the dates used as reference dates for the simulation. see
-#' @param startYearSimulation a starting year for the simulation 
-#' @param endYearSimulation last year of simulation 
-#' @param resolutionOutput the resolution chosen to write variables in files 
-#' @param outputType the type of outputs that should be written. see details 
-#' @param outputFileName the name of the output file. 
-#' @param addInfotoFileName a logical value indicating whether 
+#' @param mainDir
+#' @param startYearSimulation a numeric indicating the starting year for the
+#'   simulation (must match the dates of the input climate data file)
+#' @param endYearSimulation a numeric indicating the starting year for the
+#'   simulation (must match the dates of the input climate data file)
+#' @param resolutionOutput the resolution chosen to write variables in files,
+#'   'subdaily' (default), 'daily' or 'yearly'.
+#' @param outputType the output variables of the model that should be written in
+#'   the output model file.
+#' @param outputPath the path of  output result file.
+#' @param overWrite a logical value (T or F) indicating whether the output
+#'   result file can be overwritten if it already exists (default = F)
 #'
 #' @return
 #' @export
 #'
 #' @examples
+#' create.simulation.parameters(StartYearSimulation = 1990, EndYearSimulation  =1990  )
 create.simulation.parameters <- function(mainDir,
-                                         timeDateSimulation,
                                          startYearSimulation,
                                          endYearSimulation,
                                          resolutionOutput = "subdaily",
@@ -78,13 +83,6 @@ create.simulation.parameters <- function(mainDir,
     stop(paste0("'overWrite' must be logical not ", typeof(overWrite), "."))}
   if(overWrite==F & file.exists(outputPath)){stop("file already exists and 'overWrite' option is set to False, change 'outputPath' or set 'overWrite' to T.")}
   
-
-  if (missing(startYearSimulation) & missing(timeDateSimulation)) {
-    stop("'startYearSimulation' and 'refDateSimulation' are missing, at least one of the two must be entered.")
-  }
-  if (missing(endYearSimulation) & missing(timeDateSimulation)) {
-    stop("'endYearSimulation'is missing and 'refDateSimulation' are missing, at least one of the two must be entered.")
-  }
   if (!missing(startYearSimulation) & !missing(endYearSimulation)) {
     if (!is.numeric(startYearSimulation) | !is.numeric(endYearSimulation)) {
       stop(" 'startYearSimulatin' and 'endYearSimulation' must be numeric.")
@@ -92,22 +90,12 @@ create.simulation.parameters <- function(mainDir,
     if (startYearSimulation > endYearSimulation) {
       stop(" 'startYearSimulation' must be < or = to 'endYearSimulation'.")
     }
-  }
-  if (!missing(timeDateSimulation)) {
-    if (sum((is.na(as.Date(time_mod, "%d/%m/%Y")))) > 1) {
-      stop(" 'timeDateSimulation' is provide but is not in the right format, should be as 'dd/mm/yyyy' : e.g. '01/01/1999'")
-      simulation_parameters$timeDateSimulation <- as.Date(timeDateSimulation, format = "%d/%m/%Y")
-      simulation_parameters$startYearSimulation <- min(year(timeDateSimulation))
-      simulation_parameters$endYearSimulation <- max(year(timeDateSimulation))
-    }
-  } else {
+    
+  }else{stop( "'startYearSimulation' and/or 'endYearSimulation' are missing.")}
+  
+    
     simulation_parameters$startYearSimulation <- startYearSimulation
     simulation_parameters$endYearSimulation <- endYearSimulation
-    simulation_parameters$timeDateSimulation <- seq.Date(
-      from = as.Date.character((paste0(startYearSimulation, "/01/01"))),
-      to = as.Date.character((paste0(endYearSimulation, "/12/31"))),
-      by = "days"
-    )
-  }
+
   return(simulation_parameters)
 }

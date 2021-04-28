@@ -12,13 +12,12 @@
 
 #' Create a climate data.frame to run SureauR
 #' read input climate data /selec the desired period and put it in the right
-#' format to run SurEau_Ecos Also check data consistency and input variables
-#' according to modeling_options and simulation parameters created in
-#' create_Sureau_modeling_options and create_SurEau_simuation_parameters
+#' format to run \code{run.SurEauR} Also check data consistency and input variables
+#' according to modeling options (see \code{create.modeling.options} and simulation parameters (see \code{create.simulation.parameters)
 #' 
-#' @param filePath the path of the input file containing climate data
-#' @param modeling_options the list containing the modeling options created with the function create_SurEau_modeling options 
-#' @param simulation_parameters the list containing the simulation parameters with the function create_SurEau_Simulation_parameters
+#' @param filePath the path of the input climate file. 
+#' @param modeling_options a list containing the modeling options created with \code{create.modeling.options}
+#' @param simulation_parameters a list containing the simulation parameters with \code{create.simulation.parameters}
 #'
 #' @return
 #' @export
@@ -28,6 +27,7 @@
 #' create.modeling.options()
 #' # create  the list of simulation parameters
 #' create.simulation.parameters(startYearSimulation = 1990, endYearSimulation = 1990)
+
 create.climate.data <- function(filePath, modeling_options, simulation_parameters)
 {
   # Read file if it exists, error otherwise
@@ -70,17 +70,17 @@ create.climate.data <- function(filePath, modeling_options, simulation_parameter
   # RH > 100
   if (any(climate_data$RHair_max > 100)) {
     climate_data[climate_data$RHair_max > 100, "RHair_max"] <- 100
-    warning('several values of RHair_max were >100% in climate input file')
+    warning('several values of RHair_max were >100% in climate input file and were set to 100%.')
   }
   
   if (any(climate_data$RHair_mean > 100)) {
     climate_data[climate_data$RHair_mean > 100, "RHair_mean"] <- 100
-    warning('several values of RHair_mean were >100% in climate input file')
+    warning('Several values of RHair_mean were >100% in climate input file and were set to 100 %.')
   }
   
   if (any(climate_data$RHair_min > 100)) {
     climate_data[climate_data$RHair_min > 100, "RHair_min"] <- 100
-    warning('several values of RHair_min were >100% in climate input file')
+    warning('Several values of RHair_min were >100% in the input climate data and were set to 100 %.')
   }
   
   
@@ -94,37 +94,36 @@ create.climate.data <- function(filePath, modeling_options, simulation_parameter
         }
         else {
           climate_data$DATE <- as.Date(climate_data$DATE, format = "%d/%m/%Y")
-          climate_data$Doy <- yday(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-          climate_data$Day <- day(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-          climate_data$Month <- month(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-          climate_data$Year <- year(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
+          climate_data$Doy <- yday(climate_data$DATE)
+          climate_data$Day <- day(climate_data$DATE)
+          climate_data$Month <- month(climate_data$DATE)
+          climate_data$Year <- year(climate_data$DATE)
         }
-      
-       # io = match(climate_data$DATE, simulation_parameters$timeDateSimulation)
-        io = climate_data$DATE %in% simulation_parameters$timeDateSimulation
-        climate_data = climate_data[io,]
-      #  na.omit(climate_data)
-        
-        } else {
+      } else {
         stop(paste("no variable 'DATE' in the input file!"))
       }
+      io = climate_data$Year >= simulation_parameters$startYearSimulation & climate_data$Year<= simulation_parameters$endYearSimulation
       
-      
-      
-      
-      
+      if (sum(io)==0){ stop('dates in input climate file and simulation parameters do not match')
+      }else{climate_data = climate_data[io,]
+      print(paste0(sum(io),' days covering the period from year  =', min(climate_data$Year),  'to year = ', max(climate_data$Year,),'were selected in the input climate data file'))
       }
-
+    } 
+  
+  # select desired period in input climate data 
     if (modeling_options$constantClimate == T) {
-      climate_data <- as.data.frame(lapply(climate_data[1,], rep, length(simulation_parameters$timeDateSimulation )))
-      climate_data$DATE <- simulation_parameters$timeDateSimulation 
-      climate_data$Doy <- yday(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-      climate_data$Day <- day(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-      climate_data$Month <- month(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
-      climate_data$Year <- year(as.Date(climate_data$DATE, format = "%d/%m/%Y"))
+      dateref = seq.Date(from = as.Date(paste0('01/01/',simulation_parameters$startYearSimulation),format = "%d/%m/%Y"),
+                         to   = as.Date(paste0('31/12/',simulation_parameters$endYearSimulation),format = "%d/%m/%Y"),
+                         by = "days")
+      
+      
+      climate_data <- as.data.frame(lapply(climate_data[1,], rep, length(dateref)))
+      climate_data$DATE <- dateref
+      climate_data$Doy <- yday(dateref)
+      climate_data$Day <- day(dateref)
+      climate_data$Month <- month(dateref)
+      climate_data$Year <- year(dateref)
     }  
-    
-    
-
+  
   return(climate_data)
 }
