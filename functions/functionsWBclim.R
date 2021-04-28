@@ -1,10 +1,4 @@
 
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Authors : <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
-#           <Julien Ruffault (julien.ruff@gmail.com)>
-#           <Francois Pimont (francois.pimont@inrae.fr)>
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-
 # create a list with all necessary daily climate values to run SureauR from climate_data 
 new.WBclim <- function(climate_data, YEAR, DOY) {
   WBclim <- list()
@@ -52,7 +46,7 @@ new.WBclim <- function(climate_data, YEAR, DOY) {
   return(WBclim)
 }
 
-# create a list with interpolated climate dataset at the required time step 
+# create a list with interpolated climate data at the required time step 
 new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
 
   WBclimHour <- list()
@@ -123,7 +117,7 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   return(WBclimHour)
 }
 
-# compute daily PET and Net radiation in WBclim
+# compute daily PET and Net radiation
 compute.RnAndETP.WBclim <- function(WBclim, WBveg, RnFormulation = "Linacre", ETPFormulation = "PT") {
 
   # calculate net radiation
@@ -170,16 +164,5 @@ interp.WBclim=function(clim1,clim2,p=0.5) {
   res$RHair_mean = (1-p)*clim1$RHair_mean + p*clim2$RHair_mean
   res$ETP        = (1-p)*clim1$ETP + p*clim2$ETP
   return(res)
-}
-
-
-compute.dailyclim.WBclim <- function(climate_list, general_params, year, DOY) {
-  # select climate data for the year and doy in SUREAU_ECOS
-  output_list <- lapply(climate_list, FUN = function(x) x[year(general_params$time_mod) == year & yday(general_params$time_mod) == DOY])
-  
-  output_list$net_radiation <- NA
-  output_list$ETP <- NA
-  
-  return(output_list)
 }
 

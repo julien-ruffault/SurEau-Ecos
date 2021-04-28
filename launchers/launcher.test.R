@@ -25,7 +25,7 @@ output_path               <- paste0(mainDir,'/Results_model/test.csv')
 modeling_options  <- create.modeling.options(constantClimate=T,
                                                  stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
-                                                      endYearSimulation = 1991,
+                                                      endYearSimulation = 1990,
                                                       mainDir= mainDir,
                                                       outputType = 'diagnostic_subdaily',
                                                       overWrite = T,

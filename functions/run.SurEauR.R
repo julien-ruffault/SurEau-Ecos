@@ -15,7 +15,7 @@
 run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters) { # start loop on years
 
   if (!nargs() == 6) {
-    stop("One of several input parameters were missing")
+    stop("One or several input parameters were missing")
   }
 
 
