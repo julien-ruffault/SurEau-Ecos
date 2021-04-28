@@ -1,6 +1,6 @@
 
 #' Create a list with simulation parameters to run SureauEcos. Can be used as an
-#' input in 
+#' input in
 #'
 #' @param mainDir
 #' @param startYearSimulation a numeric indicating the starting year for the
@@ -19,12 +19,12 @@
 #' @export
 #'
 #' @examples
-#' create.simulation.parameters(StartYearSimulation = 1990, EndYearSimulation  =1990  )
+#' create.simulation.parameters(StartYearSimulation = 1990, EndYearSimulation = 1990)
 create.simulation.parameters <- function(mainDir,
                                          startYearSimulation,
                                          endYearSimulation,
                                          resolutionOutput = "subdaily",
-                                         overWrite=F,
+                                         overWrite = F,
                                          outputType,
                                          outputPath) {
   simulation_parameters <- list()
@@ -78,11 +78,14 @@ create.simulation.parameters <- function(mainDir,
   } else {
     stop("'outputPath' is missing with no default value ")
   }
-  
+
   if (!is.logical(overWrite)) {
-    stop(paste0("'overWrite' must be logical not ", typeof(overWrite), "."))}
-  if(overWrite==F & file.exists(outputPath)){stop("file already exists and 'overWrite' option is set to False, change 'outputPath' or set 'overWrite' to T.")}
-  
+    stop(paste0("'overWrite' must be logical not ", typeof(overWrite), "."))
+  }
+  if (overWrite == F & file.exists(outputPath)) {
+    stop("file already exists and 'overWrite' option is set to False, change 'outputPath' or set 'overWrite' to T.")
+  }
+
   if (!missing(startYearSimulation) & !missing(endYearSimulation)) {
     if (!is.numeric(startYearSimulation) | !is.numeric(endYearSimulation)) {
       stop(" 'startYearSimulatin' and 'endYearSimulation' must be numeric.")
@@ -90,12 +93,13 @@ create.simulation.parameters <- function(mainDir,
     if (startYearSimulation > endYearSimulation) {
       stop(" 'startYearSimulation' must be < or = to 'endYearSimulation'.")
     }
-    
-  }else{stop( "'startYearSimulation' and/or 'endYearSimulation' are missing.")}
-  
-    
-    simulation_parameters$startYearSimulation <- startYearSimulation
-    simulation_parameters$endYearSimulation <- endYearSimulation
+  } else {
+    stop("'startYearSimulation' and/or 'endYearSimulation' are missing.")
+  }
+
+
+  simulation_parameters$startYearSimulation <- startYearSimulation
+  simulation_parameters$endYearSimulation <- endYearSimulation
 
   return(simulation_parameters)
 }

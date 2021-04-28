@@ -1,32 +1,39 @@
-#' Create a list containing modeling options that can be used as an input  
-#' in \code{run.SurEauR} 
+#' Create a list containing modeling options that can be used as an input
+#' in \code{run.SurEauR}
 #'
 #' @param timeStepForEvapo a numerical value (1,2,3,4 or 8) indicating the time
 #'   step for the main evapotranspiration loop (in hours). Should be one of the
 #'   following (default = 1)
 #' @param resetSWC a logical value indicating whether soil layers should be
 #'   refilled at the beginning of each year of the simulation (default=F)
-#' @param avoidWaterSoilTransfer a logical value indicating whether the transfer of water between soil layers should be avoided by disconnecting the soil layers that get refilled from the soil-plant system (default =F)
-#' @param ETPFormulation  the formulation of ETP to be used, either 'PT' (Priestley-Taylor) or 'PM' (penmman). Default is 'PT'(Priestley Taylor)
-#' @param RnFormulation the method to be used to calculate net radiation from global radiation
-#' @param constantClimate  a logical value indicating whether the climate should be considered constant or not (default = F)
-#' @param compOptionsForEvapo the option to be used for the loops  (voir avec Francois) 
-#' @param stomatalRegulationType the type of regulation to be used for stomatal response to leaf symplasmic water potential (default = "Creneau")
+#' @param avoidWaterSoilTransfer a logical value indicating whether the transfer
+#'   of water between soil layers should be avoided by disconnecting the soil
+#'   layers that get refilled from the soil-plant system (default =F)
+#' @param ETPFormulation  the formulation of ETP to be used, either 'PT'
+#'   (Priestley-Taylor) or 'PM' (penmman). Default is 'PT'(Priestley Taylor)
+#' @param RnFormulation the method to be used to calculate net radiation from
+#'   global radiation
+#' @param constantClimate  a logical value indicating whether the climate should
+#'   be considered constant or not (default = F)
+#' @param compOptionsForEvapo the option to be used for the loops  (voir avec
+#'   Francois)
+#' @param stomatalRegulationType the type of regulation to be used for stomatal
+#'   response to leaf symplasmic water potential (default = "Creneau")
 #'
 #' @return
 #' @export
 #'
-#'@examples
-#'create_SurEau_modeling_options()
-#'create_SurEau_modeling_options(timeStepForEvapo = 2, resetSWC = 2)
+#' @examples
+#' create_SurEau_modeling_options()
+#' create_SurEau_modeling_options(timeStepForEvapo = 2, resetSWC = 2)
 create.modeling.options <- function(timeStepForEvapo = 1,
-                                           resetSWC = F,
-                                           avoidWaterSoilTransfer = T,
-                                           ETPFormulation = c("PT", "PM"),
-                                           RnFormulation = c("Linacre", "Linear"),
-                                           constantClimate = F,
-                                           compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
-                                           stomatalRegulationType = c("Creneau","Sigmoid")) {
+                                    resetSWC = F,
+                                    avoidWaterSoilTransfer = T,
+                                    ETPFormulation = c("PT", "PM"),
+                                    RnFormulation = c("Linacre", "Linear"),
+                                    constantClimate = F,
+                                    compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
+                                    stomatalRegulationType = c("Creneau", "Sigmoid")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(6, 10, 12, 14, 18, 24)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")
@@ -52,9 +59,9 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   RnFormulation <- match.arg(RnFormulation)
 
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
-  stomatalRegulationType <-  match.arg(stomatalRegulationType)
-  
-  
+  stomatalRegulationType <- match.arg(stomatalRegulationType)
+
+
   if (compOptionsForEvapo == "Normal") {
     compOptions <- list("nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
@@ -80,7 +87,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$resetSWC <- resetSWC
   modeling_options$avoidWaterSoilTransfer <- avoidWaterSoilTransfer
   modeling_options$compOptions <- compOptions
-  modeling_options$stomatalRegulationType  = stomatalRegulationType
+  modeling_options$stomatalRegulationType <- stomatalRegulationType
 
   return(modeling_options)
 }

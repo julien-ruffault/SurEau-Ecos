@@ -25,7 +25,7 @@ output_path               <- paste0(mainDir,'/Results_model/test.csv')
 modeling_options  <- create.modeling.options(constantClimate=T,
                                                  stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
-                                                      endYearSimulation = 1990,
+                                                      endYearSimulation = 1991,
                                                       mainDir= mainDir,
                                                       outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
@@ -42,7 +42,7 @@ run.SurEauR(modeling_options = modeling_options ,
        climate_data = climate_data,
        stand_parameters = stand_parameters, 
        soil_parameters = soil_parameters,
-       vegetation_parameters=vegetation_parameters)
+       vegetation_parameters = vegetation_parameters)
 
 # for analyses / 
   filename  = paste0(mainDir,"/Results_model/test.csv")
