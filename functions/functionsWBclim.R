@@ -69,7 +69,7 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   WBclimHour$RG <- WBclim$RG * io * 3600
   WBclimHour$Rn <- WBclim$net_radiation * io * 3600
   PAR_cumul <- 24 * Rg_Watt.to.PPFD_umol(Rg_MJday.to.RgWatt(WBclim$RG))
-  WBclimHour$PAR <- PAR_cumul * io * 3600
+  WBclimHour$PAR <- 10*PAR_cumul * io * 3600 # TODO voir conversion du PAR 
 
   # Air temperature ---------------------------------------------------------
   WBclimHour$Tair_mean <- sapply(timeRelativeToSunset, FUN = function(x) {

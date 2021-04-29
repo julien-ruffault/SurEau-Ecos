@@ -44,6 +44,7 @@ run.SurEauR(modeling_options = modeling_options ,
        soil_parameters = soil_parameters,
        vegetation_parameters = vegetation_parameters)
 
+
 # for analyses / 
   filename  = paste0(mainDir,"/Results_model/test.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")

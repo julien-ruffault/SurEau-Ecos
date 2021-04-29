@@ -1,22 +1,53 @@
 
-# TODO list for SurEau  (mise à jout le 28/04/2021 par JR) 
+TODO list for SurEau  (mise à jour le 29/04/2021 par JR) 
 
-# -  un script de comparaison et de plot de la simulation reference 
-#  - ajouter une fonction pour initialiser les PLC (et autres) au début de chaque annee
-#  - separate output parameters from simulation parameters  ?
-#  - voir pkoi le PAR est multiplie par 10 dans la fonction compute.Transpiration  in functionsWVveg (around L405) -->Julien 
-#  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ? 
-#  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers 
-#  - voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant) 
-#  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (julien)
 
-# Principaux développements à faire : 
+# -  un script de comparaison et de plot de la simulation reference (JR, NM and FP)
+
+#  - ajouter une fonction pour initialiser les PLC (et autres) au début de chaque annee (JR and NM)
+
+#  - separate output parameters from simulation parameters  ? (JR) 
+
+#  - voir conversion du PAR ds WBclim (JR)
+
+#  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> farie des tests sur puechabon (JR) puis voir pour implementation (JR FP)
+
+#  - voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant ->(JR, NM)
+
+#  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (JR)
+
+ #----Trunk symplasmic canopy water content----
+  #TODO Warning: same parameters for leaves and trunk (NM)
+
+---
+# computeTranspiration (gmin, Emin, gcanopy, Ebound and regulation)
+# #FP this section was cleaned a bit and a bug was corrected in Eprime (when regul=0)
+# TODO check why we have gs and gs_lim with same value
+#  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?  --> (NM)
+
+
+
+# Principaux développements à faire  (JR and NM)
 # LAI leaf shedding --> pheno + changement conductance + option 
 # Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy 
 # Revoir initialisation du sol 
 
+
+#regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegulationType
+## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
+
+
+#TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...
+#-- >OK bonne idee -->(JR)
+
+#conduc <- distribute.conductances(kPlantInit=.veg_params$kPlantInit) # TODO --> ajouter les LV  (JR and NM)
+
+#.veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?  --> (NM)
+
 # ENSUITE : 
-# 1. faire tourner avec climat non constant 
-# 2. Faire tourner sur autre vegetation pour tests 
-# 3. sites fluxnet et comparaison aux données 
-# 4. essai d'inversion pour la RU 
+# 1. test de sensibilité à la résolution temporelle 
+# 2. test de sensibilité aux parametres de vegetaiton et de sol 
+# 3. faire tourner avec climat non constant 
+# 4. Faire tourner sur autre vegetation pour tests 
+# 5. sites fluxnet et comparaison aux données 
+# 6. essai d'inversion pour la RU 

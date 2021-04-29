@@ -21,10 +21,6 @@
 
 # V10 (6/03/2021) // Nico and Francois did lots of modification and started to get promissing runs with Leaf cavitation
 
-# V11-12 (11-12/03/2021) // Starting cleaning the code
-# TODO UpdateSoilWater.WBsoil should be double checked (use the good psi and "waterrelease from cavitation"!) but can be called in the main as we don't update soil over 1 large time step.
-
-
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # create an "object" WBveg from  veg_params
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
@@ -390,11 +386,9 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) 
   WBveg$Emin <- WBveg$gmin * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
   #WBveg$gminTLAI <- WBveg$gminT*TBA unused
   WBveg$EminT <- WBveg$gmin_T * WBveg$params$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
-  WBclim$PAR  <- WBclim$PAR*10 #TODO check this !!!! A corriger dans climat
   
   # canopy with no regulation
   WBveg$gs_bound <- calculate_gs_Jarvis(PAR = WBclim$PAR, leafTemperature = WBveg$leafTemperature)
-  gCrown0=45 #TODO gCrown0 hardcoded
   windSpeed = max(0.1, WBclim$WS)
   WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = windSpeed)
   WBveg$gBL = TGbl_Leaf[2]
