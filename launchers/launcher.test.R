@@ -10,6 +10,10 @@
 rm(list = ls()) # Clear environment
 gc()            # Clear memory
 
+
+# Warning  : check how is gCrown calucalute in the fucntion compute.Transpiration. WBVeg/ seems that there is a mistake for windspeed ! 
+
+
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 

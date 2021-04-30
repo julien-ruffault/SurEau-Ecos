@@ -10,9 +10,9 @@ TODO list for SurEau  (mise à jour le 29/04/2021 par JR)
 
 #  - separate output parameters from simulation parameters  ? (JR) 
 
-#  - voir conversion du PAR ds WBclim (JR)
-
 # - remonter les options de Jarvis dans veg.params (JR and NM)  : gsMax, Ca, gsNight and JarvisPAR/ mettre Ca en parametres climatiques  (ajouter une option dans modeling.options our le faire varier ou alors fixer au taux "courant")  
+# --> Ju 
+# 
 
 #  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (JR and FP)
 

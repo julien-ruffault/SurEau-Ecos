@@ -47,7 +47,12 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
     "gmin_T",
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
     "k_TSymInit",
-    "gCrown0"
+    "gCrown0",
+    "gsMax", # parameter in Jarvis model (currently default to 200) 
+    "gsNight", # parameter in jarvis gs model (currently default to 20 
+    "JarvisPAR", # parameter in Jarvis gs mdoel (currently default is 0.006) 
+    "Tgs_sens",# temperature parameter in Jarvis model (currently default Value is 17)
+    "Tgs_optim" # temperature parameter in Jarvis model (currently default value is 25)
   )
   
   for (i in 1:length(params)) {

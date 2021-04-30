@@ -358,7 +358,7 @@ update.capaSym.WBveg <- function(WBveg){
 # computeTranspiration
 # TODO check why we have gs and gs_lim with same value
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) {
+compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
   TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean,SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
                      WS = WBclim$WS,VPD = WBclim$VPD,RH = max(100, WBclim$RHair_mean),gs=WBveg$gs,Einst = max(0.00001, WBveg$SumFluxSoilToCollar))
   WBveg$leafTemperature <- TGbl_Leaf [1] # Transpiration/Gs du pas de temps précédent
@@ -369,7 +369,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) 
   WBveg$EminT <- WBveg$gmin_T * WBveg$params$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
   
   # canopy with no regulation
-  WBveg$gs_bound <- calculate_gs_Jarvis(PAR = WBclim$PAR, leafTemperature = WBveg$leafTemperature)
+  WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR)
   windSpeed = max(0.1, WBclim$WS)
   WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = windSpeed)
   WBveg$gBL = TGbl_Leaf[2]
@@ -638,5 +638,29 @@ yearlyInitialisation.WBveg <- function(WBveg)
 return(WBveg)
     }
   
+# stomatal conductance calculation with Jarvis type formulations
+calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1)
+{
+  
+  if (option==1) # temeperature effect on gs 
+  {
+    gsMax2    = max(0,WBveg$params$gsMax/(1+((WBveg$leafTemperature-WBveg$params$Tgs_optim)/WBveg$params$Tgs_sens)^2))
+    gsNight2  = max(0,WBveg$params$gsNight/(1+((WBveg$leafTemperature-WBveg$params$Tgs_optim)/WBveg$params$Tgs_sens)^2))
+  }
+
+  #if (option==7){
+  # gsMax2 = (gsMax*(1 + gs_CO2_sens/100*(Ca-300)/100))/(1+pow((leafTemperature-Tgs_optim)/Tgs_sens,2))  # 
+  # gsNight2 = (gs_night* (1 + gs_CO2_sens/100*(Ca-300)/100))/(1+pow((T_Leaf-Tgs_optim)/Tgs_sens,2));
+  #}
+  
+  WBveg$gs_bound=   gsNight2 + (gsMax2-gsNight2)*(1-exp(-WBveg$params$JarvisPAR*PAR))
+  #print(gs_Jarvis)
+  return(WBveg)
+}
+
+
+
+
+
   
   

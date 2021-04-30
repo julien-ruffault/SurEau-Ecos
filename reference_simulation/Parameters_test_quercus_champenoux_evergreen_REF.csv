@@ -30,3 +30,9 @@ PsiStartClosing;-0.5
 PsiClose;-2
 gmin_T;3
 gCrown0;45
+gsMax;200
+gsNight;20 
+JarvisPAR;0.006
+Tgs_sens;17
+Tgs_optim;25
+
