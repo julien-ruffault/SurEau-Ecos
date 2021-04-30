@@ -6,20 +6,6 @@
 #           Francois Pimont (francois.pimont@inrae.fr)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-# V2 (18/12/2020) // JR modified the following : 
-# -  Remettre le initialze year dans le function pheno (si DOY = 1, on reinitialise le LAI, la PLC et le k)
-# -  Ajout d'un k qui depent du LAI selon kplant  = kPlantInit*LAI/LAImax
-# -  Mettre une seuil de 10 % de PLC pour commencer la defoliation --> OK 
-
-# V3 (21/01/2021) // JR added the new formulation for transpiration
-
-# To be done : TESTER Penmann au lieu de Priestly taylor  dans Granier  
-#              puis Se debrasser de granier avec Gs, Gbl et Gcrown
-
-# (25/01/2021) // NM addded new formamulation to derive stomatal conductances 
-# note  = see to transfer Lv, La, R and kroot in WVveg rather than in WBsoil 
-
-# V10 (6/03/2021) // Nico and Francois did lots of modification and started to get promissing runs with Leaf cavitation
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # create an "object" WBveg from  veg_params
@@ -60,9 +46,6 @@ new.WBveg <- function(veg_params) {
   # Leaf and canopy conductance
   WBveg$gmin <- NA #Gmin for leaves
   WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
-  
-  warning("WBveg$TBA is hard coded in new.WBveg")
-
   WBveg$gs <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
   WBveg$gs_bound <- NA
   WBveg$gs_lim <- NA
@@ -71,7 +54,7 @@ new.WBveg <- function(veg_params) {
   WBveg$gBL <- NA
   WBveg$gCrown <- NA
   WBveg$regulFact <- 0.01 # 
-  warning("why initiliazed to 1 value (JR, 22/04/2021)")
+  
   
   # Fluxes
   #WBveg$E0 = 0
@@ -89,10 +72,9 @@ new.WBveg <- function(veg_params) {
   WBveg$LAI      <- numeric(1)    #  LAI
   WBveg$canopyStorageCapacity      <- numeric(1)    #  Canopy Storage Capacity
   
-  # interception 
+  # rainfall and interception 
   WBveg$pptSoil  <- 0 # ppt that reach the soil
   WBveg$interceptedWaterAmount       <- 0 # interceptedWater /quantite d'eau dans la canopee
-  
   WBveg$evaporationIntercepted <- 0
   WBveg$ETPr <- 0
   
@@ -101,8 +83,8 @@ new.WBveg <- function(veg_params) {
   WBveg$deadLAI <- 0
   
   # Cavitation
-  WBveg$PLC_Root     <- 0  # percent loss of conductivity [%]/ below part of the platn
-  WBveg$PLC_TL       <- 0  # percent loss of conductivity [%] /  Above part of the plant
+  WBveg$PLC_Root     <- 0  # percent loss of conductivity [%]/ 
+  WBveg$PLC_TL       <- 0  # percent loss of conductivity [%] /
   
   # leaf temp
   WBveg$leafTemperature <- NA
@@ -131,7 +113,7 @@ new.WBveg <- function(veg_params) {
   WBveg$DMDeadCanopy    <- 0 # Dead Canopy dry matter [gMS/m2 soil]
   
   #---------------------# 
-  warning("cleaner bien ces initialisation des Q") 
+  warning("cleaner bien ces initialisation des Q, a voir avec la revision du calcul du LFMC") 
   WBveg$params$Q_LApo_sat_mmol  <- 0
   WBveg$Q_LApo_mmol  <- 0
   WBveg$params$Q_TApo_sat_mmol <- 0
@@ -339,7 +321,7 @@ update.kplant.WBveg <- function(WBveg,WBsoil) {
 }
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Compute an up date of plant capacitances (19/02/2021) - checked FP 11/03/2021
+# Compute an update plant capacitances
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 update.capaSym.WBveg <- function(WBveg){
   PsiTlp <- WBveg$params$PsiTlp
@@ -373,8 +355,7 @@ update.capaSym.WBveg <- function(WBveg){
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# computeTranspiration (gmin, Emin, gcanopy, Ebound and regulation)
-# #FP this section was cleaned a bit and a bug was corrected in Eprime (when regul=0)
+# computeTranspiration
 # TODO check why we have gs and gs_lim with same value
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours,modeling_options) {
@@ -648,3 +629,14 @@ compute.regulFact <- function(psi, params,regulationType) {
   return(list("regulFact"=regulFact,"stomatalClosure"=stomatalClosure,"regulFactPrime"=regulFactPrime))
 }
 
+
+
+yearlyInitialisation.WBveg <- function(WBveg)
+{
+  WBveg$PLC_Root <- 0 
+  WBveg$PLC_TL   <- 0 
+return(WBveg)
+    }
+  
+  
+  

@@ -208,6 +208,20 @@ PPFD_umol.to.Rg_Watt <- function (PPFD, J_to_mol = 4.6, frac_PAR = 0.5)
   Rg <- PPFD/frac_PAR/J_to_mol
   return(Rg)
 }
+
+
+
+#' converts radiation from W.m-2 to umol/m-2/s-1 .
+#'
+#' @param Rg Global radiation (W/m2)
+#' @param J_to_mol Conversion factor 
+#' @param frac_PAR Fanction of solar rdiation that is photosynthetically active radiation (PAR) 
+#'
+#' @return  	
+#'Photosynthetic photon flux density (umol.m-2.s-1)
+#' @export
+#'
+#' @examples
 Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5) 
 {
   PPFD <- Rg * frac_PAR * J_to_mol
@@ -216,12 +230,17 @@ Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5)
 
 Rg_Watt.to.Rg_MJday <-  function(Rg)
 {
-RgMJ = Rg*0.0864
+return(RgMJ = Rg*0.0864)
 }
   
 Rg_MJday.to.RgWatt <-  function(Rg)
 {
-  RgWatt = Rg*(1/0.0864)
+  return(RgWatt = Rg*(1/0.0864))
 }
 
-
+Rg_MJ.to.RgWatt <- function(Rg,Nhours)
+{
+  
+  return(RgWatt = Rg*(10^6/(Nhours*3600)))
+  
+}

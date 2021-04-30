@@ -103,7 +103,7 @@ create.climate.data <- function(filePath, modeling_options, simulation_parameter
       stop("dates in input climate file and simulation parameters do not match")
     } else {
       climate_data <- climate_data[io, ]
-      print(paste0(sum(io), " days covering the period from year  =", min(climate_data$Year), "to year = ", max(climate_data$Year, ), "were selected in the input climate data file"))
+      print(paste0(sum(io), " days covering the period from year  =", min(climate_data$Year), "to year = ", max(climate_data$Year), "were selected in the input climate data file"))
     }
   }
 

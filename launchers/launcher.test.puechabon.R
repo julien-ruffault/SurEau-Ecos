@@ -45,6 +45,11 @@ run.SurEauR(modeling_options = modeling_options ,
        soil_parameters = soil_parameters,
        vegetation_parameters=vegetation_parameters)
 
+
+
+
+
+
 # for analyses / 
   PsiData  = paste0(mainDir,"/Results_model/test_puech.csv")
   filename  = paste0(mainDir,"/Results_model/test_puech.csv")
@@ -66,6 +71,32 @@ run.SurEauR(modeling_options = modeling_options ,
   
   
  
+  # plot des contenus en eau du sol 
+  quartz(width=8,height=2.5)
+  par(mfrow=c(1,3),mar=c(3,5,2,4))
+  plot(DATA$DD,DATA$fluxSoilToCollar.C1,type='l',col='red',axes=F,lwd=0.5, main ='layer 1')
+  box(lwd=1)
+  axis(2,col='red')
+  par(new=T)
+  plot(DATA$DD,DATA$SWS1,col='black',axes=F,box=F,type='l')
+  axis(4)
+  
+
+  plot(DATA$DD,DATA$fluxSoilToCollar.C2,type='l',col='red',axes=F,lwd=0.5, main ='layer 2')
+  box(lwd=1)
+  axis(2,col='red')
+  par(new=T)
+  plot(DATA$DD,DATA$SWS2,col='black',axes=F,box=F,type='l')
+  axis(4)
+  
+  plot(DATA$DD,DATA$fluxSoilToCollar.C3,type='l',col='red',axes=F,lwd=0.5, main ='layer 3')
+  box(lwd=1)
+  axis(2,col='red')
+  par(new=T)
+  plot(DATA$DD,DATA$SWS3,col='black',axes=F,box=F,type='l')
+  axis(4)
+  
+  
   
   
   

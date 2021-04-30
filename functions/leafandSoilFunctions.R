@@ -363,10 +363,26 @@ ConvertFluxFrom_mm_To_mmolm2s <- function(x, timeStep, LAI) {
   return(y)
 }
 
+
+#' Convert a water instantaneous water flux in mmol.m-2.s-1 to a amount in mm 
+#' over a defined time period 
+#'
+#' @param x The instaneous flux (mmol.m-2.s-1) to be converted. expressed per
+#' m2 of leaf 
+#' @param timeStep timeStep (in hours) 
+#' @param LAI leaf area index of the stand 
+#'
+#' @return
+#' @export
+#'
+#' @examples
 ConvertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
   y <- x * (LAI * timeStep * 3600 * 18) / 10^6
   return(y)
 }
+
+
+
 
 calculate_gs_Jarvis <- function(PAR, leafTemperature, option=1, gsMax = 200, Ca = 400, gsNight = 20, JarvisPAR = 0.006, Tgs_sens=17, Tgs_optim=25)
 {

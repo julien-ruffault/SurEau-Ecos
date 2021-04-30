@@ -17,8 +17,6 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
   if (!nargs() == 6) {
     stop("One or several input parameters were missing")
   }
-
-
   soil_var_list <- new.WBsoil(soil_parameters) #  create soil from input parameters
   veg_var_list <- new.WBveg(vegetation_parameters) #  create vegetation from vegetation parameters
   model_output <- new.WBoutput(simulation_parameters) #  create output file and parameters
@@ -31,6 +29,7 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
 
     stopDeadPlant <- FALSE # set break conditions to allow to run on following years after death
 
+    veg_var_list <- yearlyInitialisation.WBveg(veg_var_list)
 
     if (modeling_options$resetSWC == T) {
       soil_var_list <- set.SWCtoFieldCapacity.WBsoil(soil_var_list)

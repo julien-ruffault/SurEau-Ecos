@@ -21,7 +21,6 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
-
 modeling_options  <- create.modeling.options(constantClimate=T,
                                                  stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
@@ -49,6 +48,11 @@ run.SurEauR(modeling_options = modeling_options ,
   filename  = paste0(mainDir,"/Results_model/test.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+  
+  plot(DATA$PAR[1:24])
+  plot(DATA$gs_bound[1:100],type='l')
+  plot(DATA$gs_bound,type='l')
+  
   
   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
   lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
