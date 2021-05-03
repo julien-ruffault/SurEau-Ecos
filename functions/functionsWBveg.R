@@ -223,8 +223,8 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) 
     
   }
   
-  WBveg$WCCanopySympSat <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-  WBveg$WCCanopyApo <- (1 - WBveg$PLC_TL / 100) * WBveg$DMLiveCanopy * (1 / (WBveg$params$LDMC / 1000) - 1) * (WBveg$params$ApoplasmicFrac) / 1000
+  #WBveg$WCCanopySympSat <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  #WBveg$WCCanopyApo <- (1 - WBveg$PLC_TL / 100) * WBveg$DMLiveCanopy * (1 / (WBveg$params$LDMC / 1000) - 1) * (WBveg$params$ApoplasmicFrac) / 1000
   
   
   #print(paste0("LAIpheno = " ,WBveg$LAI))
@@ -263,24 +263,22 @@ compute.waterStorage.WBveg <- function(WBveg, VPD) {
   # Dead FMC [%]
   WBveg$DFMC <- compute.DFMC(VPD)
   
-  # Water content of dead foliage (l/m2 sol ou mm)
-  WBveg$WCCanopyDead <- (WBveg$DFMC / 100) * WBveg$DMDeadCanopy / 1000
-  
-  #----Symplasmic canopy water content----
-  RWCs <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
-  WBveg$WCCanopySymp <- max(0, RWCs) * WBveg$WCCanopySympSat
-  WBveg$LFMCSymp <- 100 * (WBveg$WCCanopySymp / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000))
+  #----Symplasmic canopy water content of the leaves----
+  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
+  Q_LSym <- max(0, RWCs) * WBveg$Q_LSym_sat_L
+  WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000))
   
   #---Apoplasmic water content----
-  #WBveg$waterRelease <- max(0, WBveg$WCCanopyApo * max(0, WBveg$dPLCAbove / 100)) #  Water release from xylem cavitation, [mm]
-  WBveg$waterRelease <-  0 # TODO modifier pour etre fonction d'un DPLC 
-  WBveg$WCCanopyApo <- max(0, WBveg$WCCanopyApo - WBveg$waterRelease) #  Canopy apoplasmic water content  [mm]
-  WBveg$LFMCApo <- 100 * (WBveg$WCCanopyApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
+  Q_LApo = (1-WBveg$PLC_TL/100) *  WBveg$Q_LApo_sat_L
+  WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
   #------LFMC total---- (Apo+Symp)
-  WBveg$LFMC <- 100 * (WBveg$WCCanopySymp + WBveg$WCCanopyApo) / (WBveg$DMLiveCanopy / 1000)
+  WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
+  
   #- FMCcanopy 
-  WBveg$FMCCanopy <- 100 * (WBveg$WCCanopySymp + WBveg$WCCanopyApo + WBveg$WCCanopyDead) / (WBveg$DMLiveCanopy / 1000 + WBveg$DMDeadCanopy / 1000)
+  # Water quantity of dead foliage (l/m2 sol ou mm)
+  Q_LDead <- (WBveg$DFMC / 100) * WBveg$DMDeadCanopy / 1000
+  WBveg$FMCCanopy <- 100 * (Q_LApo + Q_LSym + Q_LDead) / (WBveg$DMLiveCanopy / 1000 + WBveg$DMDeadCanopy / 1000)
   
   return(WBveg)
 }
@@ -489,7 +487,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   Psi_LApo_cav = WBveg$Psi_LApo_cav
   Psi_TApo_cav = WBveg$Psi_TApo_cav
   
-  K_LSym = opt$Lsym * WBveg$k_LSym   # TODO move to new.WBveg as opt parameters do not change thouought the simulation (JR) see with FP 
+  K_LSym = opt$Lsym * WBveg$k_LSym   #
   K_TSym = opt$Tsym * WBveg$k_TSym   #
   C_LSym = opt$Lsym * WBveg$C_LSym   #
   C_TSym = opt$Tsym * WBveg$C_TSym   #

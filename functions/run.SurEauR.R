@@ -49,14 +49,17 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
       # kplant should be computed after rainfall
       veg_var_list <- update.kplant.WBveg(veg_var_list, soil_var_list) # compute conductance soil+plant
 
-      for (tt in 1:length(climHour$ETP)) #
+      for (tt in 1:length(climHour$ETP)) # first hour is 0, last hour is 23 for a day
       {
-        # print(tt)
+        
         # set climate
         Clim_current <- lapply(climHour, function(x) x[max(tt - 1, 1)]) # select climate of the h
         Clim_next <- lapply(climHour, function(x) x[tt]) # select climate of the next time step
         Clim_mid <- interp.WBclim(Clim_current, Clim_next, 0.5) # note : Clim_mid is not a list of "type" WBclimHour
-
+        
+        # for the first iteration, Clim_current and Clim_next are climate at 0h (no matter the time_step_evap) so the first
+        # iteration of the model is from 0h to 0h in order to equilibrate initial values with 0h climate
+        # Then any iteration brings model variables to Clim_next (which is printed in the ouputs)
 
         veg_var_list <- compute.evapoIntercepted.WBveg(veg_var_list, ETP = Clim_mid$ETP)
 
