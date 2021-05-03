@@ -1,24 +1,41 @@
 
-TODO list for SurEau  (mise à jour le 29/04/2021 par JR) 
+TODO list for SurEau  (mise à jour le 03/05/2021 par JR) 
 
 
-# see to transfer Lv, La, R and kroot in WBveg rather than in WBsoil (JR and NM)
+* TO do now 
 
-# -  un script de comparaison et de plot de la simulation reference (JR, NM and FP)
+# refaire l'initialisation des parametres d'interaction soil-plants (JR and NM)
+Reorganiser l'initialisation du sol et l'initialisation de plante 
+--> proposer une initialisation de la biomasse racinaire basée sur des allométries
+--> determiner la surface racinaire en estimantun rayon de racine 
+--> distribuer cette surface racinaire dans les couches de sol selon les règles proposées par Xu et al. , dekauwe et al. 2020  and li et al 2021
+-->  - see to transfer Lv, La, R and kroot in WBveg rather than in WBsoil 
+
+# remonter gSoil0 comme parametre du sol 
+
+
+# Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (JR and FP)
+
+# Un script de comparaison et de plot de la simulation reference (JR, NM and FP)
  
-# - completer la fonction de reinitialisation des variables de vegetation chaque anne  
+# completer la fonction de reinitialisation des variables de vegetation chaque anne  
 
-#  - separate output parameters from simulation parameters  ? (JR) 
+# voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
 
-# - remonter les options de Jarvis dans veg.params (JR and NM)  : gsMax, Ca, gsNight and JarvisPAR/ mettre Ca en parametres climatiques  (ajouter une option dans modeling.options our le faire varier ou alors fixer au taux "courant")  
-# --> Ju 
-# 
+# Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (JR,FP)
 
-#  - Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (JR and FP)
+# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy (JR and NM)
 
-#  - voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
 
-#  - Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (JR)
+
+# optionnal developements 
+  -separate output parameters from simulation parameters  ? (JR) 
+
+ - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA 
+ 
+
+
+
 
  #----Trunk symplasmic canopy water content----
   #TODO Warning: same parameters for leaves and trunk (NM)
@@ -52,8 +69,7 @@ TODO list for SurEau  (mise à jour le 29/04/2021 par JR)
 
 # PRINCIPAUX DEVELOPPEMENTS : (JR and NM)
 # LAI leaf shedding --> pheno + changement conductance + option 
-# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy 
-# Revoir initialisation du sol 
+
 
 # ENSUITE : 
 # 1. Comparaison avec SUREAU.C (NM)

@@ -2,27 +2,22 @@
 
 #' create a list with soil parameters to run SureauR
 #'
-#' @param filePath 
-#' @param depths 
-#' @param default_soil 
-#' @param method 
-#'
+#' @param filePath path to a csv file containing parameter values
+#' @param depths maximum depth (in m) of the soil layers (default : 0.3, 1 and 4 meters) 
+#' @param default_soil a logical value indicating whether a default soil should be used  to run tests (default =F) 
 #' @return
 #' @export
 #'
 #' @examples
-create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil = F, method = "vg"){
+create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil = F) {
   
    # note : warning("if run on puechabon : add an Offset  on psisoil (-0.3) to match observations --> / modify  in function 'computeSoilConductanceAndPsi.WBsoil'  ") 
     
     .soilParams <- list()
-    .soilParams$method <- method
     .soilParams$layer_thickness <- numeric(3)
     .soilParams$layer_thickness[1] <- depths[1]
     .soilParams$layer_thickness[2] <- depths[2] - depths[1]
     .soilParams$layer_thickness[3] <- depths[3] - depths[2]
-    
-    .soilParams$Fact_Rich <- c(0.7, 0.2, 0.1) # Ritchie parameter to distribute soil evaporation among soils layers 
     
     
     if (default_soil == T) # default if no file is provided
@@ -69,9 +64,7 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
       
       
       # modele de Gardnar-Wowen for soil-root conductance (uses both soil and vegetation parameters)
-      
       .soilParams$La <- c(3000, 1700, 1700)
-      #.soilParams$Lv <- c(9000, 3000, 1000)
       .soilParams$Lv <- c(7000, 3000, 3000)
       .soilParams$r <- c(0.002, 0.002, 0.002)
     }
@@ -151,12 +144,6 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     
     # other parameters for GARDNARCOWEN
     warning("Developer note (JR, 05/01/2021); Lv,La and r of the Gardner-Cowen soil-root model are hard coded in 'create.soil.params'")
-    
-    # anciens parametres 
-    # .soilParams$La <- c(6000, 4000, 4000)
-    # .soilParams$Lv <- c(32000, 24000, 11000)
-    # .soilParams$r <- c(0.0004, 0.0004, 0.0004)
-    
     
     .soilParams$La <- c(1591, 255, 64)
     .soilParams$Lv <- c(4265, 682, 171)

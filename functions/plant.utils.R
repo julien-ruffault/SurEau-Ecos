@@ -1,3 +1,6 @@
+# Several plant functions used for SurEau-Ecos
+
+
 
 # compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
 Rs.Comp <- function(PiFT, Esymp, Pmin) {
@@ -16,19 +19,21 @@ PLCPrime.comp <- function(PLC , slope) {
   return(- slope/25 * PLC/100 * (1 - PLC/100))
 }
 
-calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
-  
 
-  # Martin-StPaul N, Ruffault J, Pimont F
-  # calculate minimum conductance from formulae by  Cochard (2019)
-  # ATTENTION : VOIR POUR MUTLIPER gminn par 2 en fonction de la signifcationn de gmin_20 (Par LAI (surface projeté), ou par surface totale (les deux faces des feuilles)
-  #warning("Indiquer les unités")
-  #warning("VOIR POUR MUTLIPER gmin par 2 en fonction de la signifcationn de gmin_20")
-  # leafTemperature / Tleaf tmeparature (in degC)
-  # TP       / Temperature for phase transition of gmin
-  # Q10_1    /  Q10 values for gcuti = f(T) below Tphase
-  # Q10_2    / Q10 values for gcuti = f(T) below  Tphase
-  
+
+#' calculate minimum conductance (gmin) following Cochard et al. (2019)
+#'
+#' @param leafTemperature Temperature of the leaf (degC)
+#' @param gmin_20   leaf conductance at 20 degC
+#' @param TPhase  Temperature for phase transition of gmin
+#' @param Q10_1 Q10 values for gmin= f(T) below Tphase
+#' @param Q10_2 Q10 values for gcuti = f(T) above Tphase
+#'
+#' @return
+#' @export
+#'
+#' @examples
+calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
   if (leafTemperature<= TPhase) {
     gmin <- gmin_20 *Q10_1^((leafTemperature - 20) / 10)
   } else if (leafTemperature> TPhase) {
@@ -37,42 +42,30 @@ calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
   return(gmin)
 }
 
-calcul.Emin <- function(gmin,vpd, air_temperature, relative_humidity, air_pressure) {
-  # calculate minimal 
-  # if vpd is not provided it is calculated from Air_Temperature and Relative humidity
-  # Air_Temperature              : Air temperature (degC)
-  # Relative_Humidity            : Relative humidity of the air (%)
-  # Air_Pressure (optionnal)     : Air_pressure (Pa)
-  if (is.missing(vpd)) {
-    if (missing(air_pressure)) {
-      air_presssure <- 101325
-    }
-    vpd <- compute.VPDfromRHandT(relative_humidity = relative_humidity, temperature = Air_temperature, air_pressure = air_pressure)
-  }
-  # calculate E_min
-  E_min <- g_min * vpd / 100 # mmol/m2/s
-  
-  return(E_min)
+#' calculate minimum transpiration (mmol/m2/s from gmin and vod 
+#'
+#' @param gmin  minimum conductance 
+#' @param VPD vapor pressure deficit  (kPa)
+#' @param airPressure surface air pressure (kPa) (default = 101.3) 
+#' @export
+#'
+#' @examples
+calcul.Emin <- function(gmin,VPD,airPressure =101.3) {
+  return(gmin * VPD /airPressure) 
 }
 
+#' compute dead fuel moisture content from VPD following De Dios et al. (2015)
+#' <https://doi.org/10.1016/j.agrformet.2015.01.002>
+#'
+#' @param VPD Vapor pressure deficit (kPA) 
+#' @param FM0 minimum fuel moisture content (% dry weight)
+#' @param FM1 maximum fuel moisture content (% dry weight)
+#' @param m rate of decay 
+#' @return
+#' fuel moisture content (% dry weight)
+#' @examples
 compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
-  
-  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
-  # Authors : Julien Ruffault (julien.ruff@gmail.co&
-  #           Nicolas MartinStPaul (nicolas.martin@inrae.fr)
-  # Date    : 30/03/2020
-  # --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
-  # compute FMC for dead fuel following Resco De Dios et al. (2015), AFM ,https://doi.org/10.1016/j.agrformet.2015.01.002
-  # INPUTS
-  #   -VPD : vapor pressure deficit (kPA)
-  #   -FM0 = 5.43 #(minimim FM, %dry weight) -           --> see Resco De Dios et al. (2015)
-  #   -FM1 = 52.91 # (FM0+FM1 : maximum FM, % dryweight) --> see Resco De Dios et al. (2015)
-  #   -m   = 0.64 #(rate of decay)
-  # OUTPUTS
-  #   - FM : fuel moisture (% dry weight)
-  ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ###
   FM <- FM0 + FM1 * exp(-m * VPD)
-  
   return(FM)
 }
 
@@ -80,6 +73,7 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
 
 distribute.conductances <- function(kPlantInit,Lv=c(7000,3000,3000))
 {
+  warning("Lv is hard coded in 'distribute.conductances'")
   k_TLInit = 1/(0.2/kPlantInit)
   k_LSymInit = 1/(0.4/kPlantInit)
   k_RootInit   = 1 /( 0.4 / kPlantInit) *Lv/sum(Lv)
@@ -87,11 +81,10 @@ distribute.conductances <- function(kPlantInit,Lv=c(7000,3000,3000))
 }
 
 
-compute.gCrown <- function(gCrown0,windSpeed){
+compute.gCrown <- function(gCrown0, windSpeed){
+  windSpeed=  max(0.1, windSpeed) # to avoid very high conductance values 
   return(gCrown0*windSpeed^0.6)
   }
 
 
-# compute.conductanceFromConductivity()
-# {}
 

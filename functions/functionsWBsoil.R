@@ -51,41 +51,30 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
 }
 
 # compute Evaporation from ETP and Gsoil and update SWS, Psi and in each soil layer 
-compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil=20, Nhours, gSoil0 = 30, LAI ,ETP , K) {
-# created 03/01/2021 by JR / based on SurEau.C with gsoil0
-# such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
-  # 
-  # WBsoil=NULL
-  # WBsoil$REW[1]=1
-  # RHair =62.5
-  # ETP=1
-  # LAI=6
-  # K=0.5
-  # Tsoil=20
-  # gSoil0=30
-  # Nhours=1
-  
-  
-  
-  VPDsoil=compute.VPDfromRHandT(RHair,Tsoil)
-  
-  if (Tsoil<0){
-    WBsoil$Evaporation <- 0}  # no evaporation from frozen soil
-  else{
-  g_Soil =    gSoil0*WBsoil$REW[1]
-  E_Soil1=    g_Soil*VPDsoil/101.3                                #  VPD effect
-  ETP_mmol_s = 10^6*ETP/(3600*Nhours*18)
-  E_Soil2    =    (g_Soil/gSoil0)*ETP_mmol_s*exp(-K*LAI)              # limitation by ETP depending on radiation reaching the soil
-  E_Soil3 =   min(E_Soil1,E_Soil2)
-  WBsoil$Evaporation=     E_Soil3*Nhours*3600*18/10^6             # Conversion from mmol/m2/s to mm      
+compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil = 20, Nhours, gSoil0 = 30, LAI, ETP, K) {
+  # created 03/01/2021 by JR / based on SurEau.C with gsoil0
+  # such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
+
+  VPDsoil <- compute.VPDfromRHandT(RHair, Tsoil)
+
+  if (Tsoil < 0) {
+    WBsoil$Evaporation <- 0
+  } # no evaporation from frozen soil
+  else {
+    g_Soil <- gSoil0 * WBsoil$REW[1]
+    E_Soil1 <- g_Soil * VPDsoil / 101.3 #  VPD effect
+    ETP_mmol_s <- 10^6 * ETP / (3600 * Nhours * 18)
+    E_Soil2 <- (g_Soil / gSoil0) * ETP_mmol_s * exp(-K * LAI) # limitation by ETP depending on radiation reaching the soil
+    E_Soil3 <- min(E_Soil1, E_Soil2)
+    WBsoil$Evaporation <- E_Soil3 * Nhours * 3600 * 18 / 10^6 # Conversion from mmol/m2/s to mm
   }
-  #print(paste0('E_Soil3=',E_Soil3))
-  
-  WBsoil$EvaporationSum <- sum(WBsoil$Evaporation)  
+  # print(paste0('E_Soil3=',E_Soil3))
+
+  WBsoil$EvaporationSum <- sum(WBsoil$Evaporation)
   WBsoil$soilWaterStock[1] <- WBsoil$soilWaterStock[1] - WBsoil$Evaporation
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
 
-return(WBsoil)  
+  return(WBsoil)
 }
   
 # Soil infiltration and update SWS, Psi and K in each soil layer 
@@ -184,7 +173,7 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
 compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
 
   # Compute soil hydraulic conductivity with Van Genuchten
-  if (WBsoil$params$method == "vg") {
+ # if (WBsoil$params$method == "vg") {
     # Soil water holding capacity  (volumetric)
     totalavailwater <- (WBsoil$params$V_saturation_capacity_vg - WBsoil$params$V_residual_capacity_vg)
 
@@ -201,14 +190,14 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
     
     PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)
     # diviser par 10000 pour passer de cm à MPa
-  }
+ # }
   # Compute soil hydraulic conductivity with campbell
-  if (WBsoil$params$method == "camp") {
-    Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC
-    kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
-    PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
-    REW <- NA
-  }
+  # if (WBsoil$params$method == "camp") {
+  #   Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC
+  #   kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
+  #   PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
+  #   REW <- NA
+  # }
 
   # Compute Soil conductance
   WBsoil$kSoil <- 1000 * WBsoil$params$Ksat_vg * WBsoil$params$B_GC * KSoil_temp

@@ -364,14 +364,12 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   WBveg$leafTemperature <- TGbl_Leaf [1] # Transpiration/Gs du pas de temps précédent
   # cuticular 
   WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
-  WBveg$Emin <- WBveg$gmin * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
-  #WBveg$gminTLAI <- WBveg$gminT*TBA unused
-  WBveg$EminT <- WBveg$gmin_T * WBveg$params$TBA * WBclim$VPD / 101.3 #  [mmol/m2/s] conersion vpd de kPa en Pa ##  en fait c'est VPD/Pa <-- changer si on veut la P
+  WBveg$Emin <- calcul.Emin(gmin = WBveg$gmin, VPD = WBclim$VPD)
+  WBveg$EminT <-  WBveg$params$TBA * calcul.Emin(gmin = WBveg$gmin_T,VPD= WBclim$VPD)
   
   # canopy with no regulation
   WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR)
-  windSpeed = max(0.1, WBclim$WS)
-  WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = windSpeed)
+  WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
   WBveg$gBL = TGbl_Leaf[2]
   WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
   WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3

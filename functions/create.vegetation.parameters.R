@@ -2,16 +2,17 @@
 # create list with all species parameters from configuration file
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-#' create a list wit the vegetation parameters to run SureauR
+#' create a list wit the vegetation parameters to run \code{run.SurEauR}
 #'
 #' @param filePath path to a csv file containing parameter values 
 #' @param stand_parameters  a list containing stand parameters created with \code{create.stand.parameters} 
 #' @param modeling_options  a list containing modeling options created with \code{create.modeling.options} 
 #'
 #' @return
+#' a list with modeling options to run  SurEau-Ecos
 #' @export
-#'
 #' @examples
+#'
 create.vegetation.parameters <- function(filePath, stand_parameters, modeling_options) {
 
   if (file.exists(filePath)) {
