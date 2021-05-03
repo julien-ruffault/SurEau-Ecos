@@ -33,7 +33,11 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
       .soilParams$wilting_point <- c(0.2, 0.2, 0.2) # Fraction of water at wilting point (cm3/cm3)
       
       # Ricthie parameters
-      .soilParams$gamma <- 1 # Ritchie parameter
+      #.soilParams$gamma <- 1 # Ritchie parameter
+      
+      .soilParams$gSoil0 = 30
+      
+      
       
       # Van Genuchten parameters
       .soilParams$alpha_vg <- rep(0.0035, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
@@ -85,13 +89,13 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
         "RFC_3",
         "field_capacity",
         "wilting_point",
-        "Ritchie_Gamma",
         "alpha_vg",
         "n_vg",
         "I_vg",
         "Ksat_vg",
         "saturation_capacity_vg",
-        "residual_capacity_vg"
+        "residual_capacity_vg",
+        "gSoil0"
       )
       
       TTT <- NULL
@@ -117,16 +121,13 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
       
       
       
-      
       .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
       
       #--------------
       # A calculer pour diagnostique
       .soilParams$field_capacity <- rep(TTT$field_capacity, 3) # Fraction of water at field capacity (cm3/cm3)
       .soilParams$wilting_point <- rep(TTT$wilting_point, 3) # Fraction of water at wilting point (cm3/cm3)
-      
-      # Ricthie parameters
-      .soilParams$gamma <- TTT$Ritchie_Gamma # Ritchie parameter
+    
       
       # Van Genuchten parameters
       .soilParams$alpha_vg <- rep(TTT$alpha_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
@@ -137,6 +138,8 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
       .soilParams$residual_capacity_vg <- rep(TTT$residual_capacity_vg, 3) # Fraction of residual water  (cm3/cm3)
     } # end  loop default soil = F
     
+    
+    .soilParams$gSoil0 <- TTT$gSoil0
     
     
     

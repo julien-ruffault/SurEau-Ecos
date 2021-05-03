@@ -11,9 +11,6 @@ Reorganiser l'initialisation du sol et l'initialisation de plante
 --> distribuer cette surface racinaire dans les couches de sol selon les règles proposées par Xu et al. , dekauwe et al. 2020  and li et al 2021
 -->  - see to transfer Lv, La, R and kroot in WBveg rather than in WBsoil 
 
-# remonter gSoil0 comme parametre du sol 
-
-
 # Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (JR and FP)
 
 # Un script de comparaison et de plot de la simulation reference (JR, NM and FP)

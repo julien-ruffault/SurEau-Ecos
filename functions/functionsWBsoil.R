@@ -51,7 +51,7 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
 }
 
 # compute Evaporation from ETP and Gsoil and update SWS, Psi and in each soil layer 
-compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil = 20, Nhours, gSoil0 = 30, LAI, ETP, K) {
+compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil = 20, Nhours, LAI, ETP, K) {
   # created 03/01/2021 by JR / based on SurEau.C with gsoil0
   # such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
 
@@ -61,10 +61,10 @@ compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil = 20, Nhours, gSoil
     WBsoil$Evaporation <- 0
   } # no evaporation from frozen soil
   else {
-    g_Soil <- gSoil0 * WBsoil$REW[1]
+    g_Soil <- WBsoil$params$gSoil0 * WBsoil$REW[1]
     E_Soil1 <- g_Soil * VPDsoil / 101.3 #  VPD effect
     ETP_mmol_s <- 10^6 * ETP / (3600 * Nhours * 18)
-    E_Soil2 <- (g_Soil / gSoil0) * ETP_mmol_s * exp(-K * LAI) # limitation by ETP depending on radiation reaching the soil
+    E_Soil2 <- (g_Soil / WBsoil$params$gSoil0) * ETP_mmol_s * exp(-K * LAI) # limitation by ETP depending on radiation reaching the soil
     E_Soil3 <- min(E_Soil1, E_Soil2)
     WBsoil$Evaporation <- E_Soil3 * Nhours * 3600 * 18 / 10^6 # Conversion from mmol/m2/s to mm
   }
