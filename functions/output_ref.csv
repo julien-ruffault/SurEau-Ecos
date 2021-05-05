@@ -24,10 +24,10 @@ Psi_TSym;WBveg;Psi_TSym;1
 Psi_TApo_cav;WBveg;Psi_TApo_cav;1
 Psi_LApo_cav;WBveg;Psi_LApo_cav;1
 Psi_AllSoil;WBveg;Psi_AllSoil;1
-Q_LApo_mmol;WBveg;Q_LApo_mmol;1
-Q_TApo_mmol;WBveg;Q_TApo_mmol;1
-Q_LSym_mmol;WBveg;Q_LSym_mmol;1
-Q_TSym_mmol;WBveg;Q_TSym_mmol;1
+Q_LApo_sat_mmol;WBveg;Q_LApo_sat_mmol;1
+Q_TApo_sat_mmol;WBveg;Q_TApo_sat_mmol;1
+Q_LSym_sat_mmol;WBveg;Q_LSym_sat_mmol;1
+Q_TSym_sat_mmol;WBveg;Q_TSym_sat_mmol;1
 gmin_T;WBveg;gmin_T;1
 gmin;WBveg;gmin;1
 gs;WBveg;gs;1
@@ -56,6 +56,11 @@ interceptedWaterAmount;WBveg;interceptedWaterAmount;1
 evaporationIntercepted;WBveg;evaporationIntercepted;1
 ETPr;WBveg;ETPr;1
 deadLAI;WBveg;deadLAI;1
+DFMC;WBveg;DFMC;1
+LFMCSymp;WBveg;LFMCSymp;1
+LFMCApo;WBveg;LFMCApo;1
+LFMC;WBveg;LFMC;1
+FMCCanopy;WBveg;FMCCanopy;1
 PsiSoil1;WBsoil;PsiSoil;1
 PsiSoil2;WBsoil;PsiSoil;2
 PsiSoil3;WBsoil;PsiSoil;3

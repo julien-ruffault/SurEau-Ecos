@@ -103,30 +103,36 @@ new.WBveg <- function(veg_params) {
   WBveg$LFMCSymp <- NA # Live fuel moisture content of the apoplasmic compartment (gH20/gMS)
   WBveg$LFMC     <- NA # live fuel moisture content (gH20/gMS)
   
-  WBveg$WCCanopySymp    <- NA # water content in the sympoplasm compartment at saturation (l/m2 (i.e. mm)
-  WBveg$WCCanopySympSat <- NA # water content in the sympoplasm compartment (l/m2 (i.e. mm)
-  WBveg$WCCanopyApo     <- NA # water content in the apoplasm compartment  (l/m2 (i.e. mm)
-  WBveg$WCDeadCanopy    <- NA # water content in the dead compartment  (l/m2 (i.e. mm) , initialized at zero
-  
   WBveg$waterRelease    <- 0 # water release in the soil because of Cavitation (Unit)
   WBveg$DMLiveCanopy    <- NA # Live Canopy dry matter [gMS/m2 soil]
   WBveg$DMDeadCanopy    <- 0 # Dead Canopy dry matter [gMS/m2 soil]
   
   #---------------------# 
   warning("cleaner bien ces initialisation des Q, a voir avec la revision du calcul du LFMC") 
-  WBveg$params$Q_LApo_sat_mmol  <- 0
-  WBveg$Q_LApo_mmol  <- 0
-  WBveg$params$Q_TApo_sat_mmol <- 0
-  WBveg$Q_TApo_mmol  <- 0
+
+  # Q leaf apo 
+  WBveg$Q_LApo_sat_mmol  <- 0
+  WBveg$Q_LApo_sat_L <- 0
+
+  # Q trunk apo 
+  WBveg$Q_TApo_sat_mmol <- 0
+  WBveg$Q_TApo_sat_L <- 0
+
+  # Q leaf symplasm
+  WBveg$Q_LSym_sat_mmol   <- 0
+  WBveg$Q_LSym_sat_L      <- 0
+
+  # Q Trunk symplasm
+  WBveg$Q_TSym_sat_mmol   <- 0
+  WBveg$Q_TSym_sat_L      <- 0
+
   
-  WBveg$params$Q_LSym_sat_mmol   <- 0
-  WBveg$Q_LSym_mmol       <- 0
-  WBveg$params$Q_TSym_sat_mmol   <- 0
-  WBveg$Q_TSym_mmol       <- 0
+  WBveg$Delta_Q_LApo_mmol_diag <- 0
+  
   
   WBveg$F_L_Cav <- 0
   WBveg$F_T_Cav <- 0
-  WBveg$Delta_Q_LApo_mmol_diag <- 0
+ 
   #---------------------#
 
   WBveg$PLC_TL  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_TL, P50 = WBveg$params$P50_VC_TL)
@@ -204,30 +210,20 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) 
   
   if (DOY==1)
   {
-    Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$params$Q_LSym_sat_mmol <- Q_LSym_sat_L*1000000/18
-    WBveg$Q_LSym_mmol <- WBveg$params$Q_LSym_sat_mmol
-    
-    Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$params$Q_LApo_sat_mmol <- Q_LApo_sat_L*1000000/18
-    WBveg$Q_LApo_mmol <- WBveg$params$Q_LApo_sat_mmol
-    
-    Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$params$Q_TSym_sat_mmol <- Q_TSym_sat_L*1000000/18
-    WBveg$Q_TSym_mmol <- WBveg$params$Q_TSym_sat_mmol
-    
-    Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$params$Q_TApo_sat_mmol <- Q_TApo_sat_L* 1000000/18
-    WBveg$Q_TApo_mmol <- WBveg$params$Q_TApo_sat_mmol
-    
-    
+    WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
+
+    WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
+   
+    WBveg$Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
+   
+    WBveg$Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+    WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
+   
   }
-  
-  #WBveg$WCCanopySympSat <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-  #WBveg$WCCanopyApo <- (1 - WBveg$PLC_TL / 100) * WBveg$DMLiveCanopy * (1 / (WBveg$params$LDMC / 1000) - 1) * (WBveg$params$ApoplasmicFrac) / 1000
-  
-  
-  #print(paste0("LAIpheno = " ,WBveg$LAI))
+
   return(WBveg)
 }
 
@@ -265,14 +261,14 @@ compute.waterStorage.WBveg <- function(WBveg, VPD) {
   
   #----Symplasmic canopy water content of the leaves----
   RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
-  Q_LSym <- max(0, RWCs) * WBveg$Q_LSym_sat_L
+  Q_LSym <- max(0,  RWC_LSym) * WBveg$Q_LSym_sat_L
   WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000))
   
-  #---Apoplasmic water content----
+  #---Apoplasmic water content-------------------------------------------------
   Q_LApo = (1-WBveg$PLC_TL/100) *  WBveg$Q_LApo_sat_L
   WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
-  #------LFMC total---- (Apo+Symp)
+  #------LFMC total---- (Apo+Symp) --------------------------------------------
   WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
   
   #- FMCcanopy 
@@ -336,7 +332,7 @@ update.capaSym.WBveg <- function(WBveg){
     RWC_LSym_prime = -PiFullTurgor/WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
   }
   #Compute the leaf capacitance (mmol/MPa/m2_sol)
-  WBveg$C_LSym <- WBveg$params$Q_LSym_sat_mmol*RWC_LSym_prime
+  WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol*RWC_LSym_prime
   
   #----Trunk symplasmic canopy water content----
   #TODO Warning: same parameters for leaves and trunk
@@ -346,7 +342,7 @@ update.capaSym.WBveg <- function(WBveg){
   if(WBveg$Psi_TSym > PsiTlp) {RWC_TSym_prime = RWC_TSym/(-PiFullTurgor-WBveg$Psi_TSym-Esymp+2*Esymp*RWC_TSym)} 
   else {RWC_TSym_prime = -PiFullTurgor/WBveg$Psi_TSym^2}
   #Compute the capacitance (mmol/MPa/m2_sol)
-  WBveg$C_TSym <- WBveg$params$Q_TSym_sat_mmol*RWC_TSym_prime
+  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol*RWC_TSym_prime
   
   return(WBveg)
 }
@@ -505,9 +501,9 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   
   #Compute K_L_Cav et K_T_Cav
   PLC_prime_L = PLCPrime.comp(WBveg$PLC_TL,WBveg$params$slope_VC_TL)
-  K_L_Cav = -opt$Lcav * WBveg$params$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
+  K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
   PLC_prime_T = PLCPrime.comp(WBveg$PLC_Root,WBveg$params$slope_VC_Root)
-  K_T_Cav = -opt$Tcav * WBveg$params$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
+  K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
   
   # 2. While loop in order to decide if cavitation or not :
   # In order to account for the cavitation that occurs only when potentials go below their lowest value "cav" (formerly called "mem" in an earlier version)
@@ -533,6 +529,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   nwhilecomp = 0 # count the number of step in while loop (if more than 4 no solution and warning)
   while (((!LcavitWellComputed)|(!TcavitWellComputed))&(nwhilecomp<length(delta_L_cavs))) {
     nwhilecomp = nwhilecomp + 1
+    #print(paste0('nwhilecomp=',nwhilecomp)) for debugging 
     delta_L_cav = delta_L_cavs[nwhilecomp]
     delta_T_cav = delta_T_cavs[nwhilecomp]
    

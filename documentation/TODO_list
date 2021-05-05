@@ -1,8 +1,15 @@
 
 TODO list for SurEau  (mise à jour le 03/05/2021 par JR) 
 
+# Change the name  creneau function by something else for stomat regulation type
+# update hours in whc clim hour from 1:24 to 0:23 
+# check LFMC routine and results 
+# update LAIdead/ change pheno function (see my previous version 3.3 )
 
+# see warning regarding saturation camp ampebell 
 * TO do now 
+
+# see the initilisation of Q for the trunk that hard coded in new.WBveg
 
 # refaire l'initialisation des parametres d'interaction soil-plants (JR and NM)
 Reorganiser l'initialisation du sol et l'initialisation de plante 

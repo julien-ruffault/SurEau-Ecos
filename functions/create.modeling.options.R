@@ -35,12 +35,12 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
                                     stomatalRegulationType = c("Creneau", "Sigmoid")) {
   if (timeStepForEvapo == "Variable") {
-    TIME <- c(6, 10, 12, 14, 18, 24)
+    TIME <- c(0, 6, 12, 14, 16, 22)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")
-  } else if (as.numeric(timeStepForEvapo) %in% c(0.1, 0.2, 0.5, 1, 2, 4, 6, 8)) {
-    TIME <- seq(as.numeric(timeStepForEvapo), 24, as.numeric(timeStepForEvapo))
+  } else if (as.numeric(timeStepForEvapo) %in% c(1, 2, 4, 6)) {
+    TIME <- seq(0, 23, as.numeric(timeStepForEvapo))
   } else {
-    stop(paste0("`timeStepForEvap` must be equal to 1,2,4,6 or 8  or set to 'variable'"))
+    stop(paste0("`timeStepForEvap` must be equal to 1,2,4,6 or set to 'variable'"))
   }
 
   if (!is.logical(resetSWC)) {

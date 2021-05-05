@@ -401,6 +401,30 @@ kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
 
 
 
+ # Function medfate pour calcule de la distribution des racines dans le sol 
+# NumericVector ldrRS_one(double Z50, double Z95, NumericVector d){
+#   int nlayer = d.size();
+#   NumericVector dCum = clone(d);
+#   NumericVector Vd(nlayer);
+#   double c = 2.94/log(Z50/Z95);
+#   double Vtot = 0.0;
+#   Vd[0] = 1.0/(1.0+pow(d[0]/Z50,c));
+#   Vtot = Vd[0];
+#   for(int i=1;i<nlayer;i++) dCum[i] = dCum[i]+dCum[i-1];
+#   for(int i=1;i<nlayer;i++){
+#     Vd[i] = 1.0/(1.0+pow(dCum[i]/Z50,c)) -1.0/(1.0+pow(dCum[i-1]/Z50,c));
+#     Vtot +=Vd[i];
+#   }
+#   //Rescale proportions so that they sum 1
+#   for(int i=0;i<nlayer; i++) {
+#     Vd[i] = Vd[i]/Vtot;
+#   }
+#   return(Vd);
+# }
+
+
+
+
 
 
 

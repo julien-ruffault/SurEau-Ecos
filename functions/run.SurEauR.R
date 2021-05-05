@@ -81,7 +81,8 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
           
         
         if (simulation_parameters$resolutionOutput == "subdaily") {
-          write.WBoutput(Date = climDay$Date, WBoutput = model_output, WBsoil = soil_var_list, WBveg = veg_var_list, WBclim = Clim_next)}
+          write.WBoutput(Date = climDay$Date, WBoutput = model_output, WBsoil = soil_var_list, WBveg = veg_var_list, WBclim = Clim_next)
+          }
           if(stopDeadPlant==T) {print('STOP2');break}
       } # end loop on hours
       if (simulation_parameters$resolutionOutput == "daily") {

@@ -59,7 +59,7 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   } # 6h-18h
 
   # desegregation at the hourly time step
-  TIME_HOUR <- seq(1, 24, 1)
+  TIME_HOUR <- seq(0, 23, 1)
   timeRelativeToSunset <- TIME_HOUR * 3600 - sunrise_sunset_daylen[1] # time relative to sunset (in seconds)
 
   # Radiation  --------------------------------------------------------------
@@ -105,8 +105,10 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
 
   WBclimHour$TIME <- modeling_options$TIME
-  WBclimHour$nHours <- round(as.numeric(base::diff(c(0, as.numeric(WBclimHour$TIME)))), digit = 2)
+  WBclimHour$nHours = c(base::diff(c(WBclimHour$TIME[length(WBclimHour$TIME)],24)),base::diff(as.numeric(WBclimHour$TIME)))
+  # nhours for the first time period is equal to midnight minus the last hour of the previous day 
 
+  
   if (length(modeling_options$TIME) < 24) {
     WBclimHour$RG <- WBclimHour$RG[modeling_options$TIME]
     WBclimHour$Rn <- WBclimHour$Rn[modeling_options$TIME]
@@ -117,7 +119,7 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
     WBclimHour$VPD <- WBclimHour$VPD[modeling_options$TIME]
     WBclimHour$WS <- WBclimHour$WS[modeling_options$TIME]
   }
-  WBclimHour$TIME[which(WBclimHour$TIME == 24)] <- 23.99
+  #WBclimHour$TIME[which(WBclimHour$TIME == 24)] <- 23.99
   return(WBclimHour)
 }
 

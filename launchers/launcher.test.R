@@ -5,7 +5,6 @@
 #           <Francois Pimont (francois.pimont@inrae.fr)>
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
-
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
 gc()            # Clear memory
