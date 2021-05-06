@@ -13,7 +13,7 @@
 #' @export
 #' @examples
 #'
-create.vegetation.parameters <- function(filePath, stand_parameters, modeling_options) {
+create.vegetation.parameters <- function(filePath, stand_parameters, soil_parameters, modeling_options) {
 
   if (file.exists(filePath)) {
     io <- read.csv(file = filePath, sep = ";", dec='.',head = T)
@@ -45,15 +45,18 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
-    "gmin_T",
+    "gmin_T",  #  conductance (gmin) of the trunk
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
     "k_TSymInit",
-    "gCrown0",
-    "gsMax", # parameter in Jarvis model (currently default to 200) 
-    "gsNight", # parameter in jarvis gs model (currently default to 20 
-    "JarvisPAR", # parameter in Jarvis gs mdoel (currently default is 0.006) 
-    "Tgs_sens",# temperature parameter in Jarvis model (currently default Value is 17)
-    "Tgs_optim" # temperature parameter in Jarvis model (currently default value is 25)
+    "gCrown0", 
+    "gsMax",      # parameter in Jarvis model (currently default to 200) 
+    "gsNight",    # parameter in jarvis gs model (currently default to 20 
+    "JarvisPAR",  # parameter in Jarvis gs mdoel (currently default is 0.006) 
+    "Tgs_sens",   # temperature parameter in Jarvis model (currently default Value is 17)
+    "Tgs_optim",  # temperature parameter in Jarvis model (currently default value is 25)
+    "fRootToLeaf", # root to leaf ratio 
+    "rootRadius",
+    "betaRootProfile"
   )
   
   for (i in 1:length(params)) {
@@ -170,17 +173,35 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
   
   
   
-  ##### calculate the different conductance of the plant from kPlantInit (option 1 for now)
-  conduc <- distribute.conductances(kPlantInit=.veg_params$kPlantInit) # TODO --> ajouter les LV 
+  # calculate root distribution within each soil layer (Jackson et al. 1996)
+  .veg_params$rootDistribution <-numeric(3)
+  .veg_params$rootDistribution[1] = 1-.veg_params$betaRootProfile^(soil_parameters$depth[1]*100) # conversion of depth to cm 
+  .veg_params$rootDistribution[2] = (1-.veg_params$betaRootProfile^(soil_parameters$depth[2]*100))-.veg_params$rootDistribution[1]
+  .veg_params$rootDistribution[3] = 1-(.veg_params$rootDistribution[1]+.veg_params$rootDistribution[2] )
+  
+
+  # determine root lenght (La gardner cowan)
+  RAI = .veg_params$LAImax*.veg_params$fRootToLeaf
+  
+  .veg_params$La = RAI*.veg_params$rootDistribution / (2*pi*.veg_params$rootRadius)
+  .veg_params$Lv = .veg_params$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
+  
+  ##### calculate the different conductance of the plant from kPlantInit 
+  conduc <- distribute.conductances(kPlantInit=.veg_params$kPlantInit, ri = .veg_params$rootDistribution) 
   .veg_params$k_TLInit <- conduc$k_TLInit
   .veg_params$k_RootInit <- conduc$k_RootInit 
   .veg_params$k_LSymInit <- conduc$k_LSymInit
   
-  
+
   # parameters that are difficult to estimate but that play a very minor role in the results  
   .veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?
   .veg_params$C_LApoInit = 1e-5
   .veg_params$C_TApoInit = 2e-5
+  
+  
+  print(".veg_params$TBA   = 0.8")       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?
+  print(".veg_params$C_LApoInit = 1e-5")
+  print(".veg_params$C_TApoInit = 2e-5")
   
   return(.veg_params)
 }

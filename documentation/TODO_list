@@ -1,45 +1,17 @@
 
 TODO list for SurEau  (mise à jour le 06/05/2021 par JR) 
 
-# update hours in whc clim hour from 1:24 to 0:23 
-# check LFMC routine and results 
-# update LAIdead/ change pheno function (see my previous version 3.3 )
-
-# see warning regarding saturation camp ampebell 
-* TO do now 
-
-# see the initilisation of Q for the trunk that hard coded in new.WBveg
-
-# refaire l'initialisation des parametres d'interaction soil-plants (JR and NM)
-Reorganiser l'initialisation du sol et l'initialisation de plante 
---> proposer une initialisation de la biomasse racinaire basée sur des allométries
---> determiner la surface racinaire en estimantun rayon de racine 
---> distribuer cette surface racinaire dans les couches de sol selon les règles proposées par Xu et al. , dekauwe et al. 2020  and li et al 2021
--->  - see to transfer Lv, La, R and kroot in WBveg rather than in WBsoil 
-
-# Implmenter une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (JR and FP)
-
+# check LFMC results (JR and NM)
+# update LAIdead/ change pheno function (see my previous version 3.3 ). Add an option to set LAIdead according to cavitation in modeling options (JR)
+# see the initilisation of Q for the trunk that hard coded in new.WBveg (NM and JR)
+# Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (FP)
 # Un script de comparaison et de plot de la simulation reference (JR, NM and FP)
- 
-# completer la fonction de reinitialisation des variables de vegetation chaque anne  
-
+# completer la fonction de reinitialisation des variables de vegetation chaque anne (JR and NM) 
 # voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
 
-# Changer le pas de temps horaire pour passer de 0 à 23 et non pas de 1 à 24 car jai été obligé de mettre le 24 à 23.999 et c'est pas top cette histoire (JR,FP)
-
-# Revoir la routine LFMC (entierement) / on  a fixe  water release de Canopy (JR and NM)
-
-
-
 # optionnal developements 
-  -separate output parameters from simulation parameters  ? (JR) 
-
  - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA 
  
-
-
-
-
  #----Trunk symplasmic canopy water content----
   #TODO Warning: same parameters for leaves and trunk (NM)
 
@@ -56,7 +28,6 @@ Reorganiser l'initialisation du sol et l'initialisation de plante
 # TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
 # In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
 
-
 #regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegulationType
 ## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
 
@@ -64,15 +35,11 @@ Reorganiser l'initialisation du sol et l'initialisation de plante
 #TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...
 #-- >OK bonne idee -->(JR)
 
-#conduc <- distribute.conductances(kPlantInit=.veg_params$kPlantInit) # TODO --> ajouter les LV  (JR and NM)
-
 #.veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?  --> (NM)
 
 -------------------------------------------------------------------------------------------
-
 # PRINCIPAUX DEVELOPPEMENTS : (JR and NM)
 # LAI leaf shedding --> pheno + changement conductance + option 
-
 
 # ENSUITE : 
 # 1. Comparaison avec SUREAU.C (NM)

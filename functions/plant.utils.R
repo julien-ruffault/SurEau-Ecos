@@ -71,12 +71,20 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
 
 
 
-distribute.conductances <- function(kPlantInit,Lv=c(7000,3000,3000))
+#' calcultate hydraulic conductances in the different portions of the plant 
+#' (trunk, leaf and root) according to predetermined rules 
+#' @param kPlantInit conductance of the plant from root to leaf 
+#' @param ri root distribution within the soil layers.
+#'
+#' @return
+#' @export
+#'
+#' @examples
+distribute.conductances <- function(kPlantInit,ri)
 {
-  warning("Lv is hard coded in 'distribute.conductances'")
   k_TLInit = 1/(0.2/kPlantInit)
   k_LSymInit = 1/(0.4/kPlantInit)
-  k_RootInit   = 1 /( 0.4 / kPlantInit) *Lv/sum(Lv)
+  k_RootInit   = 1 /( 0.4 / kPlantInit) *ri
   return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RootInit=k_RootInit))
 }
 

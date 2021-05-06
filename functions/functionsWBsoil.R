@@ -1,7 +1,13 @@
 # create a list of type WBsoil that contains all variables and parameters 
-new.WBsoil <- function(soil_params, initialisation = "Full") {
+new.WBsoil <- function(soil_params,vegetation_parameters, initialisation = "Full") {
   WBsoil <- list()
   WBsoil$params <- soil_params # add parameters 
+
+  #calculate B of the gardnar cowen model with information from the vegetation parameters
+  b <- 1 / sqrt(pi * vegetation_parameters$Lv)
+  WBsoil$params$B_GC <- vegetation_parameters$La * 2 * pi / (log(b / vegetation_parameters$rootRadius))
+    
+
 
   if (initialisation == "Full") {
     WBsoil$soilWaterStock <- soil_params$V_field_capacity

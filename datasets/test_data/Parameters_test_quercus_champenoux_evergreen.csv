@@ -35,3 +35,6 @@ gsNight;20
 JarvisPAR;0.006
 Tgs_sens;17
 Tgs_optim;25
+fRootToLeaf;1
+rootRadius;0.0002
+betaRootProfile;0.97
