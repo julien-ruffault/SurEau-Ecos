@@ -152,8 +152,8 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     .soilParams$Lv <- c(4265, 682, 171)
     .soilParams$r <- c(0.0007, 0.0007, 0.0007)
     
-    .soilParams$b <- 1 / sqrt(pi * .soilParams$Lv)
-    .soilParams$B_GC <- .soilParams$La * 2 * 3.14 / (log(.soilParams$b / .soilParams$r)) # B du modele de Gardnar-Cowen
+    b <- 1 / sqrt(pi * .soilParams$Lv)
+    .soilParams$B_GC <- .soilParams$La * 2 * 3.14 / (log(b / .soilParams$r)) # B du modele de Gardnar-Cowen
     
     
     #

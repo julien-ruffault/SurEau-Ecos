@@ -18,7 +18,7 @@
 #' @param compOptionsForEvapo the option to be used for the loops  (voir avec
 #'   Francois)
 #' @param stomatalRegulationType the type of regulation to be used for stomatal
-#'   response to leaf symplasmic water potential (default = "Creneau")
+#'   response to leaf symplasmic water potential (default = "PiecewiseLinear")
 #'
 #' @return
 #' @export
@@ -33,7 +33,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
-                                    stomatalRegulationType = c("Creneau", "Sigmoid")) {
+                                    stomatalRegulationType = c("PiecewiseLinear", "Sigmoid")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")

@@ -1,7 +1,6 @@
 
-TODO list for SurEau  (mise à jour le 03/05/2021 par JR) 
+TODO list for SurEau  (mise à jour le 06/05/2021 par JR) 
 
-# Change the name  creneau function by something else for stomat regulation type
 # update hours in whc clim hour from 1:24 to 0:23 
 # check LFMC routine and results 
 # update LAIdead/ change pheno function (see my previous version 3.3 )

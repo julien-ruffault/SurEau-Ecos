@@ -76,7 +76,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, modeling_op
   
   
   # Gestion des parameters de vegetaion pour la regulation stomatique selon  les options 
-  if (modeling_options$stomatalRegulationType=='Creneau')
+  if (modeling_options$stomatalRegulationType=='PiecewiseLinear')
   {
     params_regulation <- c("PsiStartClosing", "PsiClose")
   } 

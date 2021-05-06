@@ -182,15 +182,15 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
 
     REW <- actualavailwater / totalavailwater  #/ numeric [ncouches
     REW[REW <= 0.001] <- 0.001
-
+  
 
     KSoil_temp <- REW^(WBsoil$params$I_vg) * (1 - (1 - REW^(1 / WBsoil$params$m))^WBsoil$params$m)^2
-
-    #PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)-0.3
+  
+    #PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)-0.3 # for Puechabon only 
     
-    PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)
-    # diviser par 10000 pour passer de cm à MPa
- # }
+    PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)  # diviser par 10000 pour passer de cm à MPa
+    
+
   # Compute soil hydraulic conductivity with campbell
   # if (WBsoil$params$method == "camp") {
   #   Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC

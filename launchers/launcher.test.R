@@ -67,6 +67,13 @@ run.SurEauR(modeling_options = modeling_options ,
   
   
   
+  # plot des LFMC pour tests 
+   plot(DATA$DD,DATA$LFMC,type='l')
+   plot(DATA$DD,DATA$LFMCApo)
+   plot(DATA$DD,DATA$LFMCSymp,type='l')
+   plot(DATA$DD,DATA$FMCCanopy,type='l')
+
+  
   # plot des conductances 
   plot(DATA$DD,DATA$k_Root1,type='l',ylim=c(0,4),lwd=1.5)
   lines(DATA$DD,DATA$k_Root2,col='green',lwd=1.5)
@@ -75,6 +82,9 @@ run.SurEauR(modeling_options = modeling_options ,
   lines(DATA$DD,DATA$k_LSym,col='pink',lwd=1.5)
   lines(DATA$DD,DATA$k_TSym,col='grey30',lwd=1.5)
 
+  
+  plot(DATA$REW1,DATA$kSoil1)
+  
   plot(DATA$DD,DATA$PLC_Root)  
   lines(DATA$DD,DATA$PLC_TL)
 

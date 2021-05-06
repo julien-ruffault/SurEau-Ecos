@@ -591,11 +591,11 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
 
 
 # This function computes regulation ie stomatal closure parameters (including derivative from current psi)
-# stomatalclosure is 0, 1 or 2 depending on the value of psi in "creneau"
+# stomatalclosure is 0, 1 or 2 depending on the value of psi in "PiecewieLinear"
 # regulFact is regul proportion between 0 and 1
 # regulFactPrime is the first order derivative of regul function in psi
 compute.regulFact <- function(psi, params,regulationType) {
-  if(regulationType=="Creneau") {
+  if(regulationType=="PiecewiseLinear") {
     if (psi > params$PsiStartClosing) {
       stomatalClosure = 0
       regulFact = 1
