@@ -8,6 +8,10 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 # completer la fonction de reinitialisation des variables de vegetation chaque anne (JR and NM) 
 # voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
 
+# ajouter des sorties journalieres et annuelles  si les ouptus sont selectionnés a ce pas de temps 
+#  - > ajouter des variables journalieres qui font la moyenne et/ou min or max des variables  subdaily 
+#  --> ajouter des variables annuelles
+
 # optionnal developements 
  - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA 
  
@@ -40,9 +44,6 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 
 
 -------------------------------------------------------------------------------------------
-# PRINCIPAUX DEVELOPPEMENTS : (JR and NM)
-# LAI leaf shedding --> pheno + changement conductance + option 
-
 # ENSUITE : 
 # 1. Comparaison avec SUREAU.C (NM)
 # 2. Test de sensibilité des processus à la résolution temporelle (FP)
@@ -51,4 +52,4 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 # 5. Faire tourner sur autre vegetation pour tests 
 # 6. Faire un script pour produire des cartes sur le sud de la France (JR)
 # 7. Sites fluxnet et comparaison aux données 
-# 8. Essai d'inversion pour la RU 
+# 8. Essai d'inversion pour la RU. 

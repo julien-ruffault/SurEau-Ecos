@@ -30,7 +30,7 @@ modeling_options  <- create.modeling.options(constantClimate=T,
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
-                                                      outputType = 'diagnostic_subdaily',
+                                                      outputType = 'simple_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
