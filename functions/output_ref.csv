@@ -55,7 +55,7 @@ pptSoil;WBveg;pptSoil;1
 interceptedWaterAmount;WBveg;interceptedWaterAmount;1
 evaporationIntercepted;WBveg;evaporationIntercepted;1
 ETPr;WBveg;ETPr;1
-deadLAI;WBveg;deadLAI;1
+LAIdead;WBveg;LAIdead;1
 DFMC;WBveg;DFMC;1
 LFMCSymp;WBveg;LFMCSymp;1
 LFMCApo;WBveg;LFMCApo;1

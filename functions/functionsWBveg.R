@@ -78,9 +78,7 @@ new.WBveg <- function(veg_params) {
   WBveg$evaporationIntercepted <- 0
   WBveg$ETPr <- 0
   
-   warning("defoliation option is yet to be reimplented")
-  #WBveg$defoliation <- 0 # defoliation // no defoliation (add an option to set defoliation due to cavitation of the Plant Above)
-  WBveg$deadLAI <- 0
+  WBveg$LAIdead <- 0
   
   # Cavitation
   WBveg$PLC_Root     <- 0  # percent loss of conductivity [%]/ 
@@ -148,7 +146,7 @@ new.WBveg <- function(veg_params) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute pheno and LAI for an object WBveg in SUREAU_ECOS
 ### ### ### ### ### ### ### ### ### ### ## ### ### ### ### ### ### ### ### ##
-compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) {
+compute.pheno.WBveg <- function(WBveg, temperature, DOY) {
   
   # INPUTS --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- --- ---
   #   - WBveg
@@ -170,7 +168,7 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) 
     }
   }
   
-  if (WBveg$params$Foliage == "Deciduous" & LAImod == T) # si decidus LAI =fonction(pheno)-defol
+  if (WBveg$params$Foliage == "Deciduous") # si decidus LAI =fonction(pheno)
   {
     if (is.na(WBveg$budburstDate) == T) # si pas de debourrement
     {
@@ -196,35 +194,51 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY, LAImod = T, LAIpres=F) 
     }
     
   }
+  return(WBveg)
+}
+
+# update LAI as a function of LAIpheno and caviation + update LAI dependent parameters 
+### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   
-  # temporary for now /// 
-  WBveg$LAI <- WBveg$LAIpheno
+  if (modeling_options$defoliation == F) # cavitation does not affect LAI
+  {WBveg$LAIdead = 0 }
+  
+  else if (modeling_options$defoliation == T) # cvitation affect LAI 
+  {
+    #  leaf shedding because of cavitation  // starts only if PLCabove > 10 % 
+    if (WBveg$PLC_TL > 10){
+      WBveg$LAIdead <- max(0, WBveg$LAIpheno *WBveg$PLC_TL / 100) # defoliation in LAI unit
+    }else {WBveg$LAIdead = 0}
+  }
+  
+  WBveg$LAI     <-  WBveg$LAIpheno - WBveg$LAIdead
+
   
   # update LAI-dependent variables 
   WBveg$FCC <- (1 - exp(-WBveg$params$K * WBveg$LAI))
   WBveg$canopyStorageCapacity  <- 1.5 * WBveg$LAI
   
   # update water storing capacities of the dead and living canopy
-  WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA
-  WBveg$DMDeadCanopy <- WBveg$deadLAI * WBveg$params$LMA
+  WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA      # water storing capacities of the living component
+  WBveg$DMDeadCanopy <- WBveg$LAIdead * WBveg$params$LMA  # water storing capacities of the dead component
+  #.WBveg$WCCanopySympSat <- (1 / (.WBveg$params$LDMC / 1000) - 1) * .WBveg$DMLiveCanopy * (1 - .WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  #.WBveg$WCCanopyApo <- (1 - .WBveg$PLCAbove / 100) * .WBveg$DMLiveCanopy * (1 / (.WBveg$params$LDMC / 1000) - 1) * (.WBveg$params$ApoplasmicFrac) / 1000
   
-  if (DOY==1)
-  {
-    WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
-
-    WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
-   
-    WBveg$Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
-   
-    WBveg$Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
-    WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
-   
-  }
-
+  WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
+  
+  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
+  
+  WBveg$Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
+  
+  WBveg$Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
+  
   return(WBveg)
+  
 }
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##

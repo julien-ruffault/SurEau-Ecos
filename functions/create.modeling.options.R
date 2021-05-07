@@ -19,6 +19,10 @@
 #'   Francois)
 #' @param stomatalRegulationType the type of regulation to be used for stomatal
 #'   response to leaf symplasmic water potential (default = "PiecewiseLinear")
+#' @param defoliation a logical value indicating whether trees should loose 
+#' leaves when occurs.cavitation occurs of the above part of plant.  Defoliation 
+#' starts only when PLC > 10% .
+#' 
 #'
 #' @return
 #' @export
@@ -29,6 +33,7 @@
 create.modeling.options <- function(timeStepForEvapo = 1,
                                     resetSWC = F,
                                     avoidWaterSoilTransfer = T,
+                                    defoliation =F,
                                     ETPFormulation = c("PT", "PM"),
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
@@ -54,6 +59,14 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   if (!is.logical(constantClimate)) {
     stop(" 'constantClimate' must be 'T' or 'F'.")
   }
+  
+  if (!is.logical(defoliation)) {
+    stop(" 'defoliation' must be 'T' or 'F'.")
+  }
+  
+  
+  
+  
 
   ETPFormulation <- match.arg(ETPFormulation)
   RnFormulation <- match.arg(RnFormulation)
@@ -88,6 +101,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$avoidWaterSoilTransfer <- avoidWaterSoilTransfer
   modeling_options$compOptions <- compOptions
   modeling_options$stomatalRegulationType <- stomatalRegulationType
+  modeling_options$defoliation <- defoliation
 
   return(modeling_options)
 }

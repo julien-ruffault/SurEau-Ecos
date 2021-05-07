@@ -10,7 +10,7 @@ rm(list = ls()) # Clear environment
 gc()            # Clear memory
 
 
-# Warning  : check how is gCrown calucalute in the fucntion compute.Transpiration. WBVeg/ seems that there is a mistake for windspeed ! 
+# Warning  : check how is gCrown calucalute in the function compute.Transpiration. WBVeg/ seems that there is a mistake for windspeed ! 
 
 
 # User options  ----------------------------------------------------------------
@@ -25,8 +25,9 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
 modeling_options  <- create.modeling.options(constantClimate=T,
-                                                 stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
-simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                         # <-- indicate here simulation parameters
+                                             stomatalRegulationType = "Sigmoid",
+                                             defoliation = T)                      
+simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
                                                       outputType = 'diagnostic_subdaily',
@@ -34,11 +35,11 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990
                                                       outputPath = output_path)
 
 ### Create input files and run SurEau-Ecos--------------------------------------
-climate_data     <- create.climate.data(filePath=climateData_path, modeling_options=modeling_options, simulation_parameters=simulation_parameters) #
-stand_parameters <- create.stand.parameters(LAImax=6, lat = 48.73, lon=6.23)
+climate_data     <- create.climate.data(filePath = climateData_path, modeling_options = modeling_options, simulation_parameters = simulation_parameters) #
+stand_parameters <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
 
 soil_parameters  <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
-vegetation_parameters <- create.vegetation.parameters(filePath =vegetationParameters_path, stand_parameters = stand_parameters, soil_parameter=soil_parameters,modeling_options = modeling_options)
+vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, stand_parameters = stand_parameters, soil_parameter = soil_parameters,modeling_options = modeling_options)
 
 run.SurEauR(modeling_options = modeling_options ,
         simulation_parameters = simulation_parameters, 
@@ -53,9 +54,9 @@ run.SurEauR(modeling_options = modeling_options ,
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
   
-  plot(DATA$PAR[1:24])
-  plot(DATA$gs_bound[1:100],type='l')
-  plot(DATA$gs_bound,type='l')
+  #plot(DATA$PAR[1:24])
+  #plot(DATA$gs_bound[1:100],type='l')
+  #plot(DATA$gs_bound,type='l')
   
   
   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
@@ -66,6 +67,8 @@ run.SurEauR(modeling_options = modeling_options ,
   
   lines(DATA$DD,DATA$Psi_AllSoil,type='l',lwd=2)
   
+  plot(DATA$DD,DATA$LAI)
+  plot(DATA$DD,DATA$LAIdead)
   
   
   # plot des LFMC pour tests 
@@ -86,8 +89,8 @@ run.SurEauR(modeling_options = modeling_options ,
   
   plot(DATA$REW1,DATA$kSoil1)
   
-  plot(DATA$DD,DATA$PLC_Root)  
-  lines(DATA$DD,DATA$PLC_TL)
+  plot(DATA$DD,DATA$PLC_Root,type='l')  
+  lines(DATA$DD,DATA$PLC_TL,col='red')
 
   plot(DATA$C_LSym,type='l')
   plot(DATA$C_LApo)

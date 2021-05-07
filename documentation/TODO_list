@@ -2,7 +2,6 @@
 TODO list for SurEau  (mise à jour le 06/05/2021 par JR) 
 
 # check LFMC results (JR and NM)
-# update LAIdead/ change pheno function (see my previous version 3.3 ). Add an option to set LAIdead according to cavitation in modeling options (JR)
 # see the initilisation of Q for the trunk that hard coded in new.WBveg (NM and JR)
 # Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (FP)
 # Un script de comparaison et de plot de la simulation reference (JR, NM and FP)
@@ -14,8 +13,6 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
  
  #----Trunk symplasmic canopy water content----
   #TODO Warning: same parameters for leaves and trunk (NM)
-
-# - K_LSym = opt$Lsym * WBveg$k_LSym   # TODO move to new.WBveg as opt parameters do not change thouought the simulation (JR) see with FP 
 
 ---
 # computeTranspiration (gmin, Emin, gcanopy, Ebound and regulation)
@@ -36,6 +33,11 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 #-- >OK bonne idee -->(JR)
 
 #.veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?  --> (NM)
+
+
+
+
+
 
 -------------------------------------------------------------------------------------------
 # PRINCIPAUX DEVELOPPEMENTS : (JR and NM)
