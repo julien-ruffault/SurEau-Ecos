@@ -78,6 +78,7 @@ new.WBveg <- function(veg_params) {
   WBveg$evaporationIntercepted <- 0
   WBveg$ETPr <- 0
   
+  WBveg$defoliation <- 0 # defoliation // no defoliation (add an option to set defoliation due to cavitation of the Plant Above)
   WBveg$LAIdead <- 0
   
   # Cavitation
