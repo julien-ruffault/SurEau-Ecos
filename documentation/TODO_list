@@ -2,9 +2,7 @@
 TODO list for SurEau  (mise à jour le 06/05/2021 par JR) 
 
 # check LFMC results (JR and NM)
-# see the initilisation of Q for the trunk that hard coded in new.WBveg (NM and JR)# 
-
-# voir la relation Tsoil vs Tair 
+# voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP 
  
 # Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (FP)
 # Un script de comparaison et de plot de la simulation reference (JR, NM and FP)

@@ -417,7 +417,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
     for (its in c(1:nts)) { #INTERNAL LOOP ON SMALL TIME STEPS
       p = (its-0.5)/nts
       WBclim = interp.WBclim(WBclim_current,WBclim_next,p) # climate at nph
-      WBsoil_n <- compute.evaporationG.WBsoil(WBsoil = WBsoil_n,ETP = WBveg_n$ETPr,RHair = WBclim$RHair,K = WBveg_n$params$K,LAI = WBveg_n$LAI,Nhours = Nhours/nts)
+      WBsoil_n <- compute.evaporationG.WBsoil(WBsoil = WBsoil_n,ETP = WBveg_n$ETPr,Tair = WBclim$Tair_mean, RHair = WBclim$RHair,K = WBveg_n$params$K,LAI = WBveg_n$LAI,Nhours = Nhours/nts)
       fluxEvaporationSoilLargeTimeStep = fluxEvaporationSoilLargeTimeStep + WBsoil_n$E_Soil3/nts
       #WBclim = lapply(seq_along(WBclim_current),function(i) unlist(0.5*(WBclim_current[i])+unlist(WBclim_next[i])))
       WBveg_tmp <- compute.transpiration.WBveg(WBveg_n, WBclim, Nhours, modeling_options) # transpi with climate at nph

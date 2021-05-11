@@ -57,10 +57,12 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
 }
 
 # compute Evaporation from ETP and Gsoil and update SWS, Psi and in each soil layer 
-compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tsoil = 20, Nhours, LAI, ETP, K) {
+compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K) {
   # created 03/01/2021 by JR / based on SurEau.C with gsoil0
   # such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
 
+  Tsoil = 0.6009*Tair+3.59 # from relation fitted on O3HP 
+  
   VPDsoil <- compute.VPDfromRHandT(RHair, Tsoil)
 
   if (Tsoil < 0) {

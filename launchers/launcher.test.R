@@ -76,7 +76,7 @@ run.SurEauR(modeling_options = modeling_options ,
    plot(DATA$DD,DATA$LFMCApo)
    plot(DATA$DD,DATA$LFMCSymp,type='l')
    plot(DATA$DD,DATA$FMCCanopy,type='l')
-
+   plot(DATA$DD,DATA$DFMC,type='l')
   
   # plot des conductances 
   plot(DATA$DD,DATA$k_Root1,type='l',ylim=c(0,4),lwd=1.5)
@@ -98,8 +98,6 @@ run.SurEauR(modeling_options = modeling_options ,
   plot(DATA$C_TSym)
   
   plot(DATA$Psi_LSym,DATA$C_LSym)
-  
-  plot(DATA$
   
   plot(DATA$DD,DATA$SWS1,col='black',type='l')
   lines(DATA$DD,DATA$SWS2,col='red')

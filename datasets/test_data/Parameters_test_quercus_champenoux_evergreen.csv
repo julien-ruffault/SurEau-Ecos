@@ -42,7 +42,7 @@ PiFullTurgor_Trunk;-2.1
 EpsilonSymp_Trunk;10
 ApoplasmicFrac_Trunk;0.4
 SymplasmicFrac_Trunk;0.2
-VolumeLiving_TRB;10
+VolumeLiving_TRB;5
 fTRBToLeaf;0.8
 C_LApoInit;1e-5
 C_TApoInit;2e-5
