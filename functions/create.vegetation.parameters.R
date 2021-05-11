@@ -5,6 +5,7 @@
 #' create a list wit the vegetation parameters to run \code{run.SurEauR}
 #'
 #' @param filePath path to a csv file containing parameter values 
+#' @param listOfParameters a list containing the necessary input parameters instead of reading them in file. Will only be used if 'filePath' arguement is not provided
 #' @param stand_parameters  a list containing stand parameters created with \code{create.stand.parameters} 
 #' @param modeling_options  a list containing modeling options created with \code{create.modeling.options} 
 #'
@@ -13,8 +14,45 @@
 #' @export
 #' @examples
 #'
-create.vegetation.parameters <- function(filePath, stand_parameters, soil_parameters, modeling_options) {
+create.vegetation.parameters <- function(filePath,listOfParameters,stand_parameters, soil_parameters, modeling_options) {
 
+   
+  if (!missing(filePath))
+  {TTT = read.vegetation.file(filePath,modeling_options=modeling_options)}
+
+  if(missing(filePath) &  !missing(listOfParameters))
+  {TTT=listOfParameters}
+
+  if(missing(filePath) &  missing(listOfParameters))
+  {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
+
+  
+  
+  # calculate root distribution within each soil layer (Jackson et al. 1996)
+  TTT$rootDistribution <-numeric(3)
+  TTT$rootDistribution[1] = 1-TTT$betaRootProfile^(soil_parameters$depth[1]*100) # conversion of depth to cm 
+  TTT$rootDistribution[2] = (1-TTT$betaRootProfile^(soil_parameters$depth[2]*100))-TTT$rootDistribution[1]
+  TTT$rootDistribution[3] = 1-(TTT$rootDistribution[1]+TTT$rootDistribution[2] )
+  
+
+  # determine root lenght (La gardner cowan)
+  RAI = TTT$LAImax*TTT$fRootToLeaf
+  
+  TTT$La = RAI*TTT$rootDistribution / (2*pi*TTT$rootRadius)
+  TTT$Lv = TTT$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
+  
+  ##### calculate the different conductance of the plant from kPlantInit 
+  conduc <- distribute.conductances(kPlantInit=TTT$kPlantInit, ri = TTT$rootDistribution) 
+  TTT$k_TLInit <- conduc$k_TLInit
+  TTT$k_RootInit <- conduc$k_RootInit 
+  TTT$k_LSymInit <- conduc$k_LSymInit
+  
+  
+  return(TTT)
+}
+
+read.vegetation.file <- function(filePath, modeling_options){
+  
   if (file.exists(filePath)) {
     io <- read.csv(file = filePath, sep = ";", dec='.',head = T)
   } else {
@@ -22,9 +60,9 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
   }
   
   colnames(io) <- c("Name", "Value")
-
-  .veg_params <- list() # initialization 
-  .veg_params$LAImax <- stand_parameters$LAImax
+  
+  TTT <- list() # initialization 
+  TTT$LAImax <- stand_parameters$LAImax
   
   # setting commomn params for WB_veg (regardless of the options)
   params <- c(
@@ -77,7 +115,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
       stop(paste0("'", params[i], "' is not provided several times in input vegetation parameter file, correct \n", filePath))
     } else if (length(AAA) == 1) {
       if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-        eval(parse(text = paste0(".veg_params$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+        eval(parse(text = paste0("TTT$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
       } else {
         stop(paste0(params[i], "must be numeric"))
       }
@@ -92,7 +130,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
     params_regulation <- c("PsiStartClosing", "PsiClose")
   } 
   if(modeling_options$stomatalRegulationType=='Sigmoid') {
-  params_regulation <- c("P12_gs", "P88_gs")
+    params_regulation <- c("P12_gs", "P88_gs")
   }
   
   for (i in 1:length(params_regulation)) {
@@ -105,7 +143,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
       stop(paste0("'", params_regulation[i], "' is provided several times in input vegetation parameter file, correct \n", filePath))
     } else if (length(AAA) == 1) {
       if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-        eval(parse(text = paste0(".veg_params$", params_regulation[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+        eval(parse(text = paste0("TTT$", params_regulation[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
       } else {
         stop(paste0(params_regulation[i], "must be numeric"))
       }
@@ -113,12 +151,12 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
   }
   
   if (modeling_options$stomatalRegulationType=='Sigmoid')
-  {.veg_params$P50_gs  = (.veg_params$P12_gs + .veg_params$P88_gs)/2
-  .veg_params$slope_gs = 100/(.veg_params$P12_gs-.veg_params$P88_gs)
+  {TTT$P50_gs  = (TTT$P12_gs + TTT$P88_gs)/2
+  TTT$slope_gs = 100/(TTT$P12_gs-TTT$P88_gs)
   }
   
-
-
+  
+  
   ##### Foliage Type  ####
   AAA <- io[which(io$Name == "Foliage"), "Value"]
   if (length(AAA) == 0) # checking that it exists in input file  /otherwise stop running
@@ -127,14 +165,14 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
   } else if (length(AAA) > 1) {
     stop(paste0("'", params[i], "'Foliage' is provided several times in input vegetation parameter file, correct"))
   } else if (length(AAA) == 1) { # checking that parameter is numeric in input file /stop running otherwise
-    .veg_params$Foliage <- as.character(AAA)
+    TTT$Foliage <- as.character(AAA)
   }
   
-  if (!.veg_params$Foliage %in% c("Evergreen", "Deciduous")) {
+  if (!TTT$Foliage %in% c("Evergreen", "Deciduous")) {
     stop("'Foliage' should be 'Evergreen' or 'Deciduous' / Check Type of spelling ")
   }
   
-  if (.veg_params$Foliage == "Deciduous") {
+  if (TTT$Foliage == "Deciduous") {
     params_Decid <- c("Tbase", "Fcrit", "DayStart", "nbdayLAI")
     for (i in 1:length(params_Decid))
     {
@@ -147,7 +185,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
         stop(paste0("'", params_Decid[i], "' is not provided several times in input vegetation parameter file, correctr"))
       } else if (length(AAA) == 1) {
         if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-          eval(parse(text = paste0(".veg_params$", params_Decid[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+          eval(parse(text = paste0("TTT$", params_Decid[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
         } else {
           stop(paste0(params_Decid[i], "must be numeric"))
         }
@@ -171,7 +209,7 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
         stop(paste0("'", params_PT[i], "' is provided several times in input vegetation file"))
       } else if (length(AAA) == 1) {
         if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-          eval(parse(text = paste0(".veg_params$", params_PT[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+          eval(parse(text = paste0("TTT$", params_PT[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
         } else {
           stop(paste0(params_PT[i], "must be numeric, check in input vegetation file "))
         }
@@ -179,29 +217,6 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
     }
   }
   
+  return(TTT)
   
-  
-  # calculate root distribution within each soil layer (Jackson et al. 1996)
-  .veg_params$rootDistribution <-numeric(3)
-  .veg_params$rootDistribution[1] = 1-.veg_params$betaRootProfile^(soil_parameters$depth[1]*100) # conversion of depth to cm 
-  .veg_params$rootDistribution[2] = (1-.veg_params$betaRootProfile^(soil_parameters$depth[2]*100))-.veg_params$rootDistribution[1]
-  .veg_params$rootDistribution[3] = 1-(.veg_params$rootDistribution[1]+.veg_params$rootDistribution[2] )
-  
-
-  # determine root lenght (La gardner cowan)
-  RAI = .veg_params$LAImax*.veg_params$fRootToLeaf
-  
-  .veg_params$La = RAI*.veg_params$rootDistribution / (2*pi*.veg_params$rootRadius)
-  .veg_params$Lv = .veg_params$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
-  
-  ##### calculate the different conductance of the plant from kPlantInit 
-  conduc <- distribute.conductances(kPlantInit=.veg_params$kPlantInit, ri = .veg_params$rootDistribution) 
-  .veg_params$k_TLInit <- conduc$k_TLInit
-  .veg_params$k_RootInit <- conduc$k_RootInit 
-  .veg_params$k_LSymInit <- conduc$k_LSymInit
-  
-  
-  return(.veg_params)
-}
-
-
+  }

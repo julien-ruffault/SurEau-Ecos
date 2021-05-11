@@ -3,13 +3,14 @@
 #' create a list with soil parameters to run SureauR
 #'
 #' @param filePath path to a csv file containing parameter values
+#' @param listOfParameters a list containing the necessary input parameterr instead of reading them  in file. Will only be used if 'filePath' arguement is not provided
 #' @param depths maximum depth (in m) of the soil layers (default : 0.3, 1 and 4 meters) 
 #' @param default_soil a logical value indicating whether a default soil should be used  to run tests (default =F) 
 #' @return
 #' @export
 #'
 #' @examples
-create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil = F) {
+create.soil.parameters<- function(filePath, listOfParameters, depths = c(0.3, 1, 4), default_soil = F) {
   
    # note : warning("if run on puechabon : add an Offset  on psisoil (-0.3) to match observations --> / modify  in function 'computeSoilConductanceAndPsi.WBsoil'  ") 
     
@@ -62,54 +63,16 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     }
     if (default_soil == F) #
     {
-      if (file.exists(filePath)) {
-        io <- data.frame(read.csv(filePath,header=T,sep=';',dec='.'))
-      } else {
-        stop(paste0("Could not find input soil parameter file : ", filePath))
-      }
+      if (!missing(filePath))
+      {TTT = read.soil.file(filePath)}
       
+      if(missing(filePath) &  !missing(listOfParameters))
+      {TTT=listOfParameters}
       
-      colnames(io) <- c("Name", "Value")
-      #   # setting common parameters for WB_soil (regardless of the options)
-      params <- c(
-        "RFC_1",
-        "RFC_2",
-        "RFC_3",
-        "field_capacity",
-        "wilting_point",
-        "alpha_vg",
-        "n_vg",
-        "I_vg",
-        "Ksat_vg",
-        "saturation_capacity_vg",
-        "residual_capacity_vg",
-        "gSoil0"
-      )
+      if(missing(filePath) &  missing(listOfParameters))
+      {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
       
-      TTT <- NULL
-      for (i in 1:length(params))
-      {
-        AAA <- which(io$Name == params[i]) ## line number of the variable
-        
-        if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
-        {
-          stop(paste0("'", params[i], "' is not provided in input soil parameter file, check presence or spelling\n", filePath))
-        } else if (length(AAA) > 1) {
-          stop(paste0("'", params[i], "' is provided several times in input soil parameter file, correct \n", filePath))
-        } else if (length(AAA) == 1) {
-          if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
-            #print(params[i])
-            
-            eval(parse(text = paste0("TTT$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
-          } else {
-            stop(paste0(params[i], "must be numeric"))
-          }
-        }
-      } # end loop on params
-      
-      
-      
-      
+    
       .soilParams$gSoil0 <- TTT$gSoil0
       
       .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
@@ -153,5 +116,51 @@ create.soil.parameters<- function(filePath, depths = c(0.3, 1, 4), default_soil 
     return(.soilParams)
   } # end of the function
   
-
+read.soil.file <- function(filePath){ 
+  if (file.exists(filePath)) {
+    io <- data.frame(read.csv(filePath,header=T,sep=';',dec='.'))
+  } else {
+    stop(paste0("Could not find input soil parameter file : ", filePath))
+  }
   
+  colnames(io) <- c("Name", "Value")
+  #   # setting common parameters for WB_soil (regardless of the options)
+  params <- c(
+    "RFC_1",
+    "RFC_2",
+    "RFC_3",
+    "field_capacity",
+    "wilting_point",
+    "alpha_vg",
+    "n_vg",
+    "I_vg",
+    "Ksat_vg",
+    "saturation_capacity_vg",
+    "residual_capacity_vg",
+    "gSoil0"
+  )
+  
+  TTT <- NULL
+  for (i in 1:length(params))
+  {
+    AAA <- which(io$Name == params[i]) ## line number of the variable
+    
+    if (length(AAA) == 0) # checking that it exists n input file  /otherwise stop running
+    {
+      stop(paste0("'", params[i], "' is not provided in input soil parameter file, check presence or spelling\n", filePath))
+    } else if (length(AAA) > 1) {
+      stop(paste0("'", params[i], "' is provided several times in input soil parameter file, correct \n", filePath))
+    } else if (length(AAA) == 1) {
+      if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
+        #print(params[i])
+        
+        eval(parse(text = paste0("TTT$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+      } else {
+        stop(paste0(params[i], "must be numeric"))
+      }
+    }
+  } # end loop on params
+  
+  return(TTT)
+  
+}

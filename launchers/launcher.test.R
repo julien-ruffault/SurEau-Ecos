@@ -24,9 +24,9 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
-modeling_options  <- create.modeling.options(constantClimate=T,
+modeling_options     <- create.modeling.options(constantClimate=T,
                                              stomatalRegulationType = "Sigmoid",
-                                             defoliation = T)                      
+                                             defoliation = F)                      
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
