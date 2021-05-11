@@ -55,6 +55,7 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
+    #browser()
     df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)

@@ -6,7 +6,7 @@
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # Initialization ---------------------------------------------------------------
-rm(list = ls()) # Clear environment
+rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
 
@@ -30,7 +30,7 @@ modeling_options  <- create.modeling.options(constantClimate=T,
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
-                                                      outputType = 'simple_subdaily',
+                                                      outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -99,7 +99,7 @@ run.SurEauR(modeling_options = modeling_options ,
   
   plot(DATA$Psi_LSym,DATA$C_LSym)
   
-  
+  plot(DATA$
   
   plot(DATA$DD,DATA$SWS1,col='black',type='l')
   lines(DATA$DD,DATA$SWS2,col='red')
@@ -113,9 +113,7 @@ run.SurEauR(modeling_options = modeling_options ,
  
 
 
-
- 
- # datmax=max(DATA$Time)
+# datmax=max(DATA$Time)
 # datmin=min(DATA$Time)
 # 
 # nicolasOutput='F'

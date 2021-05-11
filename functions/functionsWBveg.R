@@ -15,7 +15,10 @@ new.WBveg <- function(veg_params) {
   WBveg <- list() # initialisation
   
   WBveg$params <- veg_params # assign parameters 
-  WBveg$params$PsiTlp <- WBveg$params$PiFullTurgor*WBveg$params$EpsilonSymp/(WBveg$params$PiFullTurgor+WBveg$params$EpsilonSymp)
+  
+  WBveg$params$PsiTlp_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
+  WBveg$params$PsiTlp_Trunk <-  WBveg$params$PiFullTurgor_Trunk*WBveg$params$EpsilonSymp_Trunk/(WBveg$params$PiFullTurgor_Trunk+WBveg$params$EpsilonSymp_Trunk)
+  
   
   # potentials 
   WBveg$Psi_LApo = 0
@@ -46,14 +49,13 @@ new.WBveg <- function(veg_params) {
   # Leaf and canopy conductance
   WBveg$gmin <- NA #Gmin for leaves
   WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
-  WBveg$gs <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
   WBveg$gs_bound <- NA
-  WBveg$gs_lim <- NA
+  WBveg$gs_lim <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
   WBveg$gcanopy_Bound <- NA
   WBveg$gcanopy_lim <- NA
   WBveg$gBL <- NA
   WBveg$gCrown <- NA
-  WBveg$regulFact <- 0.01 # 
+  WBveg$regulFact <- 0.01 #  TODO voir si y'a besoin d'initialiser 
   
   
   # Fluxes
@@ -107,8 +109,6 @@ new.WBveg <- function(veg_params) {
   WBveg$DMDeadCanopy    <- 0 # Dead Canopy dry matter [gMS/m2 soil]
   
   #---------------------# 
-  warning("cleaner bien ces initialisation des Q, a voir avec la revision du calcul du LFMC") 
-
   # Q leaf apo 
   WBveg$Q_LApo_sat_mmol  <- 0
   WBveg$Q_LApo_sat_L <- 0
@@ -223,19 +223,17 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   # update water storing capacities of the dead and living canopy
   WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA      # water storing capacities of the living component
   WBveg$DMDeadCanopy <- WBveg$LAIdead * WBveg$params$LMA  # water storing capacities of the dead component
-  #.WBveg$WCCanopySympSat <- (1 / (.WBveg$params$LDMC / 1000) - 1) * .WBveg$DMLiveCanopy * (1 - .WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-  #.WBveg$WCCanopyApo <- (1 - .WBveg$PLCAbove / 100) * .WBveg$DMLiveCanopy * (1 / (.WBveg$params$LDMC / 1000) - 1) * (.WBveg$params$ApoplasmicFrac) / 1000
   
-  WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
   
-  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
   
-  WBveg$Q_TSym_sat_L <- 5 * (1 - 0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_TSym_sat_L <- WBveg$params$VolumeLiving_TRB *WBveg$params$SymplasmicFrac_Trunk
   WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
   
-  WBveg$Q_TApo_sat_L <- 5 * (0.7) # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_TApo_sat_L <- WBveg$params$VolumeLiving_TRB*WBveg$params$ApoplasmicFrac_Trunk 
   WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
   
   return(WBveg)
@@ -275,13 +273,13 @@ compute.waterStorage.WBveg <- function(WBveg, VPD) {
   WBveg$DFMC <- compute.DFMC(VPD)
   
   #----Symplasmic canopy water content of the leaves----
-  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
+  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
   Q_LSym <- max(0,  RWC_LSym) * WBveg$Q_LSym_sat_L
-  WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac) / 1000))
+  WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000))
   
   #---Apoplasmic water content-------------------------------------------------
   Q_LApo = (1-WBveg$PLC_TL/100) *  WBveg$Q_LApo_sat_L
-  WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
+  WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac_Leaf / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
   #------LFMC total---- (Apo+Symp) --------------------------------------------
   WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
@@ -316,7 +314,7 @@ compute.evapoIntercepted.WBveg <- function(WBveg, ETP) {
 # --> PLC_Root <- il est fonction du PsitrunkAPO 
 # --> PLC_TL   <-  il est fonction du PsiLeaf APO 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# updateKplant - checked FP 11/03/2021 # upaated JR 22/04/2021 
+# updateKplant
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 update.kplant.WBveg <- function(WBveg,WBsoil) {
   # calculate k_Root and k_TL with cavitation
@@ -330,54 +328,53 @@ update.kplant.WBveg <- function(WBveg,WBsoil) {
 }
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Compute an update plant capacitances
+# update symplasmic plant capacitances for Trunk and leaves 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-update.capaSym.WBveg <- function(WBveg){
-  PsiTlp <- WBveg$params$PsiTlp
-  PiFullTurgor <- WBveg$params$PiFullTurgor
-  Esymp <- WBveg$params$EpsilonSymp
-  dbxmin = 1e-100 # NM minimal double to avoid-INF
-  
+update.capaSym.WBveg <- function(WBveg) {
+  dbxmin <- 1e-100 # NM minimal double to avoid-INF
+
   #----Compute the relative water content of the symplasm----
-  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_LSym-dbxmin) # Relative water content (unitless)
+  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym - dbxmin) 
   #----Compute the derivative of the relative water content of the symplasm----
-  if(WBveg$Psi_LSym > PsiTlp) { # FP derivative of -Pi0- Eps(1-RWC)+Pi0/RWC
-    RWC_LSym_prime = RWC_LSym/(-PiFullTurgor-WBveg$Psi_LSym-Esymp+2*Esymp*RWC_LSym)
+  if (WBveg$Psi_LSym > WBveg$params$PsiTlp_Leaf) { # FP derivative of -Pi0- Eps(1-RWC)+Pi0/RWC
+    RWC_LSym_prime <- RWC_LSym / (-WBveg$params$PiFullTurgor_Leaf - WBveg$Psi_LSym - WBveg$params$EpsilonSymp_Leaf + 2 * WBveg$params$EpsilonSymp_Leaf * RWC_LSym)
   } else {
-    RWC_LSym_prime = -PiFullTurgor/WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
+    RWC_LSym_prime <- -WBveg$params$PiFullTurgor_Leaf / WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
   }
-  #Compute the leaf capacitance (mmol/MPa/m2_sol)
-  WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol*RWC_LSym_prime
-  
+  # Compute the leaf capacitance (mmol/MPa/m2_sol)
+  WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol * RWC_LSym_prime
+
   #----Trunk symplasmic canopy water content----
-  #TODO Warning: same parameters for leaves and trunk
-  RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor, Esymp = WBveg$params$EpsilonSymp, Pmin = WBveg$Psi_TSym-dbxmin) # Relative water content (unitless)
-  
+  RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Trunk, Esymp = WBveg$params$EpsilonSymp_Trunk, Pmin = WBveg$Psi_TSym - dbxmin) 
+
   #----Compute the derivative of the relative water content of the symplasm----
-  if(WBveg$Psi_TSym > PsiTlp) {RWC_TSym_prime = RWC_TSym/(-PiFullTurgor-WBveg$Psi_TSym-Esymp+2*Esymp*RWC_TSym)} 
-  else {RWC_TSym_prime = -PiFullTurgor/WBveg$Psi_TSym^2}
-  #Compute the capacitance (mmol/MPa/m2_sol)
-  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol*RWC_TSym_prime
-  
+  if (WBveg$Psi_TSym > WBveg$params$PsiTlp_Trunk) {
+    RWC_TSym_prime <- RWC_TSym / (-WBveg$params$PiFullTurgor_Trunk - WBveg$Psi_TSym - WBveg$params$EpsilonSymp_Trunk + 2 * WBveg$params$EpsilonSymp_Trunk * RWC_TSym)
+  }
+  else {
+    RWC_TSym_prime <- -WBveg$params$PiFullTurgor_Trunk / WBveg$Psi_TSym^2
+  }
+  # Compute the capacitance (mmol/MPa/m2_sol)
+  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol * RWC_TSym_prime
+
   return(WBveg)
 }
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # computeTranspiration
-# TODO check why we have gs and gs_lim with same value
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
   TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean,SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
-                     WS = WBclim$WS,VPD = WBclim$VPD,RH = max(100, WBclim$RHair_mean),gs=WBveg$gs,Einst = max(0.00001, WBveg$SumFluxSoilToCollar))
+                     WS = WBclim$WS,VPD = WBclim$VPD,RH = max(100, WBclim$RHair_mean),gs=WBveg$gs_lim,Einst = max(0.00001, WBveg$SumFluxSoilToCollar))
   WBveg$leafTemperature <- TGbl_Leaf [1] # Transpiration/Gs du pas de temps précédent
   # cuticular 
   WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- calcul.Emin(gmin = WBveg$gmin, VPD = WBclim$VPD)
-  WBveg$EminT <-  WBveg$params$TBA * calcul.Emin(gmin = WBveg$gmin_T,VPD= WBclim$VPD)
+  WBveg$EminT <-  WBveg$params$fTRBToLeaf * calcul.Emin(gmin = WBveg$gmin_T,VPD= WBclim$VPD)
   
   # canopy with no regulation
-  WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR)
+  WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
   WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
   WBveg$gBL = TGbl_Leaf[2]
   WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
@@ -389,7 +386,6 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   
   # canopy with current regulation 
   WBveg$gs_lim = WBveg$gs_bound * WBveg$regulFact
-  WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?
   WBveg$gcanopy_lim = 1/(1/WBveg$gCrown+1/WBveg$gs_lim + 1/WBveg$gBL) # NB: gcanopy_lim =0 when gs_lim=0 (1/(1+1/0)=0 in R)
   WBveg$Elim = WBveg$gcanopy_lim * WBclim$VPD / 101.3   
   #WBveg$E0 = WBveg$Emin + WBveg$Elim
@@ -543,6 +539,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
 
   nwhilecomp = 0 # count the number of step in while loop (if more than 4 no solution and warning)
   while (((!LcavitWellComputed)|(!TcavitWellComputed))&(nwhilecomp<length(delta_L_cavs))) {
+    #browser()
     nwhilecomp = nwhilecomp + 1
     #print(paste0('nwhilecomp=',nwhilecomp)) for debugging 
     delta_L_cav = delta_L_cavs[nwhilecomp]
@@ -640,12 +637,13 @@ compute.regulFact <- function(psi, params,regulationType) {
 
 
 yearlyInitialisation.WBveg <- function(WBveg)
-{
+  {
   WBveg$PLC_Root <- 0 
   WBveg$PLC_TL   <- 0 
 return(WBveg)
-    }
+  }
   
+
 # stomatal conductance calculation with Jarvis type formulations
 calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1)
 {

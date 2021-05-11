@@ -32,9 +32,9 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
     "slope_VC_TL", # [%/MPa]             / Slope of the vulnerability curve
     "P50_VC_Root",
     "slope_VC_Root",
-    "EpsilonSymp", # [MPa]            / Modulus of elasticity in leaves
-    "PiFullTurgor", # [MPa]          / Osmotic Potential at full turgor
-    "ApoplasmicFrac", # [-]           / Apoplasmic Fraction
+    "EpsilonSymp_Leaf", # [MPa]            / Modulus of elasticity in leaves
+    "PiFullTurgor_Leaf", # [MPa]          / Osmotic Potential at full turgor in leaves
+    "ApoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
     "LDMC", # [mgMS/g]                / Leaf dry matter content (measured for fully watered leaves)
     "LMA", # [g/m2leaf]                   / Leaf mass per area
     "K", # [-]                        / Light extinction coefficient of the vegetation layer
@@ -55,8 +55,16 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
     "Tgs_sens",   # temperature parameter in Jarvis model (currently default Value is 17)
     "Tgs_optim",  # temperature parameter in Jarvis model (currently default value is 25)
     "fRootToLeaf", # root to leaf ratio 
-    "rootRadius",
-    "betaRootProfile"
+    "rootRadius",  #  radius of roots (m)
+    "betaRootProfile", # parameter for the distribution of roots in the soil 
+    "PiFullTurgor_Trunk",
+    "EpsilonSymp_Trunk",
+    "ApoplasmicFrac_Trunk",
+    "SymplasmicFrac_Trunk",
+    "VolumeLiving_TRB",
+    "fTRBToLeaf",
+    "C_LApoInit",
+    "C_TApoInit"
   )
   
   for (i in 1:length(params)) {
@@ -192,16 +200,6 @@ create.vegetation.parameters <- function(filePath, stand_parameters, soil_parame
   .veg_params$k_RootInit <- conduc$k_RootInit 
   .veg_params$k_LSymInit <- conduc$k_LSymInit
   
-
-  # parameters that are difficult to estimate but that play a very minor role in the results  
-  .veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?
-  .veg_params$C_LApoInit = 1e-5
-  .veg_params$C_TApoInit = 2e-5
-  
-  
-  print(".veg_params$TBA   = 0.8")       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?
-  print(".veg_params$C_LApoInit = 1e-5")
-  print(".veg_params$C_TApoInit = 2e-5")
   
   return(.veg_params)
 }

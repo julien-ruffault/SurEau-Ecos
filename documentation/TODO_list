@@ -2,11 +2,15 @@
 TODO list for SurEau  (mise à jour le 06/05/2021 par JR) 
 
 # check LFMC results (JR and NM)
-# see the initilisation of Q for the trunk that hard coded in new.WBveg (NM and JR)
+# see the initilisation of Q for the trunk that hard coded in new.WBveg (NM and JR)# 
+
+# voir la relation Tsoil vs Tair 
+ 
 # Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers --> f voir pour implementation (FP)
 # Un script de comparaison et de plot de la simulation reference (JR, NM and FP)
 # completer la fonction de reinitialisation des variables de vegetation chaque anne (JR and NM) 
 # voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
+
 
 # ajouter des sorties journalieres et annuelles  si les ouptus sont selectionnés a ce pas de temps 
 #  - > ajouter des variables journalieres qui font la moyenne et/ou min or max des variables  subdaily 
@@ -17,6 +21,9 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
  
  #----Trunk symplasmic canopy water content----
   #TODO Warning: same parameters for leaves and trunk (NM)
+
+# cleaner Gbl and Tleaf 
+
 
 ---
 # computeTranspiration (gmin, Emin, gcanopy, Ebound and regulation)
