@@ -638,8 +638,15 @@ compute.regulFact <- function(psi, params,regulationType) {
 
 yearlyInitialisation.WBveg <- function(WBveg)
   {
+  
+  if(WBveg$PLC_Root >85 | WBveg$PLC_TL>85)
+  {
+  WBveg <- new.WBveg(WBveg$params) 
+  }
+  
   WBveg$PLC_Root <- 0 
   WBveg$PLC_TL   <- 0 
+  
 return(WBveg)
   }
   

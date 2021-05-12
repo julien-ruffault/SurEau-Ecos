@@ -9,6 +9,7 @@
 rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
+library(profvis)
 
 # Warning  : check how is gCrown calucalute in the function compute.Transpiration. WBVeg/ seems that there is a mistake for windspeed ! 
 
@@ -24,12 +25,15 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
-modeling_options     <- create.modeling.options(constantClimate=T,
-                                             stomatalRegulationType = "Sigmoid",
-                                             defoliation = F)                      
+modeling_options     <- create.modeling.options(timeStepForEvapo=1,
+                                                constantClimate=T,
+                                                stomatalRegulationType = "Sigmoid",
+                                                defoliation = F,
+                                                resetSWC=T)                      
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
-                                                      endYearSimulation = 1990,
+                                                      endYearSimulation = 1991,
                                                       mainDir= mainDir,
+                                                      resolutionOutput = "subdaily",
                                                       outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
@@ -41,22 +45,61 @@ stand_parameters <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
 soil_parameters  <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
 vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, stand_parameters = stand_parameters, soil_parameter = soil_parameters,modeling_options = modeling_options)
 
+
+library(profvis)
+library(tictoc)
+tic()
 run.SurEauR(modeling_options = modeling_options ,
         simulation_parameters = simulation_parameters, 
        climate_data = climate_data,
        stand_parameters = stand_parameters, 
        soil_parameters = soil_parameters,
        vegetation_parameters = vegetation_parameters)
+toc()
 
 
-# for analyses / 
+# for analyses / daily time scales 
+filename  = paste0(mainDir,"/Results_model/test.csv")
+DATA = read.csv(filename,header=T, dec='.',sep="")
+
+
+plot(DATA$daily_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$daily_Psi_LApoMin,type='l',col='firebrick4')
+
+plot(DATA$daily_Psi_TSymMin)
+plot(DATA$daily_Psi_TApoMin)
+
+
+plot(DATA$daily_evaporation_mm)
+plot(DATA$daily_transpiration_mm)
+plot(DATA$daily_PLC_Root_max)
+plot(DATA$daily_PLC_TL_max)
+
+
+
+
+
+
+# for checking / yearly time scales 
+filename  = paste0(mainDir,"/Results_model/test.csv")
+DATA = read.csv(filename,header=T, dec='.',sep="")
+
+
+plot(DATA$yearly_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$yearly_Psi_LApoMin,type='l',col='firebrick4')
+plot(DATA$yearly_evaporation_mm)
+plot(DATA$yearly_transpiration_mm)
+
+print(DATA)
+
+
+
+DATA$daily_Psi
+
+# for analyses / subdaily time scales 
   filename  = paste0(mainDir,"/Results_model/test.csv")
   DATA = read.csv(filename,header=T, dec='.',sep="")
   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
-  
-  #plot(DATA$PAR[1:24])
-  #plot(DATA$gs_bound[1:100],type='l')
-  #plot(DATA$gs_bound,type='l')
   
   
   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))

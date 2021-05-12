@@ -21,24 +21,29 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
   veg_var_list <- new.WBveg(vegetation_parameters) #  create vegetation from vegetation parameters
   model_output <- new.WBoutput(simulation_parameters) #  create output file and parameters
 
-
   # @run@ ####
   for (YEAR in (simulation_parameters$startYearSimulation:simulation_parameters$endYearSimulation)) { # start loop on year
 
     print(paste0("year=", YEAR))
 
-    stopDeadPlant <- FALSE # set break conditions to allow to run on following years after death
-
-    veg_var_list <- yearlyInitialisation.WBveg(veg_var_list)
+    stopDeadPlant <- FALSE # set breaking conditions to allow to run on following years after death
 
     if (modeling_options$resetSWC == T) {
       soil_var_list <- set.SWCtoFieldCapacity.WBsoil(soil_var_list)
     }
-
+    
+    veg_var_list <- yearlyInitialisation.WBveg(veg_var_list)
+  
+    if (simulation_parameters$resolutionOutput=="yearly"){
+      output_yearly  <- new.WByearly() # create list for yearly outputs
+    }
+    
     for (DAY in climate_data$Doy[climate_data$Year == YEAR]) # Loop on days ####
     {
-      print(paste0("day=", DAY))
-
+      #print(paste0("day=", DAY))
+      if (simulation_parameters$resolutionOutput %in% c('daily','yearly')){
+        output_daily <- new.WBdaily()# create list for yearly outputs
+    }
       climDay <- new.WBclim(climate_data = climate_data, YEAR = YEAR, DOY = DAY) # Create WBclim for the day
       veg_var_list <- compute.pheno.WBveg(WBveg = veg_var_list, temperature = climDay$Tair_mean, DOY = DAY) # LAI and update
       veg_var_list <-  updateLAIandStocks.WBveg(WBveg = veg_var_list,modeling_options=modeling_options) 
@@ -83,16 +88,25 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
         
         if (simulation_parameters$resolutionOutput == "subdaily") {
           write.WBoutput(Date = climDay$Date, WBoutput = model_output, WBsoil = soil_var_list, WBveg = veg_var_list, WBclim = Clim_next)
-          }
+        }
+          
+        if (simulation_parameters$resolutionOutput %in% c("daily","yearly")) {
+          output_daily <- update.WBdaily(WBdaily = output_daily, WBsoil=soil_var_list, WBveg = veg_var_list, WBclim = climDay)
+        }  
+          
           if(stopDeadPlant==T) {print('STOP2');break}
       } # end loop on hours
       if (simulation_parameters$resolutionOutput == "daily") {
-        write.WBoutput(Date = climDay$Date, WBoutput = model_output, WBsoil = soil_var_list, WBveg = veg_var_list, WBclim = Clim_next)}
+        write.WBoutput.daily(Date = climDay$Date, WBoutput = model_output, WBdaily = output_daily)
+      }
+      if (simulation_parameters$resolutionOutput == "yearly") {
+      }
+      
         if(stopDeadPlant==T) {print('STOP3');break}
         
     } # end loop on days
     if (simulation_parameters$resolutionOutput == "yearly") {
-      write.WBoutput(Date = climDay$Date, WBoutput = model_output, WBsoil = soil_var_list, WBveg = veg_var_list, WBclim = Clim_next)
+      write.WBoutput.yearly(year=YEAR, WBoutput = model_output, WByearly=output_yearly)
     }
   } # end loop on years
 }

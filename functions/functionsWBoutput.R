@@ -8,7 +8,7 @@ new.WBoutput <- function(simulation_parameters) {
     stop(paste0("ouput type: ", simulation_parameters$outputType, "' does not exist, check presence or spelling"))
   }
 
-  # Read references type (saved in output_ref; note : should be modified by the developers only)
+  # Read references type (saved in output_ref; note : should be modified by developers only)
   if (file.exists(paste0(simulation_parameters$mainDir,"/functions/output_ref.csv"))) {
     outputref <- read.table(paste0(simulation_parameters$mainDir,"/functions/output_ref.csv"), dec = ".", sep = ";", header = T, stringsAsFactors = F)
   } else {
@@ -60,3 +60,165 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)
 }
+
+write.WBoutput.daily <- function(WBoutput,Date,WBdaily){
+  TIME <- Date
+  df = as.numeric(TIME)
+  df2= NULL
+  for(i in (1:length(WBoutput$contingencyTable[,1])))
+  {
+    #print(WBoutput$contingencyTable[i,]) #// for debugging only
+    #browser()
+    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+  }
+  cat(c(df,df2),"\n", file=WBoutput$testcon)  
+}
+
+write.WBoutput.yearly <- function(WBoutput,year,WByearly){
+  TIME <- year
+  df = as.numeric(TIME)
+  df2= NULL
+  for(i in (1:length(WBoutput$contingencyTable[,1])))
+  {
+    #print(WBoutput$contingencyTable[i,]) #// for debugging only
+    #browser()
+    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+  }
+  cat(c(df,df2),"\n", file=WBoutput$testcon)  
+}
+  
+  
+
+new.WBdaily  <- function(){
+  WBdaily = list()
+  
+  WBdaily$transpiration_mm = 0
+  WBdaily$evaporation_mm   = 0
+  
+  WBdaily$Psi_LSymMin = 0
+  WBdaily$Psi_LSymMax = 0
+  WBdaily$Psi_LApoMin = 0
+  WBdaily$Psi_LApoMax = 0
+  
+  WBdaily$Psi_TSymMin = 0
+  WBdaily$Psi_TSymMax = 0
+  WBdaily$Psi_TApoMin = 0
+  WBdaily$Psi_TApoMax = 0
+  
+  WBdaily$PLC_TL_max   = 0
+  WBdaily$PLC_Root_max = 0
+  
+  WBdaily$temperature  = NA
+  WBdaily$RH = NA
+  WBdaily$RG = NA
+  WBdaily$PPT = NA
+  WBdaily$Rn = NA
+  WBdaily$PPT = NA
+  WBdaily$ETP = NA
+  WBdaily$VPDmean = NA
+  WBdaily$VPDmax = NA
+  
+  
+  WBdaily$SWS=numeric(3)
+  
+  
+  return(WBdaily)
+}
+
+new.WByearly <- function(){
+  WByearly = list()
+  
+  WByearly$transpiration_mm = 0
+  WByearly$evaporation_mm   = 0
+  
+  WByearly$Psi_LSymMin = 0
+  WByearly$Psi_LSymMax = 0
+  WByearly$Psi_LApoMin = 0
+  WByearly$Psi_LApoMax = 0
+  
+  WByearly$Psi_TSymMin = 0
+  WByearly$Psi_TSymMax = 0
+  WByearly$Psi_TApoMin = 0
+  WByearly$Psi_TApoMax = 0
+  
+  WByearly$PLC_TL_max   = 0
+  WByearly$PLC_Root_max = 0
+  
+  WByearly$temperature = NA
+  WByearly$RH = NA
+  WByearly$RG = NA
+  WByearly$PPT = NA
+  WByearly$Rn = NA
+  WByearly$PPT = NA
+  WByearly$ETP = NA
+  WByearly$VPDmean  = NA
+  WByearly$VPDmax = NA
+  
+  return(WByearly)
+  
+}
+
+update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
+  
+  WBdaily$transpiration_mm = WBdaily$transpiration_mm + WBveg$AET.C
+  WBdaily$evaporation_mm   = WBdaily$evaporation_mm + WBsoil$EvaporationSum
+  
+  WBdaily$Psi_LSymMin = min(WBdaily$Psi_LSymMin,WBveg$Psi_LSym)
+  WBdaily$Psi_LSymMax = max(WBdaily$Psi_LSymMax,WBveg$Psi_LSym)
+  WBdaily$Psi_LApoMin = min(WBdaily$Psi_LApoMin,WBveg$Psi_LApo)
+  WBdaily$Psi_LApoMax = max(WBdaily$Psi_LApoMax,WBveg$Psi_LApo)
+  WBdaily$Psi_TSymMin = min(WBdaily$Psi_TSymMin,WBveg$Psi_TSym)
+  WBdaily$Psi_TSymMax = max(WBdaily$Psi_TSymMax,WBveg$Psi_TSym)
+  WBdaily$Psi_TApoMin = min(WBdaily$Psi_TApoMin,WBveg$Psi_TApo)
+  WBdaily$Psi_TApoMax = max(WBdaily$Psi_TApoMax,WBveg$Psi_TApo)
+
+  WBdaily$PLC_TL_max   = max(WBdaily$PLC_TL_max,WBveg$PLC_TL)
+  WBdaily$PLC_Root_max = max(WBdaily$PLC_Root_max,WBveg$PLC_Root)
+  
+  WBdaily$temperature  = WBclim$Tair_mean
+  WBdaily$RH = WBclim$RHair_mean
+  WBdaily$RG = WBclim$RG
+  WBdaily$PPT = WBclim$PPT
+  WBdaily$Rn = WBclim$net_radiation
+  WBdaily$PPT = WBclim$PPT
+  WBdaily$ETP = WBclim$ETP
+  WBdaily$VPD = WBclim$VPD
+  WBdaily$WS  = WBclim$WS_mean
+
+  
+  WBdaily$SWS  = WBsoil$soilWaterStock
+  
+  
+  return(WBdaily)
+}
+
+update.WByearly <- function(WByearly,WBdaily){
+  
+  WByearly$transpiration_mm = WByearly$transpiration_mm  + WBdaily$transpiration_mm 
+  WByearly$evaporation_mm   = WByearly$evaporation_mm + WBdaily$evaporation_mm
+  
+  WByearly$Psi_LSymMin = min(WByearly$Psi_LSymMin, WBdaily$Psi_LSymMin)
+  WByearly$Psi_LSymMax = max(WByearly$Psi_LSymMax, WBdaily$Psi_LSymMax)
+  WByearly$Psi_LApoMin = min(WByearly$Psi_LApoMin, WBdaily$Psi_LApoMin)
+  WByearly$Psi_LApoMax = max(WByearly$Psi_LApoMax, WBdaily$Psi_LApoMax)
+  WByearly$Psi_TSymMin = min(WByearly$Psi_TSymMin, WBdaily$Psi_TSymMin)
+  WByearly$Psi_TSymMax = max(WByearly$Psi_TSymMax, WBdaily$Psi_TSymMax)
+  WByearly$Psi_TApoMin = min(WByearly$Psi_TApoMin, WBdaily$Psi_TApoMin)
+  WByearly$Psi_TApoMax = max(WByearly$Psi_TApoMax, WBdaily$Psi_TApoMax)
+  
+  WByearly$PLC_TL_max   = max(WByearly$PLC_TL_max,WBdaily$PLC_TL_max)
+  WByearly$PLC_Root_max = max(WByearly$PLC_Root_max,WBdaily$PLC_Root_max)
+  
+  WByearly$temperature_max = max(WByearly$temperature_max,WBdaily$temperature)
+  WByearly$RH_min = min(WByearly$RH_min,WBdaily$RH)
+  WByearly$RG  = WByearly$RG + WBdaily$RG
+  WByearly$PPT = WByearly$PPT + WBdaily$PPT
+  WByearly$Rn  = WByearly$Rn + WBdaily$Rn
+  WByearly$PPT = WByearly$PPT + WBdaily$PPT
+  WByearly$ETP = WByearly$ETP + WBdaily$ETP
+  WByearly$VPDmax = max(WByearly$VPDmax, WBdaily$VPD)
+  
+
+
+  return(WByearly)
+  }
