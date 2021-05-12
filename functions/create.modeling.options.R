@@ -74,21 +74,22 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
   stomatalRegulationType <- match.arg(stomatalRegulationType)
 
-
+  scheme = "IMPLICIT"
+  #scheme = "XU"
   if (compOptionsForEvapo == "Normal") {
-    compOptions <- list("nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Accurate") {
-    compOptions <- list("nsmalltimesteps" = c(180), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(180), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Special") {
-    compOptions <- list("nsmalltimesteps" = c(720), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(720), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Fast") {
-    compOptions <- list("nsmalltimesteps" = c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Fast1") {
-    compOptions <- list("nsmalltimesteps" = c(1), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(1), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
 
   modeling_options <- list()
