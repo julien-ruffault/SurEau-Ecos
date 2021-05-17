@@ -1,4 +1,4 @@
-# script created by JR / 07/05/2021 
-# run  sensitivity  analyses on SurEAU
-# 
-# 
+# run variance-based sensitivity analysis on SurEau-Ecos. 
+# script by julien Ruffault (julien.ruff@gmail.com) / 
+# created : 11/05/2021 
+
