@@ -9,11 +9,6 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 # completer la fonction de reinitialisation des variables de vegetation chaque anne (JR and NM) 
 # voir  pour specifire les conditions de mort de la plante et quand arreter la simulation dans create_modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
 
-
-# ajouter des sorties journalieres et annuelles  si les ouptus sont selectionnés a ce pas de temps 
-#  - > ajouter des variables journalieres qui font la moyenne et/ou min or max des variables  subdaily 
-#  --> ajouter des variables annuelles
-
 # optionnal developements 
  - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA 
  

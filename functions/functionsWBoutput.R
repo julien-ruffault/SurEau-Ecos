@@ -193,7 +193,7 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
 }
 
 update.WByearly <- function(WByearly,WBdaily){
-  
+
   WByearly$transpiration_mm = WByearly$transpiration_mm  + WBdaily$transpiration_mm 
   WByearly$evaporation_mm   = WByearly$evaporation_mm + WBdaily$evaporation_mm
   
@@ -218,7 +218,5 @@ update.WByearly <- function(WByearly,WBdaily){
   WByearly$ETP = WByearly$ETP + WBdaily$ETP
   WByearly$VPDmax = max(WByearly$VPDmax, WBdaily$VPD)
   
-
-
   return(WByearly)
-  }
+}

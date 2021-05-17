@@ -24,7 +24,7 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
   # @run@ ####
   for (YEAR in (simulation_parameters$startYearSimulation:simulation_parameters$endYearSimulation)) { # start loop on year
 
-    print(paste0("year=", YEAR))
+    print(paste0("SurEau running, year = ", YEAR))
 
     stopDeadPlant <- FALSE # set breaking conditions to allow to run on following years after death
 
@@ -94,19 +94,21 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
           output_daily <- update.WBdaily(WBdaily = output_daily, WBsoil=soil_var_list, WBveg = veg_var_list, WBclim = climDay)
         }  
           
-          if(stopDeadPlant==T) {print('STOP2');break}
+          if(stopDeadPlant==T) {break}
       } # end loop on hours
       if (simulation_parameters$resolutionOutput == "daily") {
         write.WBoutput.daily(Date = climDay$Date, WBoutput = model_output, WBdaily = output_daily)
       }
       if (simulation_parameters$resolutionOutput == "yearly") {
+        output_yearly <- update.WByearly(WByearly=output_yearly, WBdaily =output_daily)
       }
       
-        if(stopDeadPlant==T) {print('STOP3');break}
+        if(stopDeadPlant==T) {break}
         
     } # end loop on days
     if (simulation_parameters$resolutionOutput == "yearly") {
       write.WBoutput.yearly(year=YEAR, WBoutput = model_output, WByearly=output_yearly)
     }
   } # end loop on years
+  close(con=model_output$testcon)
 }

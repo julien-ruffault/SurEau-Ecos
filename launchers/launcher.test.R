@@ -33,8 +33,8 @@ modeling_options     <- create.modeling.options(timeStepForEvapo=1,
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1991,
                                                       mainDir= mainDir,
-                                                      resolutionOutput = "subdaily",
-                                                      outputType = 'diagnostic_subdaily',
+                                                      resolutionOutput = "yearly",
+                                                      outputType = 'simple_yearly',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
