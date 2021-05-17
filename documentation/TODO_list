@@ -19,13 +19,6 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 
 
 ---
-# computeTranspiration (gmin, Emin, gcanopy, Ebound and regulation)
-# #FP this section was cleaned a bit and a bug was corrected in Eprime (when regul=0)
-# TODO check why we have gs and gs_lim with same value
-#  - WBveg$gs = WBveg$gs_lim #TODO check why gs and gs_lim ?  --> (NM)
-
-
-# update soil water stocks after T and water release and update psi and conductance
 # TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
 # In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
 
@@ -34,9 +27,6 @@ TODO list for SurEau  (mise à jour le 06/05/2021 par JR)
 
 
 #TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...
-#-- >OK bonne idee -->(JR)
-
-#.veg_params$TBA   = 0.8       # Trunk and branch area # actual gminT is gminT*TBA TODO : gminT could be initialized directly to 3*0.8?  --> (NM)
 
 
 

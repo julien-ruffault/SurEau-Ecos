@@ -154,6 +154,9 @@ new.WByearly <- function(){
   WByearly$VPDmean  = NA
   WByearly$VPDmax = NA
   
+  
+  
+  WByearly$dayOfDeath = NA
   return(WByearly)
   
 }
@@ -192,7 +195,7 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   return(WBdaily)
 }
 
-update.WByearly <- function(WByearly,WBdaily){
+update.WByearly <- function(WByearly,WBdaily,dayOfDeath){
 
   WByearly$transpiration_mm = WByearly$transpiration_mm  + WBdaily$transpiration_mm 
   WByearly$evaporation_mm   = WByearly$evaporation_mm + WBdaily$evaporation_mm
@@ -217,6 +220,9 @@ update.WByearly <- function(WByearly,WBdaily){
   WByearly$PPT = WByearly$PPT + WBdaily$PPT
   WByearly$ETP = WByearly$ETP + WBdaily$ETP
   WByearly$VPDmax = max(WByearly$VPDmax, WBdaily$VPD)
+  
+  if (!missing(dayOfDeath))
+      {WByearly$dayOfDeath = dayOfDeath}
   
   return(WByearly)
 }
