@@ -6,6 +6,17 @@
 rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
+PC=F
+#PC=T
+
+if (PC){
+#dir_SA_files =   
+}
+
+if(!PC){dir_SA_files = "/Users/jruffault/Dropbox/taf/temporary_SA/"}
+
+
+
 library(foreach)
 library(doParallel)
 
@@ -31,7 +42,7 @@ vegFile  <- read.vegetation.file(filePath=  paste0(mainDir,'/datasets/test_data/
 
 
 library(sensobol)
-N <- 100 # number for initial sampling 
+N <- 20 # number for initial sampling 
 k <- 2 # number of parameters
 params <- c('LAImax','P50_VC_TL','gmin20','kPlantInit','SWC','gsMax')
 
@@ -53,9 +64,8 @@ print(paste0("number of simulations : ",length(PARAMS)))
 # PARAMS[,"SWC"] <-  qunif(PARAMS[, "SWC"], 150,250)
 
 
-PARAMS[,"gsMax"] <-  qunif(PARAMS[, "gsMax"], 150,250)
+PARAMS[,"betaRootProfile"] <-  qunif(PARAMS[, "betaRootProfile"], 0.95,0.99)
 
-vegFile$betaRootProfile
 
 
 
@@ -70,7 +80,7 @@ registerDoParallel(cl)
 #tic()
 foreach(i=1:nrow(PARAMS),.packages=c('lubridate','insol')) %dopar% {
   
-  output_path = paste0("/Users/jruffault/Dropbox/taf/temporary_SA/SA_test_",i,'.csv')
+  output_path = paste0(dir_SA_files,'/SA_test_',i,'.csv')
 
   simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
@@ -83,7 +93,9 @@ foreach(i=1:nrow(PARAMS),.packages=c('lubridate','insol')) %dopar% {
   stand_parameters <- create.stand.parameters(LAImax=PARAMS[,"LAImax"][i],lat = 48.73, lon = 6.23)
 
   
-  vegFile$gsMax=PARAMS[,"gsMax"][i]
+  vegFile$betaRootProfile  = PARAMS[,"betaRootProfile"][i]
+  
+  # vegFile$gsMax=PARAMS[,"gsMax"][i]
   # vegFile$P50_VC_TL=PARAMS[,"P50_VC_TL"][i]
   # vegFile$gmin20=PARAMS[,"gmin20"][i]
   # vegFile$kPlantInit=PARAMS[,"kPlantInit"][i]
@@ -97,7 +109,7 @@ foreach(i=1:nrow(PARAMS),.packages=c('lubridate','insol')) %dopar% {
   
   
   
-soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths = c(0.373333 ,0.746666,1.119)) 
+  soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths = c(0.373333 ,0.746666,1.119)) 
 
   #soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths = c(DEPTH[i]*1/3 ,DEPTH[i]*2/3,DEPTH[i]))
 
@@ -117,7 +129,7 @@ soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths =
 Y1=NULL
 for (i in 1:nrow(PARAMS))
 {
-  io =read.csv(paste0("/Users/jruffault/Dropbox/taf/temporary_SA/SA_test_",i,'.csv'),header=T, dec='.',sep="")
+  io =read.csv(paste0(dir_SA_files,'/SA_test_',i,'.csv'),header=T, dec='.',sep="")
   Y1[i]  = io$yearly_dayOfDeath
 }
 #PARAMS = read.csv()
