@@ -10,8 +10,7 @@ rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
 library(profvis)
-
-# Warning  : check how is gCrown calucalute in the function compute.Transpiration. WBVeg/ seems that there is a mistake for windspeed ! 
+library(tictoc)
 
 
 # User options  ----------------------------------------------------------------
@@ -28,6 +27,7 @@ output_path               <- paste0(mainDir,'/Results_model/test.csv')
 modeling_options     <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
                                                 stomatalRegulationType = "Sigmoid",
+                                                scheme = 'Xu',
                                                 defoliation = F,
                                                 resetSWC=T)                      
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        

@@ -78,8 +78,6 @@ read.vegetation.file <- function(filePath, modeling_options){
     "LDMC", # [mgMS/g]                / Leaf dry matter content (measured for fully watered leaves)
     "LMA", # [g/m2leaf]                   / Leaf mass per area
     "K", # [-]                        / Light extinction coefficient of the vegetation layer
-    "SapwoodVolume", # [m3]           / Sapwood volume   / unused [per soil surface ? )
-    "WoodDensity", # [-]                / Wood density    /  unused
     "kPlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
     "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance

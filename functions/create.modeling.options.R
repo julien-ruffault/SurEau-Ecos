@@ -38,6 +38,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
+                                    scheme =c("Implicit","Xu"),
                                     stomatalRegulationType = c("Sigmoid","PiecewiseLinear")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
@@ -74,8 +75,11 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
   stomatalRegulationType <- match.arg(stomatalRegulationType)
 
-  scheme = "IMPLICIT"
-  #scheme = "XU"
+  scheme <-  match.arg(scheme)
+  
+  
+#  scheme = "Implicit"
+  #scheme = "Xu"
   if (compOptionsForEvapo == "Normal") {
     compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }

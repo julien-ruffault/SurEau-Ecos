@@ -13,8 +13,6 @@ LDMC;570
 LMA;106
 kPlantInit;0.62
 k_TSymInit;0.26
-SapwoodVolume;0.03
-WoodDensity;570
 CanopyStorageParam;1.5
 K;0.5
 Tbase;3
