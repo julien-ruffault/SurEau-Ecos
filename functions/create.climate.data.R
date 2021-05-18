@@ -95,7 +95,7 @@ create.climate.data <- function(filePath, modeling_options, simulation_parameter
         climate_data$Year <- year(climate_data$DATE)
       }
     } else {
-      stop(paste("no variable 'DATE' in the input file!"))
+      stop(paste("no variable 'DATE' in the input climate file!"))
     }
     io <- climate_data$Year >= simulation_parameters$startYearSimulation & climate_data$Year <= simulation_parameters$endYearSimulation
 

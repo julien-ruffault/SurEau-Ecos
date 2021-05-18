@@ -16,7 +16,8 @@
 #'
 create.vegetation.parameters <- function(filePath,listOfParameters,stand_parameters, soil_parameters, modeling_options) {
 
-   
+ 
+  
   if (!missing(filePath))
   {TTT = read.vegetation.file(filePath,modeling_options=modeling_options)}
 
@@ -26,7 +27,9 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   if(missing(filePath) &  missing(listOfParameters))
   {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
 
-  
+
+  TTT$LAImax =stand_parameters$LAImax
+    
   
   # calculate root distribution within each soil layer (Jackson et al. 1996)
   TTT$rootDistribution <-numeric(3)
@@ -62,7 +65,6 @@ read.vegetation.file <- function(filePath, modeling_options){
   colnames(io) <- c("Name", "Value")
   
   TTT <- list() # initialization 
-  TTT$LAImax <- stand_parameters$LAImax
   
   # setting commomn params for WB_veg (regardless of the options)
   params <- c(

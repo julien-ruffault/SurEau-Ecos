@@ -40,7 +40,7 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
 
     for (DAY in climate_data$Doy[climate_data$Year == YEAR]) # Loop on days ####
     {
-      # print(paste0("day=", DAY))
+       print(paste0("day=", DAY))
       if (simulation_parameters$resolutionOutput %in% c("daily", "yearly")) {
         output_daily <- new.WBdaily() # create list for yearly outputs
       }
