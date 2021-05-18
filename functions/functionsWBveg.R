@@ -545,28 +545,41 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     delta_L_cav = delta_L_cavs[nwhilecomp]
     delta_T_cav = delta_T_cavs[nwhilecomp]
    
-    # 2.1 Compute intermediates
-    #print (c(Eprime_nph ,C_LApo/dt , 1/(1/K_LSym + dt/C_LSym) , delta_L_cav*K_L_Cav))
-    # compute Psi_L_tilda and K_L_tilda and E_L_tilda
-    klsym = kseriesum(K_LSym, C_LSym/dt+0.5 * Eprime_nph) # for Psi_LSym_n
-    K_L_td =  C_LApo/dt + klsym + delta_L_cav*K_L_Cav
-    Psi_L_td = (C_LApo/dt*Psi_LApo_n + klsym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_L_td + dbxmin) # dbxmin to avoid 0/0
-    E_L_tilda = (E_nph + Emin_L_nph)/(1+(C_LSym/dt+0.5 * Eprime_nph+dbxmin)/K_LSym)
+    if (opt$scheme=="IMPLICIT") {
+      # 2.1 Compute intermediates
+      #print (c(Eprime_nph ,C_LApo/dt , 1/(1/K_LSym + dt/C_LSym) , delta_L_cav*K_L_Cav))
+      # compute Psi_L_tilda and K_L_tilda and E_L_tilda
+      klsym = kseriesum(K_LSym, C_LSym/dt+0.5 * Eprime_nph) # for Psi_LSym_n
+      K_L_td =  C_LApo/dt + klsym + delta_L_cav*K_L_Cav
+      Psi_L_td = (C_LApo/dt*Psi_LApo_n + klsym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_L_td + dbxmin) # dbxmin to avoid 0/0
+      E_L_tilda = (E_nph + Emin_L_nph)/(1+(C_LSym/dt+0.5 * Eprime_nph+dbxmin)/K_LSym)
       
-    # compute Psi_T_tilda and K_T_tilda and E_T_tilda
-    ktsym = kseriesum(K_TSym, C_TSym/dt) # for Psi_TSym_n
-    K_T_td = C_TApo/dt + ktsym + sum(WBveg$kSoilToCollar)  + delta_T_cav*K_T_Cav 
-    Psi_T_td = (C_TApo/dt*Psi_TApo_n + ktsym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_TApo_cav) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
-    E_T_tilda = K_TL/(K_TL + K_T_td) * Emin_T_nph/(1+(C_TSym/dt + dbxmin)/K_TSym)  # dbxmin to avoid 0/0  
-    
-    # 2.2 Compute Psi_LApo_np1
-    Psi_LApo_np1_Num = kseriesum(K_TL , K_T_td + dbxmin)*Psi_T_td + K_L_td*Psi_L_td - (E_L_tilda + E_T_tilda)
-    Psi_LApo_np1_Denom = kseriesum(K_TL, K_T_td + dbxmin) + K_L_td + dbxmin # dbxmin to avoid 0/0
-    Psi_LApo_np1 = Psi_LApo_np1_Num/Psi_LApo_np1_Denom
-    
-    # 2.3 Compute Psi_TApo_np1
-    Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
-    
+      # compute Psi_T_tilda and K_T_tilda and E_T_tilda
+      ktsym = kseriesum(K_TSym, C_TSym/dt) # for Psi_TSym_n
+      K_T_td = C_TApo/dt + ktsym + sum(WBveg$kSoilToCollar)  + delta_T_cav*K_T_Cav 
+      Psi_T_td = (C_TApo/dt*Psi_TApo_n + ktsym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_TApo_cav) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
+      E_T_tilda = K_TL/(K_TL + K_T_td) * Emin_T_nph/(1+(C_TSym/dt + dbxmin)/K_TSym)  # dbxmin to avoid 0/0  
+      
+      # 2.2 Compute Psi_LApo_np1
+      Psi_LApo_np1_Num = kseriesum(K_TL , K_T_td + dbxmin)*Psi_T_td + K_L_td*Psi_L_td - (E_L_tilda + E_T_tilda)
+      Psi_LApo_np1_Denom = kseriesum(K_TL, K_T_td + dbxmin) + K_L_td + dbxmin # dbxmin to avoid 0/0
+      Psi_LApo_np1 = Psi_LApo_np1_Num/Psi_LApo_np1_Denom
+      
+      # 2.3 Compute Psi_TApo_np1
+      Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
+    } else if (opt$scheme=="XU") {
+      # 2.1 LApo
+      alpha = exp(-(K_TL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
+      Psi_td = (K_TL*Psi_TApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_TL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
+      Psi_LApo_np1 = alpha * Psi_LApo_n +(1-alpha) * Psi_td
+        
+      # 2.2. TApo
+      alpha = exp(-(K_TL+K_TSym + sum(WBveg$kSoilToCollar)+delta_T_cav*K_T_Cav)/C_TApo*dt)
+      Psi_td = (K_TL*Psi_LApo_n + K_TSym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil)+ delta_T_cav*K_T_Cav*Psi_TApo_cav)/(K_TL + K_TSym+sum(WBveg$kSoilToCollar)+delta_T_cav*K_T_Cav + dbxmin) # dbxmin to avoid 0/0
+      Psi_TApo_np1 = alpha * Psi_TApo_n +(1-alpha) * Psi_td
+      
+    }
+      
     # 2.4 check if cavitation is well computed according to delta_cav, np1 and "cav"
     LcavitWellComputed = (delta_L_cav==(Psi_LApo_np1 < Psi_LApo_cav))|(opt$Lcav==0)
     TcavitWellComputed = (delta_T_cav==(Psi_TApo_np1 < Psi_TApo_cav))|(opt$Tcav==0)
@@ -577,9 +590,19 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   WBveg$Diag_nwhile_cavit = nwhilecomp  # Diagnostic step to track cavit event and eventual errors (corresponding to nwhilecomp==5)
   
   # 3. Compute Psi_Symp_np1 (L and T)
-  klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
-  Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
-  Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
+  if (opt$scheme=="IMPLICIT") {
+    klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
+    Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
+    Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
+  } else if (opt$scheme=="XU") {
+    alpha = exp(-K_LSym/C_LSym*dt)
+    Psi_td = (K_LSym*Psi_LApo_n - (E_nph + Emin_L_nph))/(K_LSym + dbxmin) # dbxmin to avoid 0/0
+    Psi_LSym_np1 = alpha * Psi_LSym_n +(1-alpha) * Psi_td
+    alpha = exp(-K_TSym/C_TSym*dt)
+    Psi_td = (K_TSym*Psi_TApo_n - Emin_T_nph)/(K_TSym + dbxmin) # dbxmin to avoid 0/0
+    Psi_TSym_np1 = alpha * Psi_TSym_n +(1-alpha) * Psi_td
+  }
+
   
   #Step 4 : set computed values in WBveg and update Psi_cav, PLC and Psi_AllSoil
   WBveg$Psi_LApo<-Psi_LApo_np1
@@ -600,7 +623,6 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   WBveg$Psi_AllSoil <- sum (WBveg$kSoilToCollar * WBsoil$PsiSoil)/sum (WBveg$kSoilToCollar)
   return(WBveg)
 }
-
 
 # This function computes regulation ie stomatal closure parameters (including derivative from current psi)
 # stomatalclosure is 0, 1 or 2 depending on the value of psi in "PiecewieLinear"
