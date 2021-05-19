@@ -15,8 +15,6 @@ if (PC){
 
 if(!PC){dir_SA_files = "/Users/jruffault/Dropbox/taf/temporary_SA/"}
 
-
-
 library(foreach)
 library(doParallel)
 
@@ -38,40 +36,53 @@ vegFile  <- read.vegetation.file(filePath=  paste0(mainDir,'/datasets/test_data/
 
 
 
-# parameters test that had no influence on time to death : gsMax, alpah_vg, Ksat 
+
+
+
+# parameters test that had no influence on time to death : gsMax, alpah_vg, Ksat , PiFullTurgor_Leaf, P12_gs, P88_gs
+# notes : pour la RU, on sample La RU et on fait varier le DETPH du sol de maniere à correpsondre à la RU selectionnée
+# note  : Pour P12_Gs and P88_GS on sample le P12_Gs et un autre parametre 'diff'  =P88_gs-P12_gs  puis on determine le P88_gs comme P88_gs= diff+P12_gs 
+
+# tester gsoil0
 
 
 library(sensobol)
-N <- 20 # number for initial sampling 
-k <- 2 # number of parameters
-params <- c('LAImax','P50_VC_TL','gmin20','kPlantInit','SWC','gsMax')
+N <- 200 # number for initial sampling 
+k <- 3 # number of parameters
+#params <- c('LAImax','P50_VC_TL','gmin20','kPlantInit','SWC','betaRootProfile','gCrown0')
 
-params <- c('LAImax','betaRootProfile')
+#params <- c('LAImax','P12_gs','P88_gs')
+
+params <- c('LAImax','P50_VC_TL','slope_VC_TL')
 
 R <- 10^3
 type <- "norm"
 conf <- 0.95
 PARAMS= sobol_matrices(params=params,N=N)
 #save.csv(PARAMS,)
-print(paste0("number of simulations : ",length(PARAMS)))
+print(paste0("number of simulations : ",nrow(PARAMS)))
 
 
 
- PARAMS[, "LAImax"] <- qunif(PARAMS[, "LAImax"], 4, 8)
-# PARAMS[, "P50_VC_TL"] <- qunif(PARAMS[, "P50_VC_TL"], -4.5, -2)
+PARAMS[, "LAImax"] <- qunif(PARAMS[, "LAImax"], 4, 8)
+PARAMS[, "P50_VC_TL"] <- qunif(PARAMS[, "P50_VC_TL"], -4.5, -2.5)
+PARAMS[, "slope_VC_TL"] <- qunif(PARAMS[, "slope_VC_TL"], -40, 80)
 # PARAMS[, "gmin20"] <- qunif(PARAMS[, "gmin20"], 2.5,6)
 # PARAMS[,"kPlantInit"] <-  qunif(PARAMS[, "kPlantInit"], 0.3,1)
 # PARAMS[,"SWC"] <-  qunif(PARAMS[, "SWC"], 150,250)
-
-
-PARAMS[,"betaRootProfile"] <-  qunif(PARAMS[, "betaRootProfile"], 0.95,0.99)
-
-
+# PARAMS[,"betaRootProfile"] <-  qunif(PARAMS[, "betaRootProfile"], 0.95,0.99)
+# PARAMS[, "gCrown0"] <- qunif(PARAMS[, "gCrown0"], 30, 60)
+# PARAMS[, "PiFullTurgor_Leaf"] <- qunif(PARAMS[, "PiFullTurgor_Leaf"], -2.7, -1.5)
 
 
 
 
-#DEPTH =PARAMS[,"SWC"] / ((soilFile$saturation_capacity_vg-soilFile$residual_capacity_vg)*1000)
+ #PARAMS[, "P12_gs"] <- qunif(PARAMS[, "P12_gs"], -2.5, -1.5 )
+ #PARAMS[, "P88_gs"] <-  PARAMS[, "P12_gs"] + qunif(PARAMS[, "P88_gs"], -1,-0.3)
+ 
+ 
+ 
+ # DEPTH =PARAMS[,"SWC"] / ((soilFile$saturation_capacity_vg-soilFile$residual_capacity_vg)*1000)
 
 # run the model 
 cores=detectCores()
@@ -93,10 +104,16 @@ foreach(i=1:nrow(PARAMS),.packages=c('lubridate','insol')) %dopar% {
   stand_parameters <- create.stand.parameters(LAImax=PARAMS[,"LAImax"][i],lat = 48.73, lon = 6.23)
 
   
-  vegFile$betaRootProfile  = PARAMS[,"betaRootProfile"][i]
   
+  #vegFile$P12_gs  = PARAMS[,"P12_gs"][i]
+  #vegFile$P88_gs  = PARAMS[,"P88_gs"][i]
+  
+  #vegFile$PiFullTurgor_Leaf  = PARAMS[,"PiFullTurgor_Leaf"][i]
+  # vegFile$gCrown0  = PARAMS[,"gCrown0"][i]
+  # vegFile$betaRootProfile  = PARAMS[,"betaRootProfile"][i]
   # vegFile$gsMax=PARAMS[,"gsMax"][i]
-  # vegFile$P50_VC_TL=PARAMS[,"P50_VC_TL"][i]
+   vegFile$P50_VC_TL=PARAMS[,"P50_VC_TL"][i]
+   vegFile$slope_VC_TL = PARAMS[,"slope_VC_TL"][i]
   # vegFile$gmin20=PARAMS[,"gmin20"][i]
   # vegFile$kPlantInit=PARAMS[,"kPlantInit"][i]
   # 

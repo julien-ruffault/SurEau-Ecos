@@ -1,9 +1,9 @@
 Name;Value
 Foliage;Evergreen
-P50_VC_TL;-7.0
-slope_VC_TL;30
-P50_VC_Root;-7.0
-slope_VC_Root;30
+P50_VC_TL;-3.4
+slope_VC_TL;60
+P50_VC_Root;-3.4
+slope_VC_Root;60
 kPlantInit;1.2
 k_TSymInit;0.26
 gCrown0;45
