@@ -1,38 +1,28 @@
 
-TODO list for SurEau  (mise à jour le 19/05/2021 par JR) 
+TODO list for SurEau  (mise à jour le 20/05/2021 par JR) 
 
 
 # TODO before release 
-# faire la list des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
-# faire un guide général de l'utilisation de SUREAU (JR) --> use RmarkDown/knitr  
+- faire la list des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
+- faire un guide général de l'utilisation de SUREAU (JR) --> use RmarkDown/knitr  
+- check LFMC results (JR and NM)
+- voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
+- initialisation de la végétation biomass,volume, area (NM)  
+- voir l'implementation des Q par m2 de sol pour matcher avec le modèle de bilan en eau  (NM)
+- Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers (FP)
 
-# check LFMC results (JR and NM)
-# voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
- 
-# initialisation de la végétation biomass,volume, area (NM)  
- 
-# voir l'implementation des Q par m2 de sol pour matcher avec le modèle de bilan en eau  (NM)
 
-# Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers (FP)
-
-# Un script de comparaison et de plot de la simulation reference (JR, NM and FP)/ attendre que le modele soit stabilisé
-
-# voir  pour specifire les conditions de mort de la plante/  quand arreter la simulation et eventullement proposer que la simu continue même si la plante est morte en enlevant les processus  
-#   -- implementer dans modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
-
-# optionnal developements 
- - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA 
-
-# cleaner Gbl and Tleaf 
-
-# TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
-# In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
-
-#regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegulationType
+# optionnal 
+- Un script de comparaison et de plot de la simulation reference (JR, NM and FP)/ attendre que le modele soit stabilisé
+- voir  pour specifire les conditions de mort de la plante/  quand arreter la simulation et eventullement proposer que la simu continue même si la plante est morte en enlevant les processus  -
+-- implementer dans modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
+ - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA -
+ - cleaner Gbl and Tleaf 
+- TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
+- In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
+- regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation
 ## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
-
-
-#TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...(JR) 
+- TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...(JR) 
 
 
 --------------------------------------------------------------------------------

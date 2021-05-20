@@ -23,7 +23,7 @@ output_path               <- paste0(mainDir,'/Results_model/test_puech.csv')
 
 
 modeling_options  <- create.modeling.options(constantClimate=F,
-                                                 stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
+                                             stomatalRegFormulation="Sigmoid")                      # <-- indicate  modeling options 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 2003,                         # <-- indicate here simulation parameters
                                                       endYearSimulation = 2003,
                                                       mainDir= mainDir,

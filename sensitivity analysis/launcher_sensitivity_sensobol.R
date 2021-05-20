@@ -26,7 +26,7 @@ source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                   
 climateData_path  <- paste0(mainDir,'/datasets/test_data/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
 modeling_options     <- create.modeling.options(timeStepForEvapo=2,
                                                 constantClimate=T,
-                                                stomatalRegulationType = "Sigmoid",
+                                                stomatalRegFormulation = "Sigmoid",
                                                 defoliation = F,
                                                 resetSWC=T,
                                                 compOptionsForEvapo="Fast")   

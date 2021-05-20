@@ -20,7 +20,7 @@ vegetationParameters_path <- paste0(mainDir,'/reference_simulation/Parameters_te
 output_path<-  paste0(mainDir,'/reference_simulation/simulation_reference_23_04.csv')
 
 modeling_options  <- create.modeling.options(constantClimate=T,
-                                             stomatalRegulationType="Sigmoid")                      # <-- indicate  modeling options 
+                                             stomatalRegFormulation="Sigmoid")                      # <-- indicate  modeling options 
 simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                         # <-- indicate here simulation parameters
                                                       endYearSimulation=1990,
                                                       mainDir=mainDir,

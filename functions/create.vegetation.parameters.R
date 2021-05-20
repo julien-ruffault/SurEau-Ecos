@@ -125,11 +125,11 @@ read.vegetation.file <- function(filePath, modeling_options){
   
   
   # Gestion des parameters de vegetaion pour la regulation stomatique selon  les options 
-  if (modeling_options$stomatalRegulationType=='PiecewiseLinear')
+  if (modeling_options$stomatalRegFormulation=='PiecewiseLinear')
   {
     params_regulation <- c("PsiStartClosing", "PsiClose")
   } 
-  if(modeling_options$stomatalRegulationType=='Sigmoid') {
+  if(modeling_options$stomatalRegFormulation=='Sigmoid') {
     params_regulation <- c("P12_gs", "P88_gs")
   }
   
@@ -150,7 +150,7 @@ read.vegetation.file <- function(filePath, modeling_options){
     }
   }
   
-  if (modeling_options$stomatalRegulationType=='Sigmoid')
+  if (modeling_options$stomatalRegFormulation=='Sigmoid')
   {TTT$P50_gs  = (TTT$P12_gs + TTT$P88_gs)/2
   TTT$slope_gs = 100/(TTT$P12_gs-TTT$P88_gs)
   }

@@ -381,7 +381,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
   
   #compute current regulation
-  regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegulationType)
+  regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
   WBveg$regulFact = regul$regulFact
   
   # canopy with current regulation 
@@ -428,8 +428,8 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       #browser()
       # QUANTITIES TO CHECK IF THE RESOLUTION IS OK
       # 1. delta regulation between n and np1
-      regul_np1 = compute.regulFact(psi = WBveg_np1$Psi_LSym, params = WBveg_np1$params,regulationType=modeling_options$stomatalRegulationType)
-      regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegulationType)# TODO check why recomputed? should be in WBveg_tmp
+      regul_np1 = compute.regulFact(psi = WBveg_np1$Psi_LSym, params = WBveg_np1$params,regulationType=modeling_options$stomatalRegFormulation)
+      regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation)# TODO check why recomputed? should be in WBveg_tmp
       deltaRegulMax = max(deltaRegulMax,abs(regul_np1$regulFact-regul_n$regulFact))
       # 2. PLC at n and np1
       #print(c(signif(WBveg_np1$PLCAbove, digits = 5),signif(WBveg_n$PLCAbove, digits = 5),signif(WBveg_np1$PLCBelow, digits = 5),signif(WBveg_n$PLCBelow, digits = 5)))
@@ -545,7 +545,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     delta_L_cav = delta_L_cavs[nwhilecomp]
     delta_T_cav = delta_T_cavs[nwhilecomp]
    
-    if (opt$scheme=="Implicit") {
+    if (opt$numericalScheme=="Implicit") {
       # 2.1 Compute intermediates
       #print (c(Eprime_nph ,C_LApo/dt , 1/(1/K_LSym + dt/C_LSym) , delta_L_cav*K_L_Cav))
       # compute Psi_L_tilda and K_L_tilda and E_L_tilda
@@ -567,7 +567,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       
       # 2.3 Compute Psi_TApo_np1
       Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
-    } else if (opt$scheme=="Xu") {
+    } else if (opt$numericalScheme=="Xu") {
       # 2.1 LApo
       alpha = exp(-(K_TL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
       Psi_td = (K_TL*Psi_TApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_TL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
@@ -590,11 +590,11 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   WBveg$Diag_nwhile_cavit = nwhilecomp  # Diagnostic step to track cavit event and eventual errors (corresponding to nwhilecomp==5)
   
   # 3. Compute Psi_Symp_np1 (L and T)
-  if (opt$scheme=="Implicit") {
+  if (opt$numericalScheme=="Implicit") {
     klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
     Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
     Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
-  } else if (opt$scheme=="Xu") {
+  } else if (opt$numericalScheme=="Xu") {
     alpha = exp(-K_LSym/C_LSym*dt)
     Psi_td = (K_LSym*Psi_LApo_n - (E_nph + Emin_L_nph))/(K_LSym + dbxmin) # dbxmin to avoid 0/0
     Psi_LSym_np1 = alpha * Psi_LSym_n +(1-alpha) * Psi_td
@@ -677,7 +677,7 @@ return(WBveg)
 calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1)
 {
   
-  if (option==1) # temeperature effect on gs 
+  if (option==1) # temperature effect on gs 
   {
     gsMax2    = max(0,WBveg$params$gsMax/(1+((WBveg$leafTemperature-WBveg$params$Tgs_optim)/WBveg$params$Tgs_sens)^2))
     gsNight2  = max(0,WBveg$params$gsNight/(1+((WBveg$leafTemperature-WBveg$params$Tgs_optim)/WBveg$params$Tgs_sens)^2))

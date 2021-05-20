@@ -10,6 +10,7 @@ rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
 
+
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 
@@ -22,13 +23,19 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
 
+
+
+
+
+
+
+# create model input files --------------------------------------------------
 modeling_options     <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
-                                                stomatalRegulationType = "Sigmoid",
-                                                scheme = 'Implicit',
+                                                stomatalRegFormulation = "Sigmoid",
+                                                numericalScheme = 'Implicit',
                                                 defoliation = F,
                                                 resetSWC=T)       
-
 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1991,
@@ -38,16 +45,13 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990
                                                       overWrite = T,
                                                       outputPath = output_path)
 
-### Create input files and run SurEau-Ecos--------------------------------------
 climate_data     <- create.climate.data(filePath = climateData_path, modeling_options = modeling_options, simulation_parameters = simulation_parameters) #
 stand_parameters <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
-
-
-
 soil_parameters  <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
 vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, stand_parameters = stand_parameters, soil_parameter = soil_parameters,modeling_options = modeling_options)
 
- 
+
+# run SurEau-Ecos ---------------------------------------------------------
 run.SurEauR(modeling_options = modeling_options ,
         simulation_parameters = simulation_parameters, 
        climate_data = climate_data,
@@ -55,8 +59,10 @@ run.SurEauR(modeling_options = modeling_options ,
        soil_parameters = soil_parameters,
        vegetation_parameters = vegetation_parameters)
 
-# 
-# 
+
+# analyse outputs ---------------------------------------------------------
+
+
 # # for analyses / daily time scales 
 # filename  = paste0(mainDir,"/Results_model/test.csv")
 # DATA = read.csv(filename,header=T, dec='.',sep="")
@@ -485,3 +491,6 @@ run.SurEauR(modeling_options = modeling_options ,
 # # 
 # # 
 # # plot(DATA$CavitAbove~DATA$Time, type='l',xlim=c(datmin, datmax),  col=1, lty=1, main=paste("time step =",tstep, "h"), ylab="Psi", xlab="time")
+
+# ---- --------------------------------------------------------------------
+

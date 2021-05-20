@@ -1,27 +1,32 @@
 #' Create a list containing modeling options that can be used as an input
 #' in \code{run.SurEauR}
 #'
-#' @param timeStepForEvapo a numerical value (1,2,3,4 or 8) indicating the time
-#'   step for the main evapotranspiration loop (in hours). Should be one of the
-#'   following (default = 1)
+#'#' @param constantClimate  a logical value indicating whether the climate should
+#'   be considered constant or not (default = F)
+#' @param timeStepForEvapo a numerical value (in hours) indicating the time
+#'   step for the main evapotranspiration loop. Should be one of the
+#'   following 1,2,4,6,8 (default = 1). 
+#'  @param compOptionsForEvapo the option to be used for the loops  (voir avec
+#'   Francois)
 #' @param resetSWC a logical value indicating whether soil layers should be
-#'   refilled at the beginning of each year of the simulation (default=F)
+#'   refilled at the beginning of each year (default=F)
 #' @param avoidWaterSoilTransfer a logical value indicating whether the transfer
 #'   of water between soil layers should be avoided by disconnecting the soil
-#'   layers that get refilled from the soil-plant system (default =F)
+#'   layers that get refilled from the soil-plant system (default =F). Yet to be
+#'   implemented 
 #' @param ETPFormulation  the formulation of ETP to be used, either 'PT'
-#'   (Priestley-Taylor) or 'PM' (penmman). Default is 'PT'(Priestley Taylor)
+#'   (Priestley-Taylor) or 'P' (Penmman). Default is 'PT'.
+#'   Note: Penmman formulation is not implemented yet
 #' @param RnFormulation the method to be used to calculate net radiation from
-#'   global radiation
-#' @param constantClimate  a logical value indicating whether the climate should
-#'   be considered constant or not (default = F)
-#' @param compOptionsForEvapo the option to be used for the loops  (voir avec
-#'   Francois)
-#' @param stomatalRegulationType the type of regulation to be used for stomatal
-#'   response to leaf symplasmic water potential (default = "PiecewiseLinear")
+#'   global radiation, either 'Linacre' (default) or 'Linear' . Note : the linear 
+#'   method is not implemnted yet 
+#' @param stomatalRegFormulation the type of regulation to be used for stomatal
+#'   response to leaf symplasmic water potential, either 'Sigmoid' (default) or 
+#'   'PiecewiseLinear'
 #' @param defoliation a logical value indicating whether trees should loose 
 #' leaves when occurs.cavitation occurs of the above part of plant.  Defoliation 
-#' starts only when PLC > 10% .
+#' starts only when PLC_TL > 10% .
+#' @param numericalScheme the method to be used to ... either "Implicit" or "Xu"
 #' 
 #'
 #' @return
@@ -38,8 +43,8 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
-                                    scheme =c("Implicit","Xu"),
-                                    stomatalRegulationType = c("Sigmoid","PiecewiseLinear")) {
+                                    numericalScheme = c("Implicit","Xu"),
+                                    stomatalRegFormulation = c("Sigmoid","PiecewiseLinear")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")
@@ -73,27 +78,27 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   RnFormulation <- match.arg(RnFormulation)
 
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
-  stomatalRegulationType <- match.arg(stomatalRegulationType)
+  stomatalRegFormulation <- match.arg(stomatalRegFormulation)
 
-  scheme <-  match.arg(scheme)
+  numericalScheme <-  match.arg(numericalScheme)
   
   
-#  scheme = "Implicit"
-  #scheme = "Xu"
+#  numericalScheme = "Implicit"
+  #numericalScheme = "Xu"
   if (compOptionsForEvapo == "Normal") {
-    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Accurate") {
-    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(180), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(180), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Special") {
-    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(720), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(720), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Fast") {
-    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Fast1") {
-    compOptions <- list("scheme"=scheme,"nsmalltimesteps" = c(1), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(1), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
   }
 
   modeling_options <- list()
@@ -105,7 +110,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$resetSWC <- resetSWC
   modeling_options$avoidWaterSoilTransfer <- avoidWaterSoilTransfer
   modeling_options$compOptions <- compOptions
-  modeling_options$stomatalRegulationType <- stomatalRegulationType
+  modeling_options$stomatalRegFormulation <- stomatalRegFormulation
   modeling_options$defoliation <- defoliation
 
   return(modeling_options)
