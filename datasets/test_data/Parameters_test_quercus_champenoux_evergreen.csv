@@ -44,3 +44,5 @@ VolumeLiving_TRB;5
 fTRBToLeaf;0.8
 C_LApoInit;1e-5
 C_TApoInit;2e-5
+turgorPressureAtGsMax;2
+

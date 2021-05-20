@@ -628,29 +628,55 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
 # stomatalclosure is 0, 1 or 2 depending on the value of psi in "PiecewieLinear"
 # regulFact is regul proportion between 0 and 1
 # regulFactPrime is the first order derivative of regul function in psi
-compute.regulFact <- function(psi, params,regulationType) {
+compute.regulFact <- function(psi, params, regulationType) {
+  
   if(regulationType=="PiecewiseLinear") {
     if (psi > params$PsiStartClosing) {
       stomatalClosure = 0
       regulFact = 1
       regulFactPrime = 0
-    } else if (psi > params$PsiClose) {
+    } else if (psi > params$PsiClose) 
+      {
       stomatalClosure = 1
       regulFact = (psi - params$PsiClose)/(params$PsiStartClosing - params$PsiClose)
       regulFactPrime = 1/(params$PsiStartClosing - params$PsiClose)
-    } else {
+    } else 
+      {
       stomatalClosure = 2
       regulFact = 0
       regulFactPrime = 0
     }
   } else if (regulationType=="Sigmoid") { 
-    stomatalClosure = NA #stomatalClosure not relevant ofr sigmoid 
+    stomatalClosure = NA #stomatalClosure not relevant for sigmoid 
     PL_gs = 1/(1+exp(params$slope_gs/25*(psi-params$P50_gs)))
     regulFact = 1-PL_gs;
     al = params$slope_gs/25
     regulFactPrime = al * PL_gs * regulFact
     #regulFactPrime = al*exp(-al*(psi-P50_gs)) / ((1+exp(-al*(psi-P50_gs)))^2) # formulation in psi (same but slower to compute)
+  } else if (regulationType=="Turgor") 
+    { 
+    stomatalClosure = NA #stomatalClosure not relevant ofr sigmoid 
+    
+    rs = Rs.Comp(PiFT=params$PiFullTurgor_Leaf, Esymp=params$EpsilonSymp_Leaf, Pmin=psi)
+    turgor=turgor.comp(PiFT=params$PiFullTurgor_Leaf, Esymp=params$EpsilonSymp_Leaf, Rstemp=rs) 
+    regulFact = max(0, min(1, turgor / params$turgorPressureAtGsMax))
+    
+    if(regulFact ==1 |  regulFact ==0) 
+      {
+      regulFactPrime=0
+    } else 
+      { 
+      regulFactPrime = 0 #TODO insert the derivative to compute regulFactPrime
+        }
+    
+    
   }
+  
+    
+    
+     
+    
+  #regulFactPrime = al*exp(-al*(psi-P50_gs)) / ((1+exp(-al*(psi-P50_gs)))^2) # formulation in psi (same but slower to compute)
   #print(regulFact)
   #print(regulFactPrime)
   return(list("regulFact"=regulFact,"stomatalClosure"=stomatalClosure,"regulFactPrime"=regulFactPrime))
