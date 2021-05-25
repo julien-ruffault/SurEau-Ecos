@@ -44,7 +44,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
                                     numericalScheme = c("Implicit","Xu"),
-                                    stomatalRegFormulation = c("Sigmoid","PiecewiseLinear")) {
+                                    stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")

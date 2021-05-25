@@ -40,8 +40,8 @@ modeling_options     <- create.modeling.options(timeStepForEvapo=1,
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1991,
                                                       mainDir= mainDir,
-                                                      resolutionOutput = "yearly",
-                                                      outputType = 'simple_yearly',
+                                                      resolutionOutput = "subdaily",
+                                                      outputType = 'simple_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -103,13 +103,13 @@ plot(DATA$yearly_transpiration_mm)
 # DATA$daily_Psi
 # 
 # # for analyses / subdaily time scales 
-#   filename  = paste0(mainDir,"/Results_model/test.csv")
-#   DATA = read.csv(filename,header=T, dec='.',sep="")
-#   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+   filename  = paste0(mainDir,"/Results_model/test.csv")
+   DATA = read.csv(filename,header=T, dec='.',sep="")
+   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
 #   
 #   
-#   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
-#   lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
+   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
+   lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
 #   
 #   lines(DATA$DD,DATA$Psi_TSym,type='l',col='blue',ylim=c(-8,0))
 #   lines(DATA$DD,DATA$Psi_TApo,type='l',col='lightblue')

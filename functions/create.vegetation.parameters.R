@@ -133,6 +133,10 @@ read.vegetation.file <- function(filePath, modeling_options){
     params_regulation <- c("P12_gs", "P88_gs")
   }
   
+  if(modeling_options$stomatalRegFormulation=='Turgor') {
+    params_regulation <- c("turgorPressureAtGsMax")
+  }
+  
   for (i in 1:length(params_regulation)) {
     AAA <- which(io$Name == params_regulation[i]) ## line number of the variable
     

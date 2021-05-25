@@ -9,6 +9,40 @@ Rs.Comp <- function(PiFT, Esymp, Pmin) {
   return(A)
 }
 
+
+
+# Turgor pressure
+turgor.comp <- function(PiFT, Esymp, Rstemp) {
+  A <- -PiFT - Esymp * Rstemp
+  return(A)
+}
+
+# Osmotic potential
+osmo.comp <- function(PiFT, Rstemp) {
+  A <- PiFT / (1 - Rstemp)
+  return(A)
+}
+
+# Total potential
+psiTotalSymp.comp <- function(PiFT, Esymp, Rstemp) {
+  A <- Comp.Pturg(PiFT = PiFT, Esymp = Esymp, Rstemp = Rstemp) + Comp.Osmo(PiFT = PiFT, Rstemp = Rstemp)
+  return(A)
+}
+
+regulfactTurgor.comp <- function(Tpress = Tpress, TpRESSUREMax = TpRESSUREMax) {
+    # This function computes stomatal regulation if stomatal closure is limited (linearly) by turgor pressure
+    # It returns regulfact a dimensionless factor that 
+
+    # Parameters:
+    # Emax
+    # Tpress: turgor pressure
+    # TpRESSUREMax: : Maximum turgor pressure
+    # Ecuti: residual transpiration
+    Tr <- min(Emax * Tpress / TpRESSUREMax, Emax)
+    return(c(max(Tr, 0), min(max(max(Tr, 0) + Ecuti, 0 + Ecuti), Emax)))
+  }
+  
+
 # Total Conductance = Soil Conductance & Plant COnductance
 PLC.comp <- function(Pmin, slope , P50) {
   PLC  = 100 / (1 + exp(slope / 25 * (Pmin - P50)))
