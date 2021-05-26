@@ -50,6 +50,8 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   TTT$k_RootInit <- conduc$k_RootInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
   
+  TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB/TTT$LAImax # convert from L/m2soil to L/mzleaf
+  
   
   return(TTT)
 }
