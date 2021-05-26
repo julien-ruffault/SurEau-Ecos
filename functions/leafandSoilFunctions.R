@@ -339,47 +339,22 @@ Rs.Comp <- function(PiFT, Esymp, Pmin) {
 # return(Ksoil)
 # }
 
-# calculate_ET_Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
-#   ET_Granier <- pmax(0, ETP * (a * LAI^2 + b * LAI + c))
-#   return(ET_Granier)
-# }
+# 
 
 
 
-
-
-
-
-
-
-
-#// convert flux in mm to mol/m2/s : x(mm) , timestep(hours) ,LAI(m2/m2)
-ConvertFluxFrom_mm_To_mmolm2s <- function(x, timeStep, LAI) {
-  if (LAI > 0) {
-    y <- 10^6 * x / (LAI * timeStep * 3600 * 18)
-  } else if (LAI == 0) {
-    y <- 0
-  }
-  return(y)
+calculate.Ebound.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
+  return(pmax(0, ETP * (a * LAI^2 + b * LAI + c)))
 }
 
 
-#' Convert a water instantaneous water flux in mmol.m-2.s-1 to a amount in mm 
-#' over a defined time period 
-#'
-#' @param x The instaneous flux (mmol.m-2.s-1) to be converted. expressed per
-#' m2 of leaf 
-#' @param timeStep timeStep (in hours) 
-#' @param LAI leaf area index of the stand 
-#'
-#' @return
-#' @export
-#'
-#' @examples
-ConvertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
-  y <- x * (LAI * timeStep * 3600 * 18) / 10^6
-  return(y)
-}
+
+
+
+
+
+
+
 
 
 # utilities 

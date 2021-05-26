@@ -2,6 +2,7 @@
 
 
 
+
 # compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
 Rs.Comp <- function(PiFT, Esymp, Pmin) {
   A <- max((-1 * (Pmin + PiFT - Esymp) - sqrt((Pmin + PiFT - Esymp)^2 + 4 * (Pmin * Esymp))) / (2 * Esymp), 1 - PiFT / Pmin)
@@ -127,6 +128,59 @@ compute.gCrown <- function(gCrown0, windSpeed){
   windSpeed=  max(0.1, windSpeed) # to avoid very high conductance values 
   return(gCrown0*windSpeed^0.6)
   }
+
+
+
+
+
+calculate.Ebound_mm.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
+  ET_Granier <- pmax(0, ETP * (a * LAI^2 + b * LAI + c))
+  return(ET_Granier)
+}
+
+
+
+
+
+
+
+#'convert flux in L.m-2soil to an instantaneous flux in mmol/m-2leaf.s-1 
+#'over a defined time period 
+#'
+#' @param x the amount of water in mm (L.m-2soil)
+#' @param timeStep time step (in hours)
+#' @param LAI Leaf area index of the stand (m2leaf.m-2soil)
+#'
+#' @return
+#' @export
+#'
+#' @examples
+ConvertFluxFrom_mm_To_mmolm2s <- function(x, timeStep, LAI) {
+  if (LAI > 0) {
+    y <- 10^6 * x / (LAI * timeStep * 3600 * 18)
+  } else if (LAI == 0) {
+    y <- 0
+  }
+  return(y)
+}
+
+#' Convert an instantaneous flux in mmol.m-2Leaf.s-1 to a amount in 
+#' mm (L.m2soil) over a defined time period 
+#'
+#' @param x The instaneous flux (mmol.m-2leaf.s-1) to be converted. Expressed per
+#' m2 of leaf 
+#' @param timeStep timeStep (in hours) 
+#' @param LAI leaf area index of the stand 
+#'
+#' @return the flux over the considered time period in mm (L.m-2 Soil
+#' @export
+#'
+#' @examples
+convertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
+  y <- x * (LAI * timeStep * 3600 * 18) / 10^6
+  return(y)
+}
+
 
 
 

@@ -50,7 +50,7 @@ new.WBveg <- function(veg_params) {
   WBveg$gmin <- NA #Gmin for leaves
   WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
   WBveg$gs_bound <- NA
-  WBveg$gs_lim <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
+  WBveg$gs_lim   <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
   WBveg$gcanopy_Bound <- NA
   WBveg$gcanopy_lim <- NA
   WBveg$gBL <- NA
@@ -362,28 +362,41 @@ update.capaSym.WBveg <- function(WBveg) {
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# computeTranspiration
+# Compute transpiration
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
-  TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean,SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
-                     WS = WBclim$WS,VPD = WBclim$VPD,RH = max(100, WBclim$RHair_mean),gs=WBveg$gs_lim,Einst = max(0.00001, WBveg$SumFluxSoilToCollar))
-  WBveg$leafTemperature <- TGbl_Leaf [1] # Transpiration/Gs du pas de temps précédent
-  # cuticular 
+  
+# Tleaf is calculated using leaf transpiration from the previous time step
+TGbl_Leaf <- compute.Tleaf(
+  Tair = WBclim$Tair_mean, SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
+  WS = WBclim$WS, VPD = WBclim$VPD, RH = max(100, WBclim$RHair_mean), gs = WBveg$gs_lim, Einst = max(0.00001, WBveg$SumFluxSoilToCollar)
+)
+
+WBveg$leafTemperature <- TGbl_Leaf [1]
+  
+  # Cuticular conductances and transpiration 
   WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- calcul.Emin(gmin = WBveg$gmin, VPD = WBclim$VPD)
   WBveg$EminT <-  WBveg$params$fTRBToLeaf * calcul.Emin(gmin = WBveg$gmin_T,VPD= WBclim$VPD)
   
-  # canopy with no regulation
-  WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
-  WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
-  WBveg$gBL = TGbl_Leaf[2]
-  WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
-  WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
-  
-  #compute current regulation
+  #compute current stomatal regulation
   regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
   WBveg$regulFact = regul$regulFact
   
+  # calculate canopy Transpiration with no regulation
+  #if (modeling_options$EboundFormulation == 'Jarvis'){
+    WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
+    WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
+    WBveg$gBL = TGbl_Leaf[2]
+    WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
+    WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
+  #}
+  
+  # else if (modeling_options$EboundFormulation =='Granier1999'){
+  #   WBveg$Ebound = calculate.EboundGranier.WBveg(WBveg = WBveg, ETP=WBclim$ETP ,timeStep=Nhours)
+  # }
+  # 
+
   # canopy with current regulation 
   WBveg$gs_lim = WBveg$gs_bound * WBveg$regulFact
   WBveg$gcanopy_lim = 1/(1/WBveg$gCrown+1/WBveg$gs_lim + 1/WBveg$gBL) # NB: gcanopy_lim =0 when gs_lim=0 (1/(1+1/0)=0 in R)
@@ -441,7 +454,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       # 3. update of soil on small time step (done by FP in version 16)
       fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil_n$PsiSoil-WBveg_np1$Psi_TApo)
       # NB the time step for fluxSoilToCollar.C is Nhours/nts!
-      WBveg_np1$fluxSoilToCollar.C = ConvertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
+      WBveg_np1$fluxSoilToCollar.C = convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
       WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar.C, fluxRelease  = 0) 
       fluxSoilToCollarLargeTimeStep = fluxSoilToCollarLargeTimeStep + fluxSoilToCollar/nts # mean flux over one large time step
     } # end loop small time step
@@ -470,12 +483,12 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
   #fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil$PsiSoil-WBveg$Psi_TApo)
   #WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollar) # flux total en mmol/m2/s / used for Tleaf 
   #TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...
-  #WBveg$fluxSoilToCollar.C  <- ConvertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  #WBveg$fluxSoilToCollar.C  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
   #WBveg$AET.C               <- sum(WBveg$fluxSoilToCollar.C) # total flux
   
   # mean soil quantities on large time steps
   WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
-  WBveg$fluxSoilToCollar.C  <- ConvertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  WBveg$fluxSoilToCollar.C  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
   WBveg$AET.C               <- sum(WBveg$fluxSoilToCollar.C) # total flux 
   
   return(WBveg)
@@ -628,64 +641,36 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
 # stomatalclosure is 0, 1 or 2 depending on the value of psi in "PiecewieLinear"
 # regulFact is regul proportion between 0 and 1
 # regulFactPrime is the first order derivative of regul function in psi
-compute.regulFact <- function(psi, params, regulationType) {
-  
+compute.regulFact <- function(psi, params,regulationType) {
   if(regulationType=="PiecewiseLinear") {
     if (psi > params$PsiStartClosing) {
       stomatalClosure = 0
       regulFact = 1
       regulFactPrime = 0
-    } else if (psi > params$PsiClose) 
-      {
+    } else if (psi > params$PsiClose) {
       stomatalClosure = 1
       regulFact = (psi - params$PsiClose)/(params$PsiStartClosing - params$PsiClose)
       regulFactPrime = 1/(params$PsiStartClosing - params$PsiClose)
-    } else 
-      {
+    } else {
       stomatalClosure = 2
       regulFact = 0
       regulFactPrime = 0
     }
   } else if (regulationType=="Sigmoid") { 
-    stomatalClosure = NA #stomatalClosure not relevant for sigmoid 
+  
+    stomatalClosure = NA #stomatalClosure not relevant ofr sigmoid 
     PL_gs = 1/(1+exp(params$slope_gs/25*(psi-params$P50_gs)))
     regulFact = 1-PL_gs;
     al = params$slope_gs/25
     regulFactPrime = al * PL_gs * regulFact
     #regulFactPrime = al*exp(-al*(psi-P50_gs)) / ((1+exp(-al*(psi-P50_gs)))^2) # formulation in psi (same but slower to compute)
-  } else if (regulationType=="Turgor") 
-    { 
-    stomatalClosure = NA #stomatalClosure not relevant ofr sigmoid 
-    
-    rs = Rs.Comp(PiFT=params$PiFullTurgor_Leaf, Esymp=params$EpsilonSymp_Leaf, Pmin=psi)
-    turgor=turgor.comp(PiFT=params$PiFullTurgor_Leaf, Esymp=params$EpsilonSymp_Leaf, Rstemp=rs) 
-    regulFact = max(0, min(1, turgor / params$turgorPressureAtGsMax))
-    
-    if(regulFact ==1 |  regulFact ==0) 
-      {
-      regulFactPrime=0
-    } else 
-      { 
-      regulFactPrime = 0 #TODO insert the derivative to compute regulFactPrime
-        }
-    
-    
   }
-  
-    
-    
-     
-    
-  #regulFactPrime = al*exp(-al*(psi-P50_gs)) / ((1+exp(-al*(psi-P50_gs)))^2) # formulation in psi (same but slower to compute)
   #print(regulFact)
   #print(regulFactPrime)
   return(list("regulFact"=regulFact,"stomatalClosure"=stomatalClosure,"regulFactPrime"=regulFactPrime))
 }
 
-
-
-yearlyInitialisation.WBveg <- function(WBveg)
-  {
+yearlyInitialisation.WBveg <- function(WBveg){
   
   if(WBveg$PLC_Root >85 | WBveg$PLC_TL>85)
   {
@@ -698,10 +683,8 @@ yearlyInitialisation.WBveg <- function(WBveg)
 return(WBveg)
   }
   
-
 # stomatal conductance calculation with Jarvis type formulations
-calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1)
-{
+calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1){
   
   if (option==1) # temperature effect on gs 
   {
@@ -719,6 +702,12 @@ calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1)
   return(WBveg)
 }
 
+# calculate Ebound (mmol.m-2.s-1) with Granier formulation 
+calculate.EboundGranier.WBveg <- function(WBveg,ETP,timeStep){
+  ebound_mm = calculate.Ebound_mm.Granier(ETP = ETP, LAI=WBveg$LAI)
+  WBveg$Ebound = ConvertFluxFrom_mm_To_mmolm2s(x = ebound_mm, timeStep= timeStep, LAI =WBveg$LAI)
+  return(WBveg)
+  }
 
 
 
