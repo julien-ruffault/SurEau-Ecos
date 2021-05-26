@@ -10,7 +10,6 @@ rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
 
-
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 
@@ -21,12 +20,6 @@ soilParameters_path       <- paste0(mainDir,'/datasets/test_data/Soil_test_champ
 vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test_quercus_champenoux_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
-
-
-
-
-
-
 
 
 # create model input files --------------------------------------------------
