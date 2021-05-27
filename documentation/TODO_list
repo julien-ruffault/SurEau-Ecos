@@ -1,18 +1,15 @@
 
 TODO list for SurEau  (mise à jour le 20/05/2021 par JR) 
 
-
 # TODO before release 
-- faire la list des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
 - faire un guide général de l'utilisation de SUREAU (JR) --> use RmarkDown/knitr  
 - check LFMC results (JR and NM)
 - voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
-- initialisation de la végétation biomass,volume, area (NM)  
-- voir l'implementation des Q par m2 de sol pour matcher avec le modèle de bilan en eau  (NM)
 - Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers (FP)
+- Compute Emin.C
+- Faire la liste des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
 
-
-# optionnal 
+# Optional
 - Un script de comparaison et de plot de la simulation reference (JR, NM and FP)/ attendre que le modele soit stabilisé
 - voir  pour specifire les conditions de mort de la plante/  quand arreter la simulation et eventullement proposer que la simu continue même si la plante est morte en enlevant les processus  -
 -- implementer dans modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)

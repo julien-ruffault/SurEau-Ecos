@@ -61,59 +61,29 @@ run.SurEauR(modeling_options = modeling_options ,
 
 
 # analyse outputs ---------------------------------------------------------
-
-
-# # for analyses / daily time scales 
-# filename  = paste0(mainDir,"/Results_model/test.csv")
-# DATA = read.csv(filename,header=T, dec='.',sep="")
-# 
-# 
-# plot(DATA$daily_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
-# lines(DATA$daily_Psi_LApoMin,type='l',col='firebrick4')
-# 
-# plot(DATA$daily_Psi_TSymMin)
-# plot(DATA$daily_Psi_TApoMin)
-# 
-# 
-# plot(DATA$daily_evaporation_mm)
-# plot(DATA$daily_transpiration_mm)
-# plot(DATA$daily_PLC_Root_max)
-# plot(DATA$daily_PLC_TL_max)
-# 
-# 
-# 
-# 
-# 
-# 
-# # for checking / yearly time scales 
-# filename  = paste0(mainDir,"/Results_model/test.csv")
-# DATA = read.csv(filename,header=T, dec='.',sep="")
-# 
-# 
-# plot(DATA$yearly_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
-# lines(DATA$yearly_Psi_LApoMin,type='l',col='firebrick4')
-# plot(DATA$yearly_evaporation_mm)
-# plot(DATA$yearly_transpiration_mm)
-# 
-# print(DATA)
-# 
-# 
-# 
-# DATA$daily_Psi
-# 
 # # for analyses / subdaily time scales 
    filename  = paste0(mainDir,"/Compar_SurEauC/test.csv")
    DATA = read.csv(filename,header=T, dec='.',sep="")
    DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
-#   
-#   
+
    plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
    lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
-   plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
-   lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
+   lines(DATA$DD,DATA$Psi_AllSoil,type='l',col='blue')
+   par(new=T)
+   plot(DATA$DD,DATA$PLC_TL,type='l',col=1, ylab="", yaxt="n",xlab="")
+   axis(4)
    
-   head(DATA)
-   #   
+   plot(DATA$DD,DATA$regulFact,type='l',col=1, ylab="", yaxt="n",xlab="")
+   plot(DATA$DD,DATA$gcanopy_lim,type='l',col=1, ylab="",xlab="")
+   plot(DATA$DD,DATA$gs_lim,type='l',col=1, ylab="",xlab="")
+
+     
+   plot(DATA$DD,DATA$AET.C,type='l',col=1, ylab="",xlab="")
+   lines(DATA$DD,DATA$EminT,type='l',col=2, ylab="",xlab="")
+   
+   
+   
+   
 #   lines(DATA$DD,DATA$Psi_TSym,type='l',col='blue',ylim=c(-8,0))
 #   lines(DATA$DD,DATA$Psi_TApo,type='l',col='lightblue')
 #   
