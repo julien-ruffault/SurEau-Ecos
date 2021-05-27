@@ -51,12 +51,12 @@
 # }
 #
 
-# compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
-Rs.Comp <- function(PiFT, Esymp, Pmin) {
-  A <- max((-1 * (Pmin + PiFT - Esymp) - sqrt((Pmin + PiFT - Esymp)^2 + 4 * (Pmin * Esymp))) / (2 * Esymp), 1 - PiFT / Pmin)
-  return(A)
-}
-
+# # compute Rs from pmin (resolution from Bartlet et al 2012 EcolLett and email Herve Cochard 19/06/2015)
+# Rs.Comp <- function(PiFT, Esymp, Pmin) {
+#   A <- max((-1 * (Pmin + PiFT - Esymp) - sqrt((Pmin + PiFT - Esymp)^2 + 4 * (Pmin * Esymp))) / (2 * Esymp), 1 - PiFT / Pmin)
+#   return(A)
+# }
+# 
 
 
 
@@ -340,39 +340,6 @@ Rs.Comp <- function(PiFT, Esymp, Pmin) {
 # }
 
 # 
-
-
-
-calculate.Ebound.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
-  return(pmax(0, ETP * (a * LAI^2 + b * LAI + c)))
-}
-
-
-
-
-
-
-
-
-
-
-
-# utilities 
-convert.FtoV <- function(x, .rock_fragment_content, .layer_thickness) {
-  # . rockfragmentcontent (%)
-  # .layer_thickness (m)
-  # x :  (cm3.cm3.).
-  # y : (mm)
-  
-  y <- x * (1 - (.rock_fragment_content / 100)) * .layer_thickness * 1000
-  
-  return(y)
-}
-
-#Function to sum in series 2 k
-kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
-
-
 
 
 

@@ -10,7 +10,6 @@ rm(list = ls()) # ClWBveg$params$ear environment
 gc()            # Clear memory
 
 
-
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 
@@ -23,22 +22,17 @@ vegetationParameters_path <- paste0(mainDir,'/datasets/test_data/Parameters_test
 output_path               <- paste0(mainDir,'/Results_model/test.csv')        
 
 
-
-
-
-
-
-
 # create model input files --------------------------------------------------
-modeling_options     <- create.modeling.options(timeStepForEvapo=1,
+modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
-                                                stomatalRegFormulation = "Sigmoid",
+                                                stomatalRegFormulation = "Turgor",
+                                                thresholdMortality =99.99999,
                                                 numericalScheme = 'Implicit',
                                                 defoliation = F,
                                                 resetSWC=T)       
 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
-                                                      endYearSimulation = 1991,
+                                                      endYearSimulation = 1990,
                                                       mainDir= mainDir,
                                                       resolutionOutput = "subdaily",
                                                       outputType = 'simple_subdaily',
@@ -87,16 +81,16 @@ run.SurEauR(modeling_options = modeling_options ,
 # 
 # 
 # # for checking / yearly time scales 
-filename  = paste0(mainDir,"/Results_model/test.csv")
-DATA = read.csv(filename,header=T, dec='.',sep="")
-
-
-plot(DATA$yearly_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
-lines(DATA$yearly_Psi_LApoMin,type='l',col='firebrick4')
-plot(DATA$yearly_evaporation_mm)
-plot(DATA$yearly_transpiration_mm)
+# filename  = paste0(mainDir,"/Results_model/test.csv")
+# DATA = read.csv(filename,header=T, dec='.',sep="")
 # 
- print(DATA)
+# 
+# plot(DATA$yearly_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
+# lines(DATA$yearly_Psi_LApoMin,type='l',col='firebrick4')
+# plot(DATA$yearly_evaporation_mm)
+# plot(DATA$yearly_transpiration_mm)
+# # 
+#  print(DATA)
 # 
 # 
 # 

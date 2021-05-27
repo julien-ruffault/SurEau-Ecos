@@ -26,6 +26,9 @@
 #' @param defoliation a logical value indicating whether trees should loose 
 #' leaves when occurs.cavitation occurs of the above part of plant.  Defoliation 
 #' starts only when PLC_TL > 10% .
+#' @param thresholdMortatliy a numeric value indicating the PLC value (in % ) 
+#' above which the plant is considered dead and simulation stops for the current
+#' year. Default value is 90 
 #' @param numericalScheme the method to be used to ... either "Implicit" or "Xu"
 #' 
 #'
@@ -39,6 +42,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     resetSWC = F,
                                     avoidWaterSoilTransfer = T,
                                     defoliation =F,
+                                    thresholdMortality = 90,
                                     ETPFormulation = c("PT", "PM"),
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
@@ -70,10 +74,17 @@ create.modeling.options <- function(timeStepForEvapo = 1,
     stop(" 'defoliation' must be 'T' or 'F'.")
   }
   
+  if (!is.numeric(thresholdMortality)) {
+    stop(" 'thresholdMortatlity' must be numeric.")
+  }
+  
+  if (thresholdMortality>100  | thresholdMortality<50) {
+    stop(" 'thresholdMortatlity' must be >50 and <100 .")
+  }
   
   
   
-
+  
   ETPFormulation <- match.arg(ETPFormulation)
   RnFormulation <- match.arg(RnFormulation)
 
@@ -112,6 +123,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$compOptions <- compOptions
   modeling_options$stomatalRegFormulation <- stomatalRegFormulation
   modeling_options$defoliation <- defoliation
+  modeling_options$thresholdMortatliy <- thresholdMortality
 
   return(modeling_options)
 }

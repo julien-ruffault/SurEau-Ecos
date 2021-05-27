@@ -181,6 +181,31 @@ convertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
   return(y)
 }
 
+# Function to sum 2 conductances in series
+kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
+
+
+# not used for now
+calculate.Ebound.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
+  return(pmax(0, ETP * (a * LAI^2 + b * LAI + c)))
+}
+
+
+
+#' Convert soil parameter from from cm3.cm-3 to mm according to thickness and
+#' rock fragment content 
+#' @param x the soil value to be converted (in m3.m-3)
+#' @param rock_fragment_content rock fragment content of the soil layer (%)
+#' @param layer_thickness thickness of the soil layer (in m)
+#'
+#' @return y soil parameter in mm 
+#' @export
+#'
+#' @examples
+convert.FtoV <- function(x, rock_fragment_content = 0, layer_thickness) {
+  y <- x * (1 - (rock_fragment_content / 100)) * layer_thickness * 1000
+  return(y)
+}
 
 
 
