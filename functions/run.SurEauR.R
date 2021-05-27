@@ -80,7 +80,7 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
         soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = veg_var_list$ETPr, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)
         soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar.C, fluxRelease = 0) # veg_var_list$waterRelease)
 
-        if (veg_var_list$PLC_TL >= 90) {
+        if (veg_var_list$PLC_TL >= modeling_options$thresholdMortatliy) {
           print("The plant is dead...")
           stopDeadPlant <- TRUE
           break
