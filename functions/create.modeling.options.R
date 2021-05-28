@@ -29,7 +29,7 @@
 #' @param thresholdMortatliy a numeric value indicating the PLC value (in % ) 
 #' above which the plant is considered dead and simulation stops for the current
 #' year. Default value is 90 
-#' @param numericalScheme the method to be used to ... either "Implicit" or "Xu"
+#' @param numericalScheme the method to be used to ... either "Implicit" or "Semi-Implicit" (Xu)
 #' 
 #'
 #' @return
@@ -41,13 +41,16 @@
 create.modeling.options <- function(timeStepForEvapo = 1,
                                     resetSWC = F,
                                     avoidWaterSoilTransfer = T,
+                                    soilEvap=T,
                                     defoliation =F,
                                     thresholdMortality = 90,
                                     ETPFormulation = c("PT", "PM"),
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
-                                    compOptionsForEvapo = c("Normal", "Accurate", "Special", "Fast", "Fast1"),
-                                    numericalScheme = c("Implicit","Xu"),
+                                    compOptionsForEvapo = c("Normal", "Accurate","Fast", "Custom"),
+                                    customSmallTimeStepInSec = 600,
+                                    Lcav = 1,Tcav = 1,Eord=1,
+                                    numericalScheme = c("Implicit","Semi-Implicit"),
                                     stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
@@ -82,9 +85,6 @@ create.modeling.options <- function(timeStepForEvapo = 1,
     stop(" 'thresholdMortatlity' must be >50 and <100 .")
   }
   
-  
-  
-  
   ETPFormulation <- match.arg(ETPFormulation)
   RnFormulation <- match.arg(RnFormulation)
 
@@ -93,24 +93,19 @@ create.modeling.options <- function(timeStepForEvapo = 1,
 
   numericalScheme <-  match.arg(numericalScheme)
   
+  if (compOptionsForEvapo == "Normal") { # every 10 min, 6 min, 3min, 1min
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+  }
+  if (compOptionsForEvapo == "Accurate") { # every 10 s
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(600), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+  }
+  if (compOptionsForEvapo == "Fast") { # every hours, every 10 min
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+  }
+  if (compOptionsForEvapo == "Custom") { # every customSmallTimeStepInSec 
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(timeStepForEvapo*3600/customSmallTimeStepInSec), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+  }
   
-#  numericalScheme = "Implicit"
-  #numericalScheme = "Xu"
-  if (compOptionsForEvapo == "Normal") {
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
-  }
-  if (compOptionsForEvapo == "Accurate") {
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(180), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
-  }
-  if (compOptionsForEvapo == "Special") {
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(720), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
-  }
-  if (compOptionsForEvapo == "Fast") {
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
-  }
-  if (compOptionsForEvapo == "Fast1") {
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(1), "Lsym" = 1, "Tsym" = 1, "Eord" = 1, "Lcav" = 1, "Tcav" = 1, "CLapo" = 1, "CTapo" = 1)
-  }
 
   modeling_options <- list()
   modeling_options$constantClimate <- constantClimate
@@ -122,8 +117,9 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$avoidWaterSoilTransfer <- avoidWaterSoilTransfer
   modeling_options$compOptions <- compOptions
   modeling_options$stomatalRegFormulation <- stomatalRegFormulation
+  modeling_options$soilEvap <- soilEvap
   modeling_options$defoliation <- defoliation
   modeling_options$thresholdMortatliy <- thresholdMortality
-
+  
   return(modeling_options)
 }

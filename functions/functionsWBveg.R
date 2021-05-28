@@ -580,7 +580,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       
       # 2.3 Compute Psi_TApo_np1
       Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
-    } else if (opt$numericalScheme=="Xu") {
+    } else if (opt$numericalScheme=="Semi-Implicit") {
       # 2.1 LApo
       alpha = exp(-(K_TL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
       Psi_td = (K_TL*Psi_TApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_TL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
@@ -607,7 +607,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
     Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
     Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
-  } else if (opt$numericalScheme=="Xu") {
+  } else if (opt$numericalScheme=="Semi-Implicit") {
     alpha = exp(-K_LSym/C_LSym*dt)
     Psi_td = (K_LSym*Psi_LApo_n - (E_nph + Emin_L_nph))/(K_LSym + dbxmin) # dbxmin to avoid 0/0
     Psi_LSym_np1 = alpha * Psi_LSym_n +(1-alpha) * Psi_td
