@@ -103,21 +103,24 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   WBclimHour$ETP <- compute.ETP.PT(Tmoy = WBclimHour$Tair_mean, NetRadiation = WBclimHour$Rn, PTcoeff = PTcoeff)
   # Wind speed -----------------------------------------------------------------
   WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
-
+  browser()
+  
   WBclimHour$TIME <- modeling_options$TIME
   WBclimHour$nHours = c(base::diff(c(WBclimHour$TIME[length(WBclimHour$TIME)],24)),base::diff(as.numeric(WBclimHour$TIME)))
   # nhours for the first time period is equal to midnight minus the last hour of the previous day 
 
-  
+  index= which(TIME_HOUR %in% WBclimHour$TIME )
+
+
   if (length(modeling_options$TIME) < 24) {
-    WBclimHour$RG <- WBclimHour$RG[modeling_options$TIME]
-    WBclimHour$Rn <- WBclimHour$Rn[modeling_options$TIME]
-    WBclimHour$PAR <- WBclimHour$PAR[modeling_options$TIME]
-    WBclimHour$ETP <- WBclimHour$ETP[modeling_options$TIME]
-    WBclimHour$Tair_mean <- WBclimHour$Tair_mean[modeling_options$TIME]
-    WBclimHour$RHair_mean <-WBclimHour$RHair_mean[modeling_options$TIME]
-    WBclimHour$VPD <- WBclimHour$VPD[modeling_options$TIME]
-    WBclimHour$WS <- WBclimHour$WS[modeling_options$TIME]
+    WBclimHour$RG <- WBclimHour$RG[index]
+    WBclimHour$Rn <- WBclimHour$Rn[index]
+    WBclimHour$PAR <- WBclimHour$PAR[index]
+    WBclimHour$ETP <- WBclimHour$ETP[index]
+    WBclimHour$Tair_mean <- WBclimHour$Tair_mean[index]
+    WBclimHour$RHair_mean <-WBclimHour$RHair_mean[index]
+    WBclimHour$VPD <- WBclimHour$VPD[index]
+    WBclimHour$WS <- WBclimHour$WS[index]
   }
   #WBclimHour$TIME[which(WBclimHour$TIME == 24)] <- 23.99
   return(WBclimHour)
