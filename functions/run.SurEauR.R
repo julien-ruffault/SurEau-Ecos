@@ -77,7 +77,9 @@ run.SurEauR <- function(modeling_options, simulation_parameters, climate_data, s
         # update soil water stocks after T and water release and update psi and conductance
         # TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
         # In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
-        soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = veg_var_list$ETPr, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)
+        if(modeling_options$soilEvap) {
+          soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = veg_var_list$ETPr, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)  
+        }
         soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar.C, fluxRelease = 0) # veg_var_list$waterRelease)
 
         if (veg_var_list$PLC_TL >= modeling_options$thresholdMortatliy) {

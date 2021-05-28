@@ -28,7 +28,7 @@ PiFullTurgor_Trunk;-2.1;Mpa
 EpsilonSymp_Trunk;10;Mpa/%
 ApoplasmicFrac_Trunk;0.4;-
 SymplasmicFrac_Trunk;0.2;-
-VolumeLiving_TRB;100;(mm or sapwood litre/m2 of soil)
+VolumeLiving_TRB;39.87;(mm or sapwood litre/m2 of soil)
 Tbase;3;?C
 Fcrit;450;?C
 PTcoeff;1.14;-
