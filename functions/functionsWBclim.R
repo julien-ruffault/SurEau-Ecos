@@ -103,7 +103,6 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   WBclimHour$ETP <- compute.ETP.PT(Tmoy = WBclimHour$Tair_mean, NetRadiation = WBclimHour$Rn, PTcoeff = PTcoeff)
   # Wind speed -----------------------------------------------------------------
   WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
-  browser()
   
   WBclimHour$TIME <- modeling_options$TIME
   WBclimHour$nHours = c(base::diff(c(WBclimHour$TIME[length(WBclimHour$TIME)],24)),base::diff(as.numeric(WBclimHour$TIME)))
