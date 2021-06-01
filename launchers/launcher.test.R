@@ -25,8 +25,8 @@ output_path               <- paste0(mainDir,'/Results_model/test.csv')
 # create model input files --------------------------------------------------
 modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
-                                                stomatalRegFormulation = "Turgor",
-                                                thresholdMortality =99.99999,
+                                                stomatalRegFormulation = "Sigmoid",
+                                                thresholdMortality = 90,
                                                 numericalScheme = 'Implicit',
                                                 defoliation = F,
                                                 resetSWC=T)       
@@ -35,7 +35,7 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990
                                                       endYearSimulation = 1990,
                                                       mainDir= mainDir,
                                                       resolutionOutput = "subdaily",
-                                                      outputType = 'simple_subdaily',
+                                                      outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -104,7 +104,9 @@ run.SurEauR(modeling_options = modeling_options ,
 #   
    plot(DATA$DD,DATA$Psi_LSym,type='l',col='firebrick1',ylim=c(-6,0))
    lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
-#   
+
+   plot(DATA$DD,DATA$Tair)
+   
 #   lines(DATA$DD,DATA$Psi_TSym,type='l',col='blue',ylim=c(-8,0))
 #   lines(DATA$DD,DATA$Psi_TApo,type='l',col='lightblue')
 #   

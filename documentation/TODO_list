@@ -1,12 +1,10 @@
 
-TODO list for SurEau  (mise à jour le 26/05/2021 par JR) 
+TODO list for SurEau  (mise à jour le 28/05/2021 par JR) 
 
 # TODO before release 
-<<<<<<< HEAD
 =======
 
 - faire la list des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
->>>>>>> 5b8785b52ca592ab3e2c8f91f395c2aa110b9c22
 - faire un guide général de l'utilisation de SUREAU (JR) --> use RmarkDown/knitr  
 - check LFMC results (JR and NM)
 - voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
@@ -16,7 +14,6 @@ TODO list for SurEau  (mise à jour le 26/05/2021 par JR)
 - Faire la liste des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
 =======
 - Calculer la derivee de la fonction de turgescences (pour regulation option : modeling_options$stomatalRegFormulation) --> (FP)
-- diviser le volume_livingTRB (rentré par m2 de sol) par le LAI (repass en m2 de feuille)
 - faire une section dans le doc de relase comment calculer le volume_livingTRB (NM)
 - finir le Jarvis vs Granier1999 (JR) 
 - rajouter la succulence dans les parametres --> (NM, JR)
