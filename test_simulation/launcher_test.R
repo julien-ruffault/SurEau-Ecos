@@ -1,5 +1,5 @@
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### #
-# Test Launcher to run SurEau-ECOS-v1.0.0 on Champenoux
+#  Launcher to run tests on  SurEau-ECOS-v1.0.x 
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # Initialization ---------------------------------------------------------------
@@ -26,7 +26,7 @@ modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
                                                 stomatalRegFormulation = "Sigmoid",
                                                 thresholdMortality = 99,
-                                                numericalScheme = 'Implicit',
+                                                numericalScheme = 'Semi-Implicit',
                                                 defoliation = F,
                                                 resetSWC=T)       
 
@@ -60,6 +60,21 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 
 # output  Analysis -------------------------------------------------------------
 
+# for analyses / subdaily time scales 
+filename  = paste0(mainDir,"/test_simulation/test.csv")
+DATA = read.csv(filename,header=T, dec='.',sep="")
+DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+# plot Psis
+plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
+#axis.POSIXct(side=1,x=DATA$DD)
+#axis(side=2,las=2)
+lines(DATA$DD,DATA$Psi_LApo,type='l',col='springgreen4')
+lines(DATA$DD,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
+lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
+legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil'),
+       col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
+
 
 # # for analyses / daily time scales 
 # filename  = paste0(mainDir,"/Results_model/test.csv")
@@ -84,17 +99,3 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 # plot(DATA$yearly_transpiration_mm)
 
 
-# for analyses / subdaily time scales 
-   filename  = paste0(mainDir,"/test_simulation/test.csv")
-   DATA = read.csv(filename,header=T, dec='.',sep="")
-   DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
-   plot(DATA$DD,DATA$Psi_LSym,type='l',col='forestgreen',ylim=c(-6,0))
-   lines(DATA$DD,DATA$Psi_LApo,type='l',col='darkgreen')
-
-   lines(DATA$DD,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
-   lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
-   
-   lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
-   
-   plot(DATA$DD,DATA$PsiSoil1,type='l')
-   

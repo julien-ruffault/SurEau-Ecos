@@ -13,7 +13,7 @@ gc()            # Clear memory
 
 # User options  ----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
-source(paste0(mainDir,'/functions/load.SureauR.functions.R'))                             # do not modify 
+source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                             # do not modify 
 
 climateData_path          <- paste0(mainDir,'/Compar_SurEauC/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
 
@@ -52,7 +52,7 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 
 
 # run SurEau-Ecos ---------------------------------------------------------
-run.SurEauR(modeling_options = modeling_options ,
+run.SurEau_Ecos(modeling_options = modeling_options ,
         simulation_parameters = simulation_parameters, 
        climate_data = climate_data,
        stand_parameters = stand_parameters, 
