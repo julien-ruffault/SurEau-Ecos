@@ -44,6 +44,7 @@ EminT;WBveg;EminT;1
 Elim;WBveg;Elim;1
 transpiration_mm;WBveg;transpiration_mm;1
 Emin_mm;WBveg;Emin_mm;1
+EminT_mm;WBveg;EminT_mm;1
 fluxSoilToCollar1_mm;WBveg;fluxSoilToCollar_mm;1
 fluxSoilToCollar2_mm;WBveg;fluxSoilToCollar_mm;2
 fluxSoilToCollar3_mm;WBveg;fluxSoilToCollar_mm;3

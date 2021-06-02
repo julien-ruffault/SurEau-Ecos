@@ -67,7 +67,7 @@ new.WBveg <- function(veg_params) {
   WBveg$fluxSoilToCollar_mm <- numeric(3)
   WBveg$transpiration_mm<- 0
   WBveg$Emin_mm <- 0
-
+  WBveg$EminT_mm <- 0
   
   # LAI and LAI-dependent variables
   WBveg$LAIpheno <- numeric(1)
@@ -477,16 +477,15 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
 
   WBveg <- compute.transpiration.WBveg(WBveg, WBclim_next, Nhours,modeling_options=modeling_options) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
   
-  #  print('')
+
   # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToCollar_mm is used as input in UpdateSoilWater.WBsoil)
-  #fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil$PsiSoil-WBveg$Psi_TApo)
   #TODO FP suggests moving the computation of  fluxSoilToCollar_mm in the main loop, as it is the coupling between the two models...
 
-
-  
   # mean soil quantities on large time steps
+  WBveg$Emin_mm  = convertFluxFrom_mmolm2s_To_mm(WBveg$Emin, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  WBveg$EminT_mm = convertFluxFrom_mmolm2s_To_mm(WBveg$EminT, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  
   WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
-
   WBveg$fluxSoilToCollar_mm  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
   WBveg$transpiration_mm     <- sum(WBveg$fluxSoilToCollar_mm) # total flux in mm 
 

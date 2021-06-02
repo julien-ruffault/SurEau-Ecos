@@ -76,8 +76,16 @@ legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
 
-plot(DATA$DD, DATA$SoilEvaporation_mm,type='l')
+
 plot(DATA$DD, DATA$transpiration_mm,type='l')
+lines(DATA$DD, DATA$SoilEvaporation_mm,type='l',col='blue')
+lines(DATA$DD,DATA$Emin_mm,type='l',col='red')
+lines(DATA$DD,DATA$EminT_mm,type='l',col='green')
+
+plot(DATA$DD,DATA$transpiration_mm+DATA$SoilEvaporation_mm+DATA$Emin_mm+DATA$EminT_mm,type='l')
+
+
+
 #axis.POSIXct(side=1,x=DATA$DD)
 #axis(side=2,las=2)
 
