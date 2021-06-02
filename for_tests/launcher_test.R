@@ -38,15 +38,7 @@ simulation_parameters <- create.simulation.parameters(mainDir = mainDir,
                                                       overWrite = T,
                                                       outputPath = output_path)
 
-climate_data     <- create.climate.data(filePath = climateData_path, 
-                                        modeling_options = modeling_options,
-                                        simulation_parameters = simulation_parameters) #
-stand_parameters <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
-soil_parameters  <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.373333 ,0.746666,1.119)) 
-vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, 
-                                                      stand_parameters = stand_parameters, 
-                                                      soil_parameter = soil_parameters,
-                                                      modeling_options = modeling_options)
+
 
 
 # run SurEau-Ecos --------------------------------------------------------------
