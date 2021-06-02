@@ -10,6 +10,8 @@
 #'   Francois)
 #' @param resetSWC a logical value indicating whether soil layers should be
 #'   refilled at the beginning of each year (default=F)
+#' @param soilEvapo a logical value indicating whether soil evaporation should be 
+#' simulated (T) or set to 0 (F) ,default=T
 #' @param avoidWaterSoilTransfer a logical value indicating whether the transfer
 #'   of water between soil layers should be avoided by disconnecting the soil
 #'   layers that get refilled from the soil-plant system (default =F). Yet to be
@@ -29,7 +31,7 @@
 #' @param thresholdMortatliy a numeric value indicating the PLC value (in % ) 
 #' above which the plant is considered dead and simulation stops for the current
 #' year. Default value is 90 
-#' @param numericalScheme the method to be used to ... either "Implicit" or "Semi-Implicit" (Xu)
+#' @param numericalScheme the method to be used, either "Implicit" or "Semi-Implicit" (Xu)
 #' 
 #'
 #' @return
@@ -49,7 +51,9 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate","Fast", "Custom"),
                                     customSmallTimeStepInSec = 600,
-                                    Lcav = 1,Tcav = 1,Eord=1,
+                                    Lcav = 1,
+                                    Tcav = 1,
+                                    Eord=1,
                                     numericalScheme = c("Implicit","Semi-Implicit"),
                                     stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor")) {
   if (timeStepForEvapo == "Variable") {
@@ -75,6 +79,10 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   
   if (!is.logical(defoliation)) {
     stop(" 'defoliation' must be 'T' or 'F'.")
+  }
+  
+  if (!is.logical(soilEvap)) {
+    stop(" 'SoilEvap' must be 'T' or 'F'.")
   }
   
   if (!is.numeric(thresholdMortality)) {

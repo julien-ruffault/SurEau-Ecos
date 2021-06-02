@@ -40,7 +40,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
     for (DAY in climate_data$Doy[climate_data$Year == YEAR]) # Loop on days ####
     {
-       print(paste0("day=", DAY))
+       print(paste0("day ", DAY))
       if (simulation_parameters$resolutionOutput %in% c("daily", "yearly")) {
         output_daily <- new.WBdaily() # create list for yearly outputs
       }
@@ -78,9 +78,9 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
         # TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
         # In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
         if(modeling_options$soilEvap) {
-          soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = veg_var_list$ETPr, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)  
-        }
-        soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar.C, fluxRelease = 0) # veg_var_list$waterRelease)
+          soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = Clim_mid$ETP, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)  
+          }
+        soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar_mm)
 
         if (veg_var_list$PLC_TL >= modeling_options$thresholdMortatliy) {
           print("The plant is dead...")

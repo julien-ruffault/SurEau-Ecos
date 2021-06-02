@@ -163,7 +163,7 @@ new.WByearly <- function(){
 
 update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   
-  WBdaily$transpiration_mm = WBdaily$transpiration_mm + WBveg$AET.C
+  WBdaily$transpiration_mm = WBdaily$transpiration_mm + WBveg$transpiration_mm
   WBdaily$evaporation_mm   = WBdaily$evaporation_mm + WBsoil$EvaporationSum
   
   WBdaily$Psi_LSymMin = min(WBdaily$Psi_LSymMin,WBveg$Psi_LSym)

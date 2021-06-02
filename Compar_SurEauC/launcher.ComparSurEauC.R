@@ -71,7 +71,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
    plot(DATA$DD,DATA$gs_lim,type='l',col=1, ylab="",xlab="")
 
      
-   plot(DATA$DD,DATA$AET.C,type='l',col=1, ylab="",xlab="")
+   plot(DATA$DD,DATA$transpiration_mm ,type='l',col=1, ylab="",xlab="")
    lines(DATA$DD,DATA$EminT,type='l',col=2, ylab="",xlab="")
    
    

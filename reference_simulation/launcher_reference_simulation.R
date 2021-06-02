@@ -23,7 +23,6 @@ vegetationParameters_path <- paste0(mainDir,'/reference_simulation/Parameters_te
 output_path               <-  paste0(mainDir,'/reference_simulation/Reference_simulation_subdaily_out.csv')
 
 
-
 # Create input files and run SurEau-Ecos
 modeling_options      <- create.modeling.options()  
 simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                       
@@ -70,16 +69,16 @@ lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
-# plot water fluxes 
-plot(DATA$Time,DATA$AET.C,type='l',col='blue',xlab='Time',ylab='hourly evapotranspiration (mm)')
 
+# plot water fluxes 
+plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='fluxes (mm)')
+lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='black')
 
 # plot cavitation 
 plot(DATA$Time,DATA$PLC_TL,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
 lines(DATA$Time,DATA$PLC_Root,type='l',col='brown')
 legend('topleft',legend=c('PLC_leaf','PLC_root'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
-
 
 # plot fuel moisture 
 plot(DATA$Time,DATA$LFMCSymp,type='l', col='springgreen4',xlab='Time',ylab='Fuel moisture content (% dry weight)',ylim=c(40,80))

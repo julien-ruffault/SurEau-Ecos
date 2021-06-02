@@ -10,7 +10,6 @@ TODO list for SurEau  (mise à jour le 28/05/2021 par JR)
 - voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
 - Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers (FP)
 <<<<<<< HEAD
-- Compute Emin.C
 - Faire la liste des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
 =======
 - Calculer la derivee de la fonction de turgescences (pour regulation option : modeling_options$stomatalRegFormulation) --> (FP)
@@ -33,7 +32,7 @@ TODO list for SurEau  (mise à jour le 28/05/2021 par JR)
 - In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
 - regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation
 ## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
-- TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...(JR) 
+- TODO FP would suggest to move compute fluxSoilToCollar_mm directly in the main loop, as it is the coupling between the two models...(JR) 
 
 
 --------------------------------------------------------------------------------
