@@ -15,22 +15,20 @@ gc()            # Clear memory
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                                   # do not modify 
 
-
 # set paths
-climateData_path          <- paste0(mainDir,'/reference_simulation/test_climat.csv') 
-soilParameters_path       <- paste0(mainDir,'/reference_simulation/Soil_test.csv')
-vegetationParameters_path <- paste0(mainDir,'/reference_simulation/Parameters_test_quercus_evergreen.csv')
-output_path               <-  paste0(mainDir,'/reference_simulation/Reference_simulation_subdaily_out.csv')
-
+climateData_path          <- paste0(mainDir,'/quick_start/climat_example.csv')
+soilParameters_path       <- paste0(mainDir,'/quick_start/soil_example.csv')
+vegetationParameters_path <- paste0(mainDir,'/quick_start/vegetation_example.csv')
+output_path               <-  paste0(mainDir,'/quick_start/example_output_subdaily.csv')
 
 # Create input files and run SurEau-Ecos
 modeling_options      <- create.modeling.options()  
-simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                       
-                                                      endYearSimulation=1990,
-                                                      mainDir=mainDir,
-                                                      outputType='LFMC_subdaily',
-                                                      overWrite=T,
-                                                      outputPath=output_path)
+simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                       
+                                                      endYearSimulation = 1990,
+                                                      mainDir = mainDir,
+                                                      outputType = 'LFMC_subdaily',
+                                                      overWrite = T,
+                                                      outputPath = output_path)
 
 
 climate_data          <- create.climate.data(filePath = climateData_path, 
@@ -52,14 +50,13 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
                 soil_parameters = soil_parameters,
                 vegetation_parameters = vegetation_parameters)
 
-
-
 # exemple output  Analysis -----------------------------------------------------
 
 # for analyses / subdaily time scales 
 filename  = paste0(mainDir,"/reference_simulation/Reference_simulation_subdaily_out.csv")
-DATA = read.csv(filename,header=T, dec='.',sep="")
-DATA$Time= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+DATA      = read.csv(filename,header=T, dec='.', sep="")
+DATA$Time = as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+
 # plot Psis
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-4,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
