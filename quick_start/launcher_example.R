@@ -50,12 +50,10 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
                 soil_parameters = soil_parameters,
                 vegetation_parameters = vegetation_parameters)
 
-# exemple output  Analysis -----------------------------------------------------
-
-# for analyses / subdaily time scales 
-filename  = paste0(mainDir,"/reference_simulation/Reference_simulation_subdaily_out.csv")
+# Example output loading an plotting  ------------------------------------------
+filename  = paste0(mainDir,"/quick_start/example_output_subdaily.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
-DATA$Time = as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 
 # plot Psis
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-4,0),xlab='Time',ylab='Psi (MPa)')
@@ -65,7 +63,6 @@ lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
-
 
 # plot water fluxes 
 plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='fluxes (mm)')

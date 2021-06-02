@@ -51,7 +51,7 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   TIME <- as.POSIXct(x=paste0(Date, "/", x.m), format = "%Y-%m-%d/%H:%M", tz = "UTC")
   #browser()
   #df = as.numeric(TIME)
-  df= as.character(TIME,format='%Y-%m-%d%H:%M:%S')
+  df= as.character(TIME,format='%Y-%m-%d/%H:%M:%S')
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
@@ -65,13 +65,13 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
 
 write.WBoutput.daily <- function(WBoutput,Date,WBdaily){
   TIME <- Date
-  df = as.numeric(TIME)
+  df = as.character(TIME,format='%Y-%m-%d%H:%M:%S')
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
@@ -84,7 +84,7 @@ write.WBoutput.yearly <- function(WBoutput,year,WByearly){
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
