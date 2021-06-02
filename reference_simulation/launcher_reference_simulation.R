@@ -29,8 +29,8 @@ modeling_options      <- create.modeling.options()
 simulation_parameters <- create.simulation.parameters(startYearSimulation=1990,                       
                                                       endYearSimulation=1990,
                                                       mainDir=mainDir,
-                                                      outputType='simple_subdaily',
-                                                      overWrite=F,
+                                                      outputType='LFMC_subdaily',
+                                                      overWrite=T,
                                                       outputPath=output_path)
 
 
@@ -65,10 +65,29 @@ DATA$Time= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-4,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
 lines(DATA$Time,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
-lines(DATA$Time,DATA$Psi_LApo,type='l',col='firebrick4')
+lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
-legend('bottomright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil'),
+legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
+
+# plot water fluxes 
+plot(DATA$Time,DATA$AET.C,type='l',col='blue',xlab='Time',ylab='hourly evapotranspiration (mm)')
+
+
+# plot cavitation 
+plot(DATA$Time,DATA$PLC_TL,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
+lines(DATA$Time,DATA$PLC_Root,type='l',col='brown')
+legend('topleft',legend=c('PLC_leaf','PLC_root'),
+       col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
+
+
+# plot fuel moisture 
+plot(DATA$Time,DATA$LFMCSymp,type='l', col='springgreen4',xlab='Time',ylab='Fuel moisture content (% dry weight)',ylim=c(40,80))
+lines(DATA$Time,DATA$LFMCApo,type='l',col='brown3',lwd=2)
+lines(DATA$Time,DATA$LFMC,col='grey30')
+legend('bottomleft',legend=c('LFMC_Symplasm','LFMC_Apoplasm','LFMC'),
+       col=c('springgreen4','brown3','grey30'),lty=1,lwd=2,cex=0.8)
+
 
 
 
