@@ -176,7 +176,7 @@ ConvertFluxFrom_mm_To_mmolm2s <- function(x, timeStep, LAI) {
 #' @export
 #'
 #' @examples
-convertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI) {
+convertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI=1) {
   y <- x * (LAI * timeStep * 3600 * 18) / 10^6
   return(y)
 }

@@ -59,24 +59,24 @@ new.WBveg <- function(veg_params) {
   
   
   # Fluxes
-  #WBveg$E0 = 0
   WBveg$Eprime = 0
   WBveg$Emin <- 0
   WBveg$EminT <- 0
   WBveg$Ebound <- 0
   WBveg$Elim <- 0
-  WBveg$AET.C <- 0
-  WBveg$Emin.C <- 0
-  WBveg$fluxSoilToCollar.C <- numeric(3)
+  WBveg$fluxSoilToCollar_mm <- numeric(3)
+  WBveg$transpiration_mm<- 0
+  WBveg$Emin_mm <- 0
+  WBveg$EminT_mm <- 0
   
   # LAI and LAI-dependent variables
   WBveg$LAIpheno <- numeric(1)
-  WBveg$LAI      <- numeric(1)    #  LAI
-  WBveg$canopyStorageCapacity      <- numeric(1)    #  Canopy Storage Capacity
+  WBveg$LAI      <- numeric(1)    
+  WBveg$canopyStorageCapacity <- numeric(1)
   
   # rainfall and interception 
   WBveg$pptSoil  <- 0 # ppt that reach the soil
-  WBveg$interceptedWaterAmount       <- 0 # interceptedWater /quantite d'eau dans la canopee
+  WBveg$interceptedWaterAmount <- 0 # interceptedWater /quantite d'eau dans la canopee
   WBveg$evaporationIntercepted <- 0
   WBveg$ETPr <- 0
   
@@ -104,7 +104,6 @@ new.WBveg <- function(veg_params) {
   WBveg$LFMCSymp <- NA # Live fuel moisture content of the apoplasmic compartment (gH20/gMS)
   WBveg$LFMC     <- NA # live fuel moisture content (gH20/gMS)
   
-  WBveg$waterRelease    <- 0 # water release in the soil because of Cavitation (Unit)
   WBveg$DMLiveCanopy    <- NA # Live Canopy dry matter [gMS/m2 soil]
   WBveg$DMDeadCanopy    <- 0 # Dead Canopy dry matter [gMS/m2 soil]
   
@@ -453,9 +452,9 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       
       # 3. update of soil on small time step (done by FP in version 16)
       fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil_n$PsiSoil-WBveg_np1$Psi_TApo)
-      # NB the time step for fluxSoilToCollar.C is Nhours/nts!
-      WBveg_np1$fluxSoilToCollar.C = convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
-      WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar.C, fluxRelease  = 0) 
+      # NB the time step for fluxSoilToCollar_mm is Nhours/nts!
+      WBveg_np1$fluxSoilToCollar_mm = convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
+      WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar_mm)
       fluxSoilToCollarLargeTimeStep = fluxSoilToCollarLargeTimeStep + fluxSoilToCollar/nts # mean flux over one large time step
     } # end loop small time step
     # TESTS ON RESOLUTION
@@ -478,19 +477,18 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
 
   WBveg <- compute.transpiration.WBveg(WBveg, WBclim_next, Nhours,modeling_options=modeling_options) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
   
-  #  print('')
-  # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToCollar.C is used as input in UpdateSoilWater.WBsoil)
-  #fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil$PsiSoil-WBveg$Psi_TApo)
-  #WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollar) # flux total en mmol/m2/s / used for Tleaf 
-  #TODO FP would suggest to move compute fluxSoilToCollar.C directly in the main loop, as it is the coupling between the two models...
-  #WBveg$fluxSoilToCollar.C  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
-  #WBveg$AET.C               <- sum(WBveg$fluxSoilToCollar.C) # total flux
-  
+
+  # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToCollar_mm is used as input in UpdateSoilWater.WBsoil)
+  #TODO FP suggests moving the computation of  fluxSoilToCollar_mm in the main loop, as it is the coupling between the two models...
+
   # mean soil quantities on large time steps
-  WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
-  WBveg$fluxSoilToCollar.C  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
-  WBveg$AET.C               <- sum(WBveg$fluxSoilToCollar.C) # total flux 
+  WBveg$Emin_mm  = convertFluxFrom_mmolm2s_To_mm(WBveg$Emin, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  WBveg$EminT_mm = convertFluxFrom_mmolm2s_To_mm(WBveg$EminT, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
   
+  WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
+  WBveg$fluxSoilToCollar_mm  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  WBveg$transpiration_mm     <- sum(WBveg$fluxSoilToCollar_mm) # total flux in mm 
+
   return(WBveg)
 }
 
@@ -580,7 +578,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       
       # 2.3 Compute Psi_TApo_np1
       Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
-    } else if (opt$numericalScheme=="Xu") {
+    } else if (opt$numericalScheme=="Semi-Implicit") {
       # 2.1 LApo
       alpha = exp(-(K_TL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
       Psi_td = (K_TL*Psi_TApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_TL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
@@ -607,7 +605,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
     Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
     Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
-  } else if (opt$numericalScheme=="Xu") {
+  } else if (opt$numericalScheme=="Semi-Implicit") {
     alpha = exp(-K_LSym/C_LSym*dt)
     Psi_td = (K_LSym*Psi_LApo_n - (E_nph + Emin_L_nph))/(K_LSym + dbxmin) # dbxmin to avoid 0/0
     Psi_LSym_np1 = alpha * Psi_LSym_n +(1-alpha) * Psi_td

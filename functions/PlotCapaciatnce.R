@@ -1,6 +1,6 @@
 
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Notes pour implementation de la canopy hydraulic conductance (JR : #19/12/2020) 
+# Notes to implement  specific hydraulic conductance (JR : #19/12/2020) 
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 # inputs ( in veg paramaters)

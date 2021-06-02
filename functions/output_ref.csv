@@ -42,11 +42,12 @@ Eprime;WBveg;Eprime;1
 Emin;WBveg;Emin;1
 EminT;WBveg;EminT;1
 Elim;WBveg;Elim;1
-AET.C;WBveg;AET.C;1
-Emin.C;WBveg;Emin.C;1
-fluxSoilToCollar.C1;WBveg;fluxSoilToCollar.C;1
-fluxSoilToCollar.C2;WBveg;fluxSoilToCollar.C;2
-fluxSoilToCollar.C3;WBveg;fluxSoilToCollar.C;3
+transpiration_mm;WBveg;transpiration_mm;1
+Emin_mm;WBveg;Emin_mm;1
+EminT_mm;WBveg;EminT_mm;1
+fluxSoilToCollar1_mm;WBveg;fluxSoilToCollar_mm;1
+fluxSoilToCollar2_mm;WBveg;fluxSoilToCollar_mm;2
+fluxSoilToCollar3_mm;WBveg;fluxSoilToCollar_mm;3
 leafTemperature;WBveg;leafTemperature;1
 LAI;WBveg;LAI;1
 LAIpheno;WBveg;LAIpheno;1

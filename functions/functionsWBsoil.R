@@ -16,8 +16,7 @@ new.WBsoil <- function(soil_params,vegetation_parameters, initialisation = "Full
   WBsoil$PsiSoil <- numeric(3)
   WBsoil$kSoil <- numeric(3)
   WBsoil$REW <- numeric(3)
-  WBsoil$REWt = numeric(1)
-
+  
   WBsoil$Evaporation    <- numeric(3)
   WBsoil$EvaporationSum <- numeric(1)
 
@@ -60,7 +59,8 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
 compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K) {
   # created 03/01/2021 by JR / based on SurEau.C with gsoil0
   # such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
-
+#browser()
+  
   Tsoil = 0.6009*Tair+3.59 # from relation fitted on O3HP 
   
   VPDsoil <- compute.VPDfromRHandT(RHair, Tsoil)
@@ -74,11 +74,12 @@ compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K
     ETP_mmol_s <- 10^6 * ETP / (3600 * Nhours * 18)
     E_Soil2 <- (g_Soil / WBsoil$params$gSoil0) * ETP_mmol_s * exp(-K * LAI) # limitation by ETP depending on radiation reaching the soil
     E_Soil3 <- min(E_Soil1, E_Soil2)
-    WBsoil$Evaporation <- E_Soil3 * Nhours * 3600 * 18 / 10^6 # Conversion from mmol/m2/s to mm
+    WBsoil$Evaporation <- convertFluxFrom_mmolm2s_To_mm(E_Soil3,timeStep=Nhours) # Conversion from mmol/m2/s to mm
   }
   # print(paste0('E_Soil3=',E_Soil3))
 
   WBsoil$EvaporationSum <- sum(WBsoil$Evaporation)
+  
   WBsoil$soilWaterStock[1] <- WBsoil$soilWaterStock[1] - WBsoil$Evaporation
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
 
@@ -215,19 +216,14 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
   return(WBsoil)
 }
 
-# Update soil water reservoirs, potential and psi according to fluxes
-update.soilWater.WBsoil <- function(WBsoil, fluxEvap, fluxRelease) {
+# Update soil water reservoirs, potential and psi according to wate fluxes from the plant
+update.soilWater.WBsoil <- function(WBsoil, fluxEvap) {
   WBsoil$soilWaterStock <- WBsoil$soilWaterStock - fluxEvap
-  WBsoil$soilWaterStock[1] <- WBsoil$soilWaterStock[1] + fluxRelease # release occur in 1st soil layer only
   WBsoil <- compute.soilConductanceAndPsi.WBsoil(WBsoil)
-
-  WBsoil$REWt =(sum(WBsoil$soilWaterStock-WBsoil$params$V_residual_capacity_vg)) / (sum(WBsoil$params$V_saturation_capacity_vg -WBsoil$params$V_residual_capacity_vg))
-  
-  
   return(WBsoil)
 }
  
-# set soil water content to its field capacity 
+# set soil water content to its field capacity  update soil water potential and Psi
 set.SWCtoFieldCapacity.WBsoil <- function(WBsoil)
 {
   WBsoil$soilWaterStock <- WBsoil$params$V_field_capacity

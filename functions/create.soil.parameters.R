@@ -110,7 +110,7 @@ create.soil.parameters<- function(filePath, listOfParameters, depths = c(0.3, 1,
     .soilParams$V_soil_storage_capacity_vg <- sum(.soilParams$V_saturation_capacity_vg) - sum(.soilParams$V_residual_capacity_vg)
     
 
-    print(paste0("RU (vg)= ", .soilParams$V_soil_storage_capacity_vg))
+    print(paste0("Available water capacity : ", .soilParams$V_soil_storage_capacity_vg, ' mm'))
   
     
     return(.soilParams)
