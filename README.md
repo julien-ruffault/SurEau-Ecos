@@ -1,4 +1,4 @@
-#--- SurEau-Ecos_v1.x.x ---#
+--  SurEau-Ecos_v1.x.x  --
  
 SurEau-Ecos is a mechanistic plant water model designed to simulate water fluxes, fuel moisture content and plant mortality at stand level according to a set of vegetation traits and soil physical properties 
  
