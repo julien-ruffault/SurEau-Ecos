@@ -32,7 +32,7 @@ new.WBveg <- function(veg_params) {
   # hydraulic conductances
   WBveg$k_LSym <-  WBveg$params$k_LSymInit  # constant value during simulation   
   WBveg$k_TSym <-  WBveg$params$k_TSymInit  # constant value during simulation 
-  WBveg$k_Root <-  NA # is updated in compute.kplant.WBveg
+  WBveg$k_RT   <-  NA # is updated in compute.kplant.WBveg
   WBveg$k_TL   <-  NA # is updated in compute.kplant.WBveg
   WBveg$kSoilToCollar <- c("NA","NA","NA") # / conductance rhisophere for each soil layer
   
@@ -84,8 +84,8 @@ new.WBveg <- function(veg_params) {
   WBveg$LAIdead <- 0
   
   # Cavitation
-  WBveg$PLC_Root     <- 0  # percent loss of conductivity [%]/ 
-  WBveg$PLC_TL       <- 0  # percent loss of conductivity [%] /
+  WBveg$PLC_Leaf     <- 0  # percent loss of conductivity [%]/ 
+  WBveg$PLC_Trunk       <- 0  # percent loss of conductivity [%] /
   
   # leaf temp
   WBveg$leafTemperature <- NA
@@ -133,8 +133,8 @@ new.WBveg <- function(veg_params) {
  
   #---------------------#
 
-  WBveg$PLC_TL  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_TL, P50 = WBveg$params$P50_VC_TL)
-  WBveg$PLC_Root = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Root, P50 = WBveg$params$P50_VC_Root)
+  WBveg$PLC_Leaf  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
+  WBveg$PLC_Trunk = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
   
   # initialize capacitance
   WBveg <- update.capaSym.WBveg(WBveg) 
@@ -207,8 +207,8 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   else if (modeling_options$defoliation == T) # cvitation affect LAI 
   {
     #  leaf shedding because of cavitation  // starts only if PLCabove > 10 % 
-    if (WBveg$PLC_TL > 10){
-      WBveg$LAIdead <- max(0, WBveg$LAIpheno *WBveg$PLC_TL / 100) # defoliation in LAI unit
+    if (WBveg$PLC_Leaf > 10){
+      WBveg$LAIdead <- max(0, WBveg$LAIpheno *WBveg$PLC_Leaf / 100) # defoliation in LAI unit
     }else {WBveg$LAIdead = 0}
   }
   
@@ -277,7 +277,7 @@ compute.waterStorage.WBveg <- function(WBveg, VPD) {
   WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000))
   
   #---Apoplasmic water content-------------------------------------------------
-  Q_LApo = (1-WBveg$PLC_TL/100) *  WBveg$Q_LApo_sat_L
+  Q_LApo = (1-WBveg$PLC_Leaf/100) *  WBveg$Q_LApo_sat_L
   WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac_Leaf / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
   #------LFMC total---- (Apo+Symp) --------------------------------------------
@@ -310,18 +310,16 @@ compute.evapoIntercepted.WBveg <- function(WBveg, ETP) {
 }
 
 
-# --> PLC_Root <- il est fonction du PsitrunkAPO 
-# --> PLC_TL   <-  il est fonction du PsiLeaf APO 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # updateKplant
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 update.kplant.WBveg <- function(WBveg,WBsoil) {
-  # calculate k_Root and k_TL with cavitation
-  WBveg$k_Root = WBveg$params$k_RootInit * (1-WBveg$PLC_Root/100)
-  WBveg$k_TL   = WBveg$params$k_TLInit * (1-WBveg$PLC_TL/100)
+  # calculate k_RT and k_TL with cavitation
+  WBveg$k_RT   = WBveg$params$k_RTInit * (1-WBveg$PLC_Trunk/100)
+  WBveg$k_TL   = WBveg$params$k_TLInit * (1-WBveg$PLC_Leaf/100)
   
   # Root from root length
-  WBveg$kSoilToCollar    <- kseriesum(WBsoil$kSoil, WBveg$k_Root) # conductance from soil to collar (two resitances in series Rsoil and Rroot)
+  WBveg$kSoilToCollar    <- kseriesum(WBsoil$kSoil, WBveg$k_RT) # conductance from soil to collar (two resitances in series Rsoil and Rroot)
 
   return(WBveg) 
 }
@@ -445,7 +443,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       deltaRegulMax = max(deltaRegulMax,abs(regul_np1$regulFact-regul_n$regulFact))
       # 2. PLC at n and np1
       #print(c(signif(WBveg_np1$PLCAbove, digits = 5),signif(WBveg_n$PLCAbove, digits = 5),signif(WBveg_np1$PLCBelow, digits = 5),signif(WBveg_n$PLCBelow, digits = 5)))
-      deltaPLCMax = max(deltaPLCMax,WBveg_np1$PLC_TL-WBveg_n$PLC_TL,WBveg_np1$PLC_Root-WBveg_n$PLC_Root)
+      deltaPLCMax = max(deltaPLCMax,WBveg_np1$PLC_Leaf-WBveg_n$PLC_Leaf,WBveg_np1$PLC_Trunk-WBveg_n$PLC_Trunk)
       # Update WBveg_n
       WBveg_n = WBveg_np1
       
@@ -522,9 +520,9 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   Emin_T_nph = WBveg$EminT
   
   #Compute K_L_Cav et K_T_Cav
-  PLC_prime_L = PLCPrime.comp(WBveg$PLC_TL,WBveg$params$slope_VC_TL)
+  PLC_prime_L = PLCPrime.comp(WBveg$PLC_Leaf,WBveg$params$slope_VC_Leaf)
   K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
-  PLC_prime_T = PLCPrime.comp(WBveg$PLC_Root,WBveg$params$slope_VC_Root)
+  PLC_prime_T = PLCPrime.comp(WBveg$PLC_Trunk,WBveg$params$slope_VC_Trunk)
   K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
   
   # 2. While loop in order to decide if cavitation or not :
@@ -624,11 +622,11 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   # Cavitation
   if (WBveg$Psi_LApo < Psi_LApo_cav) {
     WBveg$Psi_LApo_cav = WBveg$Psi_LApo
-    WBveg$PLC_TL = PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_TL, P50 = WBveg$params$P50_VC_TL)
+    WBveg$PLC_Leaf = PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
   }
   if (WBveg$Psi_TApo < Psi_TApo_cav) {
     WBveg$Psi_TApo_cav = WBveg$Psi_TApo
-    WBveg$PLC_Root = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Root, P50 = WBveg$params$P50_VC_Root)
+    WBveg$PLC_Trunk = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
   }
   
   WBveg$Psi_AllSoil <- sum (WBveg$kSoilToCollar * WBsoil$PsiSoil)/sum (WBveg$kSoilToCollar)
@@ -678,13 +676,13 @@ compute.regulFact <- function(psi, params, regulationType) {
 
 yearlyInitialisation.WBveg <- function(WBveg){
   
-  if(WBveg$PLC_Root >85 | WBveg$PLC_TL>85)
+  if(WBveg$PLC_Trunk >85 | WBveg$PLC_Leaf>85)
   {
   WBveg <- new.WBveg(WBveg$params) 
   }
   
-  WBveg$PLC_Root <- 0 
-  WBveg$PLC_TL   <- 0 
+  WBveg$PLC_Trunk  <- 0 
+  WBveg$PLC_Leaf   <- 0 
   
 return(WBveg)
   }

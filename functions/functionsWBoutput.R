@@ -107,8 +107,8 @@ new.WBdaily  <- function(){
   WBdaily$Psi_TApoMin = 0
   WBdaily$Psi_TApoMax = 0
   
-  WBdaily$PLC_TL_max   = 0
-  WBdaily$PLC_Root_max = 0
+  WBdaily$PLC_Leaf_max   = 0
+  WBdaily$PLC_Trunk_max = 0
   
   WBdaily$temperature  = NA
   WBdaily$RH = NA
@@ -143,8 +143,8 @@ new.WByearly <- function(){
   WByearly$Psi_TApoMin = 0
   WByearly$Psi_TApoMax = 0
   
-  WByearly$PLC_TL_max   = 0
-  WByearly$PLC_Root_max = 0
+  WByearly$PLC_Leaf_max   = 0
+  WByearly$PLC_Trunk_max = 0
   
   WByearly$temperature = NA
   WByearly$RH = NA
@@ -177,8 +177,8 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   WBdaily$Psi_TApoMin = min(WBdaily$Psi_TApoMin,WBveg$Psi_TApo)
   WBdaily$Psi_TApoMax = max(WBdaily$Psi_TApoMax,WBveg$Psi_TApo)
 
-  WBdaily$PLC_TL_max   = max(WBdaily$PLC_TL_max,WBveg$PLC_TL)
-  WBdaily$PLC_Root_max = max(WBdaily$PLC_Root_max,WBveg$PLC_Root)
+  WBdaily$PLC_Leaf_max   = max(WBdaily$PLC_LEaf_max,WBveg$PLC_Leaf)
+  WBdaily$PLC_Trunk_max = max(WBdaily$PLC_Trunk_max,WBveg$PLC_Trunk)
   
   WBdaily$temperature  = WBclim$Tair_mean
   WBdaily$RH = WBclim$RHair_mean
@@ -211,8 +211,8 @@ update.WByearly <- function(WByearly,WBdaily,dayOfDeath){
   WByearly$Psi_TApoMin = min(WByearly$Psi_TApoMin, WBdaily$Psi_TApoMin)
   WByearly$Psi_TApoMax = max(WByearly$Psi_TApoMax, WBdaily$Psi_TApoMax)
   
-  WByearly$PLC_TL_max   = max(WByearly$PLC_TL_max,WBdaily$PLC_TL_max)
-  WByearly$PLC_Root_max = max(WByearly$PLC_Root_max,WBdaily$PLC_Root_max)
+  WByearly$PLC_Leaf_max   = max(WByearly$PLC_Leaf_max,WBdaily$PLC_Leaf_max)
+  WByearly$PLC_Trunk_max = max(WByearly$PLC_Trunk_max,WBdaily$PLC_Trunk_max)
   
   WByearly$temperature_max = max(WByearly$temperature_max,WBdaily$temperature)
   WByearly$RH_min = min(WByearly$RH_min,WBdaily$RH)

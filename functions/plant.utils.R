@@ -119,8 +119,8 @@ distribute.conductances <- function(kPlantInit,ri)
 {
   k_TLInit = 1/(0.2/kPlantInit)
   k_LSymInit = 1/(0.4/kPlantInit)
-  k_RootInit   = 1 /( 0.4 / kPlantInit) *ri
-  return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RootInit=k_RootInit))
+  k_RTInit   = 1 /( 0.4 / kPlantInit) *ri
+  return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RTInit=k_RTInit))
 }
 
 

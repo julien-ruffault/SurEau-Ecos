@@ -74,15 +74,12 @@ plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='water
 lines(DATA$Time,DATA$Emin_mm,col='forestgreen')
 lines(DATA$Time,DATA$EminT_mm,col='brown4')
 lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='grey30')
-legend('topright',legend=c('PLC_leaf','PLC_root'),
-       col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
-
-
-
+legend('topright',legend=c('Transpiration','Emin','EminT','Soil'),
+       col=c('blue','forestgreen','brown4','grey30'),lty=1,lwd=2,cex=0.8)
 
 # plot cavitation 
-plot(DATA$Time,DATA$PLC_TL,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
-lines(DATA$Time,DATA$PLC_Root,type='l',col='brown')
+plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
+lines(DATA$Time,DATA$PLC_Trunk,type='l',col='brown')
 legend('topleft',legend=c('PLC_leaf','PLC_root'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
 

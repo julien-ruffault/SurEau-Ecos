@@ -82,7 +82,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
           }
         soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar_mm)
 
-        if (veg_var_list$PLC_TL >= modeling_options$thresholdMortatliy) {
+        if (veg_var_list$PLC_Leaf >= modeling_options$thresholdMortatliy) {
           print("The plant is dead...")
           stopDeadPlant <- TRUE
           break

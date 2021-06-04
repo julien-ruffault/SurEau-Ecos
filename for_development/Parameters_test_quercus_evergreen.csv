@@ -1,9 +1,9 @@
 Name;Value
 Foliage;Evergreen
-P50_VC_TL;-3.4
-slope_VC_TL;60
-P50_VC_Root;-3.4
-slope_VC_Root;60
+P50_VC_Leaf;-3.4
+slope_VC_Leaf;60
+P50_VC_Trunk;-3.4
+slope_VC_Trunk;60
 P12_gs;-2.07
 P88_gs;-2.62
 EpsilonSymp_Leaf;10
