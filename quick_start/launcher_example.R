@@ -80,7 +80,7 @@ legend('topright',legend=c('Transpiration','Emin','EminT','Soil'),
 # plot cavitation 
 plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
 lines(DATA$Time,DATA$PLC_Trunk,type='l',col='brown')
-legend('topleft',legend=c('PLC_leaf','PLC_root'),
+legend('topleft',legend=c('PLC_Leaf','PLC_Trunk'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
 
 # plot fuel moisture 
