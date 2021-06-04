@@ -27,7 +27,7 @@
 #'   'PiecewiseLinear'
 #' @param defoliation a logical value indicating whether trees should loose 
 #' leaves when occurs.cavitation occurs of the above part of plant.  Defoliation 
-#' starts only when PLC_TL > 10% .
+#' starts only when PLC_Leaf > 10% .
 #' @param thresholdMortatliy a numeric value indicating the PLC value (in % ) 
 #' above which the plant is considered dead and simulation stops for the current
 #' year. Default value is 90 

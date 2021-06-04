@@ -34,7 +34,7 @@ simulation_parameters <- create.simulation.parameters(mainDir = mainDir,
                                                       startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
                                                       resolutionOutput = "subdaily",
-                                                      outputType = 'diagnostic_subdaily',
+                                                      outputType = 'simple_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -65,6 +65,8 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 # for analyses / subdaily time scales 
 filename  = paste0(mainDir,"/for_tests/test.csv")
 DATA = read.csv(filename,header=T, dec='.',sep="")
+head(DATA)
+strptime(DATA$Time,format=)
 DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
 # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
@@ -100,8 +102,8 @@ plot(DATA$DD,DATA$transpiration_mm+DATA$SoilEvaporation_mm+DATA$Emin_mm+DATA$Emi
 # plot(DATA$daily_Psi_TApoMin)
 # plot(DATA$daily_evaporation_mm)
 # plot(DATA$daily_transpiration_mm)
-# plot(DATA$daily_PLC_Root_max)
-# plot(DATA$daily_PLC_TL_max)
+# plot(DATA$daily_PLC_Trunk_max)
+# plot(DATA$daily_PLC_Leaf_max)
 
 
 # # for analyses / yearly time scales 

@@ -1,2 +1,2 @@
-LAI;SWS1;SWS2;SWS3;transpiration_mm;SoilEvaporation_mm;Psi_LApo;Psi_LSym;Psi_TSym;Psi_TApo;Psi_AllSoil;ETP;VPD;RG;Tair;Rn;PAR;WS;RH;PLC_Root;PLC_TL;DFMC;LFMCSymp;LFMCApo;LFMC;FMCCanopy
+LAI;SWS1;SWS2;SWS3;transpiration_mm;SoilEvaporation_mm;Emin_mm;EminT_mm;Psi_LApo;Psi_LSym;Psi_TSym;Psi_TApo;Psi_AllSoil;PPT;ETP;VPD;RG;Tair;Rn;PAR;WS;RH;PLC_Trunk;PLC_Leaf;DFMC;LFMCSymp;LFMCApo;LFMC;FMCCanopy
 

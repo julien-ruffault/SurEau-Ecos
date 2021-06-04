@@ -121,7 +121,12 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
     WBclimHour$VPD <- WBclimHour$VPD[index]
     WBclimHour$WS <- WBclimHour$WS[index]
   }
-  #WBclimHour$TIME[which(WBclimHour$TIME == 24)] <- 23.99
+ 
+  
+  # All ptt of the day fall at midgnitht 
+  WBclimHour$PPT <-  numeric(length(modeling_options$TIME))
+  WBclimHour$PPT[1] <- WBclim$PPT
+   #WBclimHour$TIME[which(WBclimHour$TIME == 24)] <- 23.99
   return(WBclimHour)
 }
 

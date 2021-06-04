@@ -63,7 +63,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
    lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
    lines(DATA$DD,DATA$Psi_AllSoil,type='l',col='blue')
    par(new=T)
-   plot(DATA$DD,DATA$PLC_TL,type='l',col=1, ylab="", yaxt="n",xlab="")
+   plot(DATA$DD,DATA$PLC_Leaf,type='l',col=1, ylab="", yaxt="n",xlab="")
    axis(4)
    
    plot(DATA$DD,DATA$regulFact,type='l',col=1, ylab="", yaxt="n",xlab="")

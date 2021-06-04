@@ -47,10 +47,10 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   ##### calculate the different conductance of the plant from kPlantInit 
   conduc <- distribute.conductances(kPlantInit=TTT$kPlantInit, ri = TTT$rootDistribution) 
   TTT$k_TLInit <- conduc$k_TLInit
-  TTT$k_RootInit <- conduc$k_RootInit 
+  TTT$k_RTInit <- conduc$k_RTInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
   
-  TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB/TTT$LAImax # convert from L/m2soil to L/mzleaf
+  TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB/TTT$LAImax # convert from L/m2soil to L/m2leaf
   
   
   return(TTT)
@@ -70,10 +70,10 @@ read.vegetation.file <- function(filePath, modeling_options){
   
   # setting commomn params for WB_veg (regardless of the options)
   params <- c(
-    "P50_VC_TL", # [MPa] / Water potential causing 50% Cavitation in the vulnerability curve
-    "slope_VC_TL", # [%/MPa]             / Slope of the vulnerability curve
-    "P50_VC_Root",
-    "slope_VC_Root",
+    "P50_VC_Leaf", # [MPa] / Water potential causing 50% Cavitation in the vulnerability curve
+    "slope_VC_Leaf", # [%/MPa]             / Slope of the vulnerability curve
+    "P50_VC_Trunk",
+    "slope_VC_Trunk",
     "EpsilonSymp_Leaf", # [MPa]            / Modulus of elasticity in leaves
     "PiFullTurgor_Leaf", # [MPa]          / Osmotic Potential at full turgor in leaves
     "ApoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves

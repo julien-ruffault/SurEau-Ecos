@@ -49,27 +49,29 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   
   x.m <- paste(floor(WBclim$TIME), round((WBclim$TIME-floor(WBclim$TIME))*60), sep=":")
   TIME <- as.POSIXct(x=paste0(Date, "/", x.m), format = "%Y-%m-%d/%H:%M", tz = "UTC")
-  
-  df = as.numeric(TIME)
+  #browser()
+  #df = as.numeric(TIME)
+  df= as.character(TIME,format='%Y-%m-%d/%H:%M:%S')
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)
+#  browser()
 }
 
 write.WBoutput.daily <- function(WBoutput,Date,WBdaily){
   TIME <- Date
-  df = as.numeric(TIME)
+  df = as.character(TIME,format='%Y-%m-%d%H:%M:%S')
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
@@ -82,7 +84,7 @@ write.WBoutput.yearly <- function(WBoutput,year,WByearly){
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
+    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
@@ -105,8 +107,8 @@ new.WBdaily  <- function(){
   WBdaily$Psi_TApoMin = 0
   WBdaily$Psi_TApoMax = 0
   
-  WBdaily$PLC_TL_max   = 0
-  WBdaily$PLC_Root_max = 0
+  WBdaily$PLC_Leaf_max   = 0
+  WBdaily$PLC_Trunk_max = 0
   
   WBdaily$temperature  = NA
   WBdaily$RH = NA
@@ -141,8 +143,8 @@ new.WByearly <- function(){
   WByearly$Psi_TApoMin = 0
   WByearly$Psi_TApoMax = 0
   
-  WByearly$PLC_TL_max   = 0
-  WByearly$PLC_Root_max = 0
+  WByearly$PLC_Leaf_max   = 0
+  WByearly$PLC_Trunk_max = 0
   
   WByearly$temperature = NA
   WByearly$RH = NA
@@ -175,8 +177,8 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   WBdaily$Psi_TApoMin = min(WBdaily$Psi_TApoMin,WBveg$Psi_TApo)
   WBdaily$Psi_TApoMax = max(WBdaily$Psi_TApoMax,WBveg$Psi_TApo)
 
-  WBdaily$PLC_TL_max   = max(WBdaily$PLC_TL_max,WBveg$PLC_TL)
-  WBdaily$PLC_Root_max = max(WBdaily$PLC_Root_max,WBveg$PLC_Root)
+  WBdaily$PLC_Leaf_max   = max(WBdaily$PLC_LEaf_max,WBveg$PLC_Leaf)
+  WBdaily$PLC_Trunk_max = max(WBdaily$PLC_Trunk_max,WBveg$PLC_Trunk)
   
   WBdaily$temperature  = WBclim$Tair_mean
   WBdaily$RH = WBclim$RHair_mean
@@ -209,8 +211,8 @@ update.WByearly <- function(WByearly,WBdaily,dayOfDeath){
   WByearly$Psi_TApoMin = min(WByearly$Psi_TApoMin, WBdaily$Psi_TApoMin)
   WByearly$Psi_TApoMax = max(WByearly$Psi_TApoMax, WBdaily$Psi_TApoMax)
   
-  WByearly$PLC_TL_max   = max(WByearly$PLC_TL_max,WBdaily$PLC_TL_max)
-  WByearly$PLC_Root_max = max(WByearly$PLC_Root_max,WBdaily$PLC_Root_max)
+  WByearly$PLC_Leaf_max   = max(WByearly$PLC_Leaf_max,WBdaily$PLC_Leaf_max)
+  WByearly$PLC_Trunk_max = max(WByearly$PLC_Trunk_max,WBdaily$PLC_Trunk_max)
   
   WByearly$temperature_max = max(WByearly$temperature_max,WBdaily$temperature)
   WByearly$RH_min = min(WByearly$RH_min,WBdaily$RH)
