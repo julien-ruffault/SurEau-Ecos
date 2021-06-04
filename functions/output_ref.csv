@@ -84,6 +84,7 @@ Rn;WBclim;Rn;1;4
 PAR;WBclim;PAR;1;4
 WS;WBclim;WS;1;4
 RH;WBclim;RHair_mean;1;4
+PPT;WBclim;PPT;1;1
 daily_transpiration_mm;WBdaily;transpiration_mm;1;4
 daily_evaporation_mm;WBdaily;evaporation_mm;1;4
 daily_Psi_LSymMin;WBdaily;Psi_LSymMin;1;4

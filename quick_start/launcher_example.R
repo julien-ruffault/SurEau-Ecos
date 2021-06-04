@@ -1,10 +1,7 @@
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Reference Launcher to run SurEau-ECOS on test dataset 
+# Example launcher to run SurEau-Ecos
 
-# Authors : <Julien Ruffault (julien.ruff@gmail.com)>
-#           <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
-#           <Francois Pimont (francois.pimont@inrae.fr)>
-#           <Herve Cochard (herve.cochard@inrae.fr)>
+# ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 
 # Initialization ---------------------------------------------------------------
@@ -64,9 +61,24 @@ lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
+
+# plot meteorological conditions 
+plot(DATA$Time,DATA$Tair,type='l',col='firebrick4',ylab='Air temperature (degC)', xlab='Time')
+par(new=T)
+barplot(DATA$PPT,col='blue',border='blue',axes=F,ylab='',xlab='',ylim=c(0,60))
+axis(4,col='blue',col.ticks='blue')
+
+
 # plot water fluxes 
-plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='fluxes (mm)')
-lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='black')
+plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='water fluxes (mm/timestep)')
+lines(DATA$Time,DATA$Emin_mm,col='forestgreen')
+lines(DATA$Time,DATA$EminT_mm,col='brown4')
+lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='grey30')
+legend('topright',legend=c('PLC_leaf','PLC_root'),
+       col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
+
+
+
 
 # plot cavitation 
 plot(DATA$Time,DATA$PLC_TL,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
