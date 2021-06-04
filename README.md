@@ -6,6 +6,8 @@ Authors : Julien Ruffault (julien.ruff@gmail.com)
           Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
           François Pimont (francois.pimont@inrae.fr)
           Hervé Cochard (herve.cochard@inrae.fr)
+          
+Please, download the last release.           
 
 Documentation on how to run SurEau-Ecos can be found in '/documentation/user_manual_v1.0.pdf''
 
