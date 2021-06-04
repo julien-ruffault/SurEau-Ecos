@@ -57,7 +57,7 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
+    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)
 #  browser()
@@ -71,7 +71,7 @@ write.WBoutput.daily <- function(WBoutput,Date,WBdaily){
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
+    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
@@ -84,7 +84,7 @@ write.WBoutput.yearly <- function(WBoutput,year,WByearly){
   {
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
-    df2[i] <- round(unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]],digits=WBoutput$contingencyTable[[i,5]])
+    df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
   }
   cat(c(df,df2),"\n", file=WBoutput$testcon)  
 }
