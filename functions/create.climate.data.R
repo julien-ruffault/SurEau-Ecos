@@ -16,6 +16,7 @@
 #' according to modeling options (see \code{create.modeling.options} and simulation parameters (see \code{create.simulation.parameters)
 #'
 #' @param filePath the path of the input climate file.
+#' @param climateData a dataframe 
 #' @param modeling_options a list containing the modeling options created with \code{create.modeling.options}
 #' @param simulation_parameters a list containing the simulation parameters with \code{create.simulation.parameters}
 #'
@@ -27,15 +28,20 @@
 #' create.modeling.options()
 #' # create  the list of simulation parameters
 #' create.simulation.parameters(startYearSimulation = 1990, endYearSimulation = 1990)
-create.climate.data <- function(filePath, modeling_options, simulation_parameters) {
+create.climate.data <- function(filePath, climateData, modeling_options, simulation_parameters) {
 
-  # Read file if it exists, error otherwise------------------------------------
-  if (file.exists(filePath)) {
+  # Read file if it exists and climateData not provided, error otherwise------------------------------------
+  
+  if (missing(climateData)){
+    if (file.exists(filePath)) {
     climate_data <- read.csv(filePath, dec = ".", sep = ";", header = T, stringsAsFactors = F)
-  } else {
+    } else {
     stop(paste0("file : ", filePath), "' does not exist, check presence or spelling")
   }
-
+    else climate_data=climateData
+}
+  
+  
   # check climate_data variables and format ------------------------------------
   # (note : 'needccol' can be adjusted according to modeling_options)
   needcol <- c("Tair_min", "Tair_max", "Tair_mean", "RG_sum", "PPT_sum", "RHair_min", "RHair_max", "RHair_mean", "WS_mean")
