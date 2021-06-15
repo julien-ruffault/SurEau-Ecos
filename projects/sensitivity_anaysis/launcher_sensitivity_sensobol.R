@@ -1,0 +1,157 @@
+# created on 17/05/2021 
+# V1  14/06/2021N
+# @author : Julien Ruffault (julien.ruff@gmail.com) 
+# compute sobol indices with the 'sensobol' package 
+# uses parameters from the CompaSurEauC simulation 
+
+
+# 
+# notes : pour la RU, on sample La RU et on fait varier le DETPH du sol de maniere à correpsondre à la RU selectionnée
+# note  : Pour P12_Gs and P88_GS on sample le P12_Gs et un autre parametre 'diff'  =P88_gs-P12_gs  puis on determine le P88_gs comme P88_gs= diff+P12_gs 
+# note : faire une analyse avec LAI et RU  + traits et une analyse traits only
+
+
+rm(list = ls()) # ClWBveg$params$ear environment
+gc()            # Clear memory
+
+library(sensobol)
+library(foreach)
+library(doParallel)
+library(lubridate)
+
+
+mainDir <- dirname(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))                 
+mainDir
+source(paste0(mainDir,'/functions/load.SurEau-Ecos.R'))                   
+directoryToRefSimu = paste0(mainDir,'/projects/Compar_SurEauC')
+directoryToRefSimu
+# keeping temporary simulation output files in a local directory
+PC=F
+if (PC){}
+if(!PC){dir_SA_files = "/Users/jruffault/Dropbox/taf/temporary_SA/"}
+
+
+# following paths and files won't change throughout the sensitivity analysis
+climateData_path  <- paste0(directoryToRefSimu,'/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
+modeling_options  <- create.modeling.options(timeStepForEvapo=2,
+                                                constantClimate=T,
+                                                defoliation = F,
+                                                compOptionsForEvapo = c("Fast"))
+soilFile <- read.soil.file(filePath=paste0(directoryToRefSimu,'/Soil_test_champenoux.csv'))
+vegFile  <- read.vegetation.file(filePath=  paste0(directoryToRefSimu,'/VegetationParams_ComparSurEauC.csv'),modeling_options=modeling_options)
+
+
+params <- c('LAImax','SWC','P50_VC_Leaf','gmin20','kPlantInit','betaRootProfile','VolumeLiving_TRB','gCrown0')
+N <- 500 # number for initial sampling 
+k <- length(params) # number of parameters
+
+
+# params <- c('LAImax','P12_gs','P88_gs')
+# parameters already tested and that had no influence on time to death : gsMax, alpah_vg, Ksat , PiFullTurgor_Leaf, P12_gs, P88_gs, slope_VC_Leaf , root_radius
+
+R <- 10^3
+type <- "norm"
+conf <- 0.95
+PARAMS= sobol_matrices(params=params,N=N)
+#save.csv(PARAMS,)
+print(paste0("number of simulations : ",nrow(PARAMS)))
+
+PARAMS[, "LAImax"] <- qunif(PARAMS[, "LAImax"], 4, 8)
+PARAMS[, "P50_VC_Leaf"] <- qunif(PARAMS[, "P50_VC_Leaf"], -4.5, -2.5)
+PARAMS[,"SWC"]  <-  qunif(PARAMS[, "SWC"], 150,250)
+PARAMS[, "gmin20"] <- qunif(PARAMS[, "gmin20"], 2.5,6)
+PARAMS[,"kPlantInit"] <-  qunif(PARAMS[, "kPlantInit"], 0.3,1)
+PARAMS[,"betaRootProfile"] <-  qunif(PARAMS[, "betaRootProfile"], 0.95,0.99)
+PARAMS[, "VolumeLiving_TRB"] <- qunif(PARAMS[, "VolumeLiving_TRB"], 20, 60)
+PARAMS[, "gCrown0"] <- qunif(PARAMS[, "gCrown0"], 30, 60)
+
+
+# kept parameters 
+# PARAMS[, "VolumeLiving_TRB"] <- qunif(PARAMS[, "VolumeLiving_TRB"], 20, 60)
+DEPTH =PARAMS[,"SWC"] / ((soilFile$saturation_capacity_vg-soilFile$residual_capacity_vg)*1000)
+# 
+# PARAMS[, "gCrown0"] <- qunif(PARAMS[, "gCrown0"], 30, 60)
+# PARAMS[, "PiFullTurgor_Leaf"] <- qunif(PARAMS[, "PiFullTurgor_Leaf"], -2.7, -1.5)
+
+
+
+#PARAMS[, "P12_gs"] <- qunif(PARAMS[, "P12_gs"], -2.5, -1.5 )
+#PARAMS[, "P88_gs"] <-  PARAMS[, "P12_gs"] + qunif(PARAMS[, "P88_gs"], -1,-0.3)
+#PARAMS[, "slope_VC_Leaf"] <- qunif(PARAMS[, "slope_VC_Leaf"], 40, 80)
+#PARAMS[, "rootRadius"] <- qunif(PARAMS[, "rootRadius"], 0.00005, 0.001)
+ 
+
+# run the model 
+cores=detectCores()
+cl <- makeCluster(cores[1]-1) #not to overload the computer
+registerDoParallel(cl)
+#tic()
+foreach(i=1:nrow(PARAMS),.packages=c('lubridate','insol')) %dopar% {
+  print(i)
+  output_path = paste0(dir_SA_files,'/SA_test_',i,'.csv')
+
+  simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
+                                                      endYearSimulation = 1990,
+                                                      mainDir= mainDir,
+                                                      resolutionOutput = "yearly",
+                                                      outputType = 'simple_yearly',
+                                                      overWrite = T,
+                                                      outputPath = output_path)
+  climate_data     <- create.climate.data(filePath = climateData_path, modeling_options = modeling_options, simulation_parameters = simulation_parameters) #
+  stand_parameters <- create.stand.parameters(LAImax=PARAMS[,"LAImax"][i],lat = 48.73, lon = 6.23)
+
+  
+  
+
+  #vegFile$rootRadius=PARAMS[,"rootRadius"][i]
+
+    #vegFile$P12_gs  = PARAMS[,"P12_gs"][i]
+  #vegFile$P88_gs  = PARAMS[,"P88_gs"][i]
+  
+  #vegFile$PiFullTurgor_Leaf  = PARAMS[,"PiFullTurgor_Leaf"][i]
+  # vegFile$gCrown0  = PARAMS[,"gCrown0"][i]
+   vegFile$betaRootProfile  = PARAMS[,"betaRootProfile"][i]
+  # vegFile$gsMax=PARAMS[,"gsMax"][i]
+   vegFile$P50_VC_Leaf=PARAMS[,"P50_VC_Leaf"][i]
+  # vegFile$slope_VC_Leaf = PARAMS[,"slope_VC_Leaf"][i]
+   vegFile$gmin20=PARAMS[,"gmin20"][i]
+   vegFile$kPlantInit=PARAMS[,"kPlantInit"][i]
+   vegFile$VolumeLiving_TRB=PARAMS[,"VolumeLiving_TRB"][i] 
+   vegFile$gCrown0 = PARAMS[,"gCrown0"][i]
+  # soilFile$alpha_vg = PARAMS[,"alpha_vg"][i]
+
+ 
+
+  
+  
+  
+  #soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths = c(0.373333 ,0.746666,1.119)) 
+
+  soil_parameters  <- create.soil.parameters(listOfParameters = soilFile, depths = c(DEPTH[i]*1/3 ,DEPTH[i]*2/3,DEPTH[i]))
+
+  vegetation_parameters <- create.vegetation.parameters(listOfParameters= vegFile, stand_parameters = stand_parameters, soil_parameter = soil_parameters,modeling_options = modeling_options)
+
+
+  run.SurEau_Ecos(modeling_options = modeling_options ,
+                  simulation_parameters = simulation_parameters, 
+                  climate_data = climate_data,
+                  stand_parameters = stand_parameters, 
+                  soil_parameters = soil_parameters,
+                  vegetation_parameters = vegetation_parameters)
+}
+
+
+Y1=NULL
+for (i in 1:nrow(PARAMS))
+{
+  io =read.csv(paste0(dir_SA_files,'/SA_test_',i,'.csv'),header=T, dec='.',sep="")
+  Y1[i]  = io$yearly_dayOfDeath
+}
+#PARAMS = read.csv()
+
+plot_scatter(data=PARAMS,N=N,Y=Y1,params=params)
+ind <- sobol_indices(Y = Y1, N = N, params = params, boot = TRUE, R = R, type = type, conf = conf)
+plot(ind)
+ind.dummy <- sobol_dummy(Y = Y1, N = N, params = params, boot = TRUE, R = R)
+plot(ind,dummy=ind.dummy)
+

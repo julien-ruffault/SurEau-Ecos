@@ -5,21 +5,21 @@ gsNight;20;mmol/m2/s
 JarvisPAR;0.006;-
 Tgs_sens;17;-
 <<<<<<< HEAD
-Tgs_optim;25;¡C
+Tgs_optim;25;?C
 =======
-Tgs_optim;25;-
+#Tgs_optim;25;-
 >>>>>>> 8ee4ee8505f9eff2a6af85e85190cf4b0d632ae5
 P12_gs;-2.07;Mpa
 P88_gs;-2.62;Mpa
 turgorPressureAtGsMax;1;Mpa
 gmin20;4;mmol/m2/s
 <<<<<<< HEAD
-TPhase_gmin;37.5;¡C
-Q10_1_gmin;1.2;mmol/m2/s /10¡C
-Q10_2_gmin;4.8;mmol/m2/s /10¡C
-kPlantInit;0.62;mmol/m2/s/Mpa
-k_TSymInit;0.26;mmol/m2/s/Mpa
-LDMC;0.5;fraction
+#TPhase_gmin;37.5;?C
+#Q10_1_gmin;1.2;mmol/m2/s /10?C
+#Q10_2_gmin;4.8;mmol/m2/s /10?C
+#kPlantInit;0.62;mmol/m2/s/Mpa
+#k_TSymInit;0.26;mmol/m2/s/Mpa
+#LDMC;0.5;fraction
 =======
 TPhase_gmin;37.5;?C
 Q10_1_gmin;1.2;mmol/m2/s /10?C
@@ -30,21 +30,21 @@ LDMC;500;fraction
 >>>>>>> 8ee4ee8505f9eff2a6af85e85190cf4b0d632ae5
 Succulence;;g/m2
 LMA;100;g/m2
-P50_VC_TL; -3.4;Mpa
-slope_VC_TL;60;%/Mpa
+P50_VC_Leaf; -3.4;Mpa
+slope_VC_Leaf;60;%/Mpa
 EpsilonSymp_Leaf;10;Mpa
 PiFullTurgor_Leaf;-2.1;Mpa
 ApoplasmicFrac_Leaf;0.4;-
-P50_VC_Root;-3.4;Mpa
-slope_VC_Root;60;%/Mpa
+P50_VC_Trunk;-3.4;Mpa
+slope_VC_Trunk;60;%/Mpa
 PiFullTurgor_Trunk;-2.1;Mpa
 EpsilonSymp_Trunk;10;Mpa/%
 ApoplasmicFrac_Trunk;0.4;-
 SymplasmicFrac_Trunk;0.2;-
 VolumeLiving_TRB;39.87;(mm or sapwood litre/m2 of soil)
 <<<<<<< HEAD
-Tbase;3;¡C
-Fcrit;450;¡C
+Tbase;3;?C
+Fcrit;450;?C
 =======
 Tbase;3;?C
 Fcrit;450;?C

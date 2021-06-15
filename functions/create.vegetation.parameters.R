@@ -114,7 +114,7 @@ read.vegetation.file <- function(filePath, modeling_options){
     {
       stop(paste0("'", params[i], "' is not provided in input vegetation parameter file, check presence or spelling\n", filePath))
     } else if (length(AAA) > 1) {
-      stop(paste0("'", params[i], "' is not provided several times in input vegetation parameter file, correct \n", filePath))
+      stop(paste0("'", params[i], "' is provided several times in input vegetation parameter file, please correct \n", filePath))
     } else if (length(AAA) == 1) {
       if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
         eval(parse(text = paste0("TTT$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
