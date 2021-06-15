@@ -38,7 +38,7 @@ create.climate.data <- function(filePath, climateData, modeling_options, simulat
     } else {
     stop(paste0("file : ", filePath), "' does not exist, check presence or spelling")
   }
-    else climate_data=climateData
+    else {climate_data=climateData}
 }
   
   
