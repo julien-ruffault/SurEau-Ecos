@@ -92,9 +92,9 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
     calculate.rhDiurnalPattern(
       temperature = x,
       tmin = WBclim$Tair_min,
-      tmax = WBclim$Tair_max,
+      tmax = WBclim$Tair_max+0.0000001, # to prevent crash when tmin = tmax
       rhmin = WBclim$RHair_min,
-      rhmax = WBclim$RHair_max
+      rhmax = WBclim$RHair_max+0.000001 # to prevent crash when RHair_min = RHair_max
     )
   })
   # VPD -----------------------------------------------------------------------
