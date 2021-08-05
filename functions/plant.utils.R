@@ -78,16 +78,25 @@ calcul.gmin <- function(leafTemperature, gmin_20,TPhase, Q10_1, Q10_2) {
 }
 
 #' calculate minimum transpiration (mmol/m2/s from gmin and vod 
-#'
-#' @param gmin  minimum conductance 
-#' @param VPD vapor pressure deficit  (kPa)
-#' @param airPressure surface air pressure (kPa) (default = 101.3) 
-#' @export
-#'
-#' @examples
-calcul.Emin <- function(gmin,VPD,airPressure =101.3) {
-  return(gmin * VPD /airPressure) 
+#' #'
+#' #' @param gmin  minimum conductance 
+#' #' @param VPD vapor pressure deficit  (kPa)
+#' #' @param airPressure surface air pressure (kPa) (default = 101.3) 
+#' #' @export
+#' #'
+#' #' @examples
+#' calcul.Emin <- function(gmin,VPD,airPressure = 101.3) {
+#'   return(gmin * VPD /airPressure) 
+#' }
+
+
+
+compute.Emin <- function(gmin, gBL, gCrown, VPD, airPressure =101.3) {
+  gmintot = 1/(1/gmin+ 1/gBL + 1/gCrown)
+  return(gmintot * VPD /airPressure) 
 }
+
+
 
 #' compute dead fuel moisture content from VPD following De Dios et al. (2015)
 #' <https://doi.org/10.1016/j.agrformet.2015.01.002>
@@ -206,6 +215,116 @@ convert.FtoV <- function(x, rock_fragment_content = 0, layer_thickness) {
   y <- x * (1 - (rock_fragment_content / 100)) * layer_thickness * 1000
   return(y)
 }
+
+
+# New verion of compute Tleaf corrected for bugs by Nicolas Martin (04/08/2021) : corrected cloud cover calculation  / Changed input parameters also
+compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, PsiLeaf,  leaf_size=50, leaf_angle=45, TurnOffEB=F) 
+{
+  #Compute Tleaf and VPDLeaf
+  # SWR  // short-wave radiation    (W/m2)
+  # WS   // windspeed    (m/s)
+  # Tair // air temperature (degC)
+  # VPD  // Vapor pressure deficit (kPa)
+  # leaf_angle // # leaf angle (depuis le plan horizontal : 0-90 deg)
+  # leaf_size  // characteristic dimension from vegetation params in mm (1 - 3000 : pine needle - banana leaf)
+  
+  #if(PsiLeaf==0) {PsiLeaf = -0.01}
+  
+  WS = max(WS, 0.1)  # Force minimum wind speed to avoid excessive heating
+  SWR=  PAR*0.5495 # from µmol/m²/s to Watts/m²
+  
+  aSWR <- 0.5 #  //  absorptance to SWR %
+  
+  gflat <- 0.00662
+  gcyl  <- 0.00403 # //  coefficient in rbl equation    m
+  jflat <- 0.5 #
+  jcyl  <- 0.6 # //  coefficient in rbl equation  none
+  
+  
+  em_leaf <- 0.97 #    // emissivity    none
+  SB <- 5.6704e-8 #    //  Stefan-Boltzman constant    W m-2 K-4
+  p  <- 1.292      #   // density of dry air    kg/m3
+  Cp <- 1010      #  // heat capacity of dry air    J kg-1 K-1
+  y  <- 0.066      # // psychrometric constant    kPa K-1
+  
+  a  <- 0.61121    # // coefficient in esat equation    kPa
+  b  <- 17.502     # // coefficient in esat equation    none
+  z  <- 240.97     # // coefficient in esat equation    °C
+  
+  # VARAIBLE CALCULEES
+  # rst  #   // stomatal resistance s m-1 (not needed)
+  # esat # //// saturation vapor pressure    kPa
+  # ea   #//water vapor pressure of the air    kPa
+  # em_air #//air emissivity
+  # s   #// slope of esat/T curve    kPa oC-1
+  # SWRabs#  // absorbed short-wave radiation    W m-2
+  # LWRin  #// incoming long-wave radiation    W m-2
+  # LWRouti #  // isothermal outgoing long-wave radiation    W m-2
+  # Rni # //  isothermal net radiation    W m-2
+  # rr # // radiative resistance    s m-1
+  # rblr #  // boundary-layer + radiative resistance    s m-1
+  # ym #//  modified psychrometric constant    kPa K-1
+  # rbl # // leaf boundary-layer resistance    s m-1
+  # Delta_T  #// leaf-to-air temperature difference    degC
+  # Tleaf, Tleaf_NonLinear#  //leaf temperature    degC
+  if(POTENTIAL_PAR>0) {cloud_cover = PAR/POTENTIAL_PAR} else {cloud_cover=0}
+  if (cloud_cover>1) {cloud_cover=1}
+  
+
+  
+  esat <- a * exp(b * Tair / (Tair + z)) # ; #kPa
+  ea <- esat * (RH / 100) # ;
+  s <- esat * b * z / ((Tair + z)^2) # ;
+  em_air <- ((1 - 0.84 * cloud_cover) * 1.31 * ((10 * ea / (Tair + 273.15))^0.14285714) + 0.84 * cloud_cover) # ;
+  VPDx =   esat - ea #Update VPD with esat and ea (why?)
+  
+  # Bilan radiatif
+  SWRabs <- aSWR * cos(leaf_angle * 3.1416 / 180) * SWR # Radiation absorbed by leaves
+  LWRin <- em_air * SB * (Tair + 273.15)^4 # Incoming long-wave radiation (W m-2) for clear and cloudy sky
+  LWRouti <- em_leaf * SB * (Tair + 273.15)^4 # Outcoming long-wave radiation (W m-2) for clear and cloudy sky
+  Rni <- SWRabs + LWRin - LWRouti # isothermal net radiation
+  rr <- p * Cp / (4 * em_leaf * SB * (Tair + 273.15)^3) # Radiative resistance
+  
+  # Boundary layer resistance
+  if (leaf_size > 3) {
+    rbl <- 1 / (1.5 * gflat * ((WS^jflat) / ((leaf_size / 1000)^(1 - jflat))))
+  } else {
+    rbl <- 1 / (1.5 * gcyl * ((WS^jcyl) / ((leaf_size / 1000)^(1 - jcyl)))) # A flat leaf if > 3mm
+  } # a needle, formula for a cylinder
+  
+  g_bl <- 1 / rbl * 1000 * 40 #      #leaf boundary layer conductance in mmol/s/m2
+  rblr <- 1 / (1 / rbl + 1 / rr) # 
+  
+  if ((gs+g_cuti)>0) {rst = 1/(gs+g_cuti)*1000*40} else {rst = 9999.99}
+  
+  ym <- y * (rst / rblr) # 
+  
+  
+  # compute Tleaf with linear approximation
+  Delta_T <- (ym * Rni * rblr / (p * Cp) - VPDx) / (s + ym) # 
+  Tleaf <- Tair + Delta_T # 
+  T_Leaf <- Tleaf
+  
+
+  e_sat_air = 611.21*exp((18.678-Tair/234.5)*Tair/(257.14+Tair)) #;    // saturation vapour water pressure at Tair in Pa from Buck's equation
+  e_air = e_sat_air*RH/100                                #// vapour water pressure at Tair and RHair
+  VPD_Air =    (e_sat_air - e_air)/1000
+  
+  e_sat = 611.21*exp((18.678-Tleaf/234.5)*Tleaf/(257.14+Tleaf))   #;    // saturation vapour water pressure at Tair in Pa from Buck's equation
+  e = e_sat*exp(PsiLeaf*2.16947115/(Tleaf+273.15)) 
+  #// effect of leaf water potential on e
+  VPD_Leaf = (e-e_air)/1000 #//vpd between leaf and air in kPa
+  
+  
+  
+  if(TurnOffEB == F) {vecres = c(T_Leaf, g_bl, VPD_Leaf,  VPD_Air, Delta_T)}
+  #If turn off energy balance Tleaf = Tair
+  if(TurnOffEB == T) {vecres = c(Tair, g_bl, VPD_Leaf, VPD_Air)}
+  
+  return(vecres)
+}
+
+
 
 
 

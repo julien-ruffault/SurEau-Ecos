@@ -228,10 +228,13 @@ Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5)
   return(PPFD)
 }
 
+
+# Convert  instantaneous radiation in watt to dialy cumulative radiation in MJ (MJ.day-1)
 Rg_Watt.to.Rg_MJday <-  function(Rg)
 {
 return(RgMJ = Rg*0.0864)
 }
+
   
 Rg_MJday.to.RgWatt <-  function(Rg)
 {
@@ -244,3 +247,45 @@ Rg_MJ.to.RgWatt <- function(Rg,Nhours)
   return(RgWatt = Rg*(10^6/(Nhours*3600)))
   
 }
+
+
+
+# determine potential for a given place and date /used to determine cloud cover 
+# return potential par in W.m2
+Potential_PAR <- function(timeOfDay, Lat, DOY) 
+{
+  diffuseFraction = 0.1;
+  solarConstant = 2084;
+  attenuationCoef  = -0.174353387144778;
+  
+  decl = Declination(DOY);
+  pn = -cos(Lat * 3.1416 / 180);
+  pz = sin(Lat * 3.1416 / 180);
+  hRad = (timeOfDay - 6) * 3.1416/12;
+  se = cos(hRad) * cos(decl);
+  sn = -pz * sin(hRad) * cos(decl) - pn * sin(decl)
+  sz = -pn * sin(hRad) * cos(decl) + pz * sin(decl)
+  alt = atan(sz / ((se*se + sn*sn)^0.5))
+  azi = 3.1416 + atan(se / sn)
+  azi[sn > 0] = azi[sn > 0] + 3.1416
+  pfd = solarConstant * exp(attenuationCoef / sin(alt))
+  pfd[alt < 0] = 0
+  dpfd = diffuseFraction * pfd
+  dpfd[alt<0] = 0
+  
+  return (dpfd + pfd * sin(alt))
+}
+
+
+# calculate declination of sun (radians ? ) for a given julian day (DOY)
+Declination <- function(DOY) {
+  #Hervé's formula for solar declination
+  c1 = 0.398749068925246 #; // =Sin(23.5*pi/180), 23.5 = Earth declination
+  c2  = 2 * 3.1416 / 365 #;
+  c3  = 80 #; // date of spring
+  x = c1 * sin((DOY - c3) * c2) #;
+  return(atan(x / ((1 - x*x)^0.5) ))
+  
+}
+
+

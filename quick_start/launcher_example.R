@@ -62,6 +62,9 @@ legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
 
+plot(DATA$LFMCSymp)
+
+
 # plot meteorological conditions 
 plot(DATA$Time,DATA$Tair,type='l',col='firebrick4',ylab='Air temperature (degC)', xlab='Time')
 par(new=T)

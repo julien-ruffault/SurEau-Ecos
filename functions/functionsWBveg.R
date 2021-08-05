@@ -16,6 +16,7 @@ new.WBveg <- function(veg_params) {
   
   WBveg$params <- veg_params # assign parameters 
   
+  
   WBveg$params$PsiTlp_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
   WBveg$params$PsiTlp_Trunk <-  WBveg$params$PiFullTurgor_Trunk*WBveg$params$EpsilonSymp_Trunk/(WBveg$params$PiFullTurgor_Trunk+WBveg$params$EpsilonSymp_Trunk)
   
@@ -47,7 +48,7 @@ new.WBveg <- function(veg_params) {
   
   
   # Leaf and canopy conductance
-  WBveg$gmin <- NA #Gmin for leaves
+  WBveg$gmin <- 0 # initialised at 0 to compute Tleaf on first time step considering gs =0 and not NA s
   WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
   WBveg$gs_bound <- NA
   WBveg$gs_lim   <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
@@ -362,31 +363,42 @@ update.capaSym.WBveg <- function(WBveg) {
 # Compute transpiration
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
-  
-# Tleaf is calculated using leaf transpiration from the previous time step
-TGbl_Leaf <- compute.Tleaf(
-  Tair = WBclim$Tair_mean, SWR = WBclim$RG * 1e6 / (Nhours * 3600), # conversion en W/m
-  WS = WBclim$WS, VPD = WBclim$VPD, RH = max(100, WBclim$RHair_mean), gs = WBveg$gs_lim, Einst = max(0.00001, WBveg$SumFluxSoilToCollar)
-)
 
-WBveg$leafTemperature <- TGbl_Leaf [1]
+  # calculate Tleaf, leafVPD and gBL 
+  TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
+                             PAR=WBclim$PAR, 
+                             POTENTIAL_PAR = WBclim$Potential_PAR,
+                           WS = WBclim$WS, 
+                           RH = WBclim$RHair_mean,
+                           gs = WBveg$gs_lim, 
+                           g_cuti = WBveg$gmin,
+                           PsiLeaf =WBveg$Psi_LSym,  
+                           leaf_size=50, 
+                           leaf_angle=45, 
+                           TurnOffEB=F) 
+  
+  WBveg$leafTemperature <-TGbl_Leaf [1]
+  WBveg$gBL = TGbl_Leaf[2]
+  WBveg$leafVPD = TGbl_Leaf[3]
+  
+  
+  
+  # calculate gcrown 
+  WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
   
   # Cuticular conductances and transpiration 
   WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
-  WBveg$Emin <- calcul.Emin(gmin = WBveg$gmin, VPD = WBclim$VPD)
-  WBveg$EminT <-  WBveg$params$fTRBToLeaf * calcul.Emin(gmin = WBveg$gmin_T,VPD= WBclim$VPD)
-  
+  WBveg$Emin <- compute.Emin(gmin = WBveg$gmin, gBL=WBveg$gBL, gCrown = WBveg$gCrown, VPD = WBveg$leafVPD)
+  WBveg$EminT <-  WBveg$params$fTRBToLeaf * compute.Emin(gmin = WBveg$gmin_T,gBL=WBveg$gBL, gCrown=WBveg$gCrown, VPD= WBclim$VPD)
   #compute current stomatal regulation
   regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
   WBveg$regulFact = regul$regulFact
   
   # calculate canopy Transpiration with no regulation
   #if (modeling_options$EboundFormulation == 'Jarvis'){
-    WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
-    WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
-    WBveg$gBL = TGbl_Leaf[2]
-    WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
-    WBveg$Ebound   = WBveg$gcanopy_Bound * WBclim$VPD / 101.3
+  WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
+  WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
+  WBveg$Ebound   = WBveg$gcanopy_Bound * WBveg$leafVPD / 101.3
   #}
   
   # else if (modeling_options$EboundFormulation =='Granier1999'){
@@ -397,11 +409,31 @@ WBveg$leafTemperature <- TGbl_Leaf [1]
   # canopy with current regulation 
   WBveg$gs_lim = WBveg$gs_bound * WBveg$regulFact
   WBveg$gcanopy_lim = 1/(1/WBveg$gCrown+1/WBveg$gs_lim + 1/WBveg$gBL) # NB: gcanopy_lim =0 when gs_lim=0 (1/(1+1/0)=0 in R)
-  WBveg$Elim = WBveg$gcanopy_lim * WBclim$VPD / 101.3   
+  WBveg$Elim = WBveg$gcanopy_lim * WBveg$leafVPD/ 101.3   
   #WBveg$E0 = WBveg$Emin + WBveg$Elim
   gs_lim_prime = WBveg$gs_bound * regul$regulFactPrime
   dbxmin = 1e-100
   WBveg$Eprime = WBveg$Elim * gs_lim_prime /(WBveg$gs_lim*(1+WBveg$gs_lim*(1/WBveg$gCrown+1/WBveg$gBL))+dbxmin)
+  
+  
+  # update Tleaf according to new conductance to avoid large gaps (comestic)
+  TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean, 
+                             PAR = WBclim$PAR, 
+                             POTENTIAL_PAR = WBclim$Potential_PAR,
+                             WS = WBclim$WS, 
+                             RH = WBclim$RHair_mean,
+                             gs = WBveg$gs_lim, 
+                             g_cuti = WBveg$gmin,
+                             PsiLeaf = WBveg$Psi_LSym,  
+                             leaf_size = 50, 
+                             leaf_angle = 45, 
+                             TurnOffEB = F) 
+  
+  WBveg$leafTemperature <-TGbl_Leaf [1]
+  WBveg$gBL = TGbl_Leaf[2]
+  WBveg$leafVPD = TGbl_Leaf[3]
+  
+  
   return(WBveg) 
 }
 
@@ -614,10 +646,10 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
 
   
   #Step 4 : set computed values in WBveg and update Psi_cav, PLC and Psi_AllSoil
-  WBveg$Psi_LApo<-Psi_LApo_np1
-  WBveg$Psi_TApo<-Psi_TApo_np1
-  WBveg$Psi_LSym<-Psi_LSym_np1
-  WBveg$Psi_TSym<-Psi_TSym_np1
+  WBveg$Psi_LApo<-min(-0.00001,Psi_LApo_np1)
+  WBveg$Psi_TApo<-min(-0.00001,Psi_TApo_np1)
+  WBveg$Psi_LSym<-min(-0.00001,Psi_LSym_np1)
+  WBveg$Psi_TSym<-min(-0.00001,Psi_TSym_np1)
   
   # Cavitation
   if (WBveg$Psi_LApo < Psi_LApo_cav) {

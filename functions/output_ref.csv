@@ -49,6 +49,7 @@ fluxSoilToCollar1_mm;WBveg;fluxSoilToCollar_mm;1;4
 fluxSoilToCollar2_mm;WBveg;fluxSoilToCollar_mm;2;4
 fluxSoilToCollar3_mm;WBveg;fluxSoilToCollar_mm;3;4
 leafTemperature;WBveg;leafTemperature;1;4
+leafVPD;WBveg;leafVPD;1;3
 LAI;WBveg;LAI;1;2
 LAIpheno;WBveg;LAIpheno;1;2
 canopyStorageCapacity;WBveg;canopyStorageCapacity;1;4

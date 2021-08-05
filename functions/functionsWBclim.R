@@ -19,7 +19,7 @@ new.WBclim <- function(climate_data, YEAR, DOY) {
   WBclim$RHair_min <- climate_data$RHair_min[index]
 
   WBclim$PPT <- climate_data$PPT_sum[index]
-  WBclim$RG <- climate_data$RG_sum[index]
+  WBclim$RG  <- climate_data$RG_sum[index]
 
   WBclim$net_radiation <- NA
   WBclim$ETP <- NA
@@ -69,8 +69,9 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
   WBclimHour$RG <- WBclim$RG * io * 3600
   WBclimHour$Rn <- WBclim$net_radiation * io * 3600
   WBclimHour$PAR = Rg_Watt.to.PPFD_umol(Rg_MJ.to.RgWatt(WBclimHour$RG,Nhours=1))
-
+  WBclimHour$Potential_PAR = Potential_PAR(timeOfDay=TIME_HOUR, Lat=lat, DOY=WBclim$DOY) 
   
+
   #PAR_cumul <- 24 * Rg_Watt.to.PPFD_umol(Rg_MJday.to.RgWatt(WBclim$RG))
   #WBclimHour$PAR <- 10*PAR_cumul * io * 3600 # TODO voir conversion du PAR 
 

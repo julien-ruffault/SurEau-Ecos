@@ -214,8 +214,17 @@ legend(20, 3, c("OutPut", "recompute"), col=c(1,2), lty=1)
 plot(VPD_Leaf_Nico[1:48], col=2, type='l', main = "Nico")
 lines(DATA$leafTemperature[1:48])
 
+plot(DATA$gmin,type='l')
+lines(DATARV$g_cuti,col=2)
 
+plot(DATA$leafVPD[2:25], type='l', ylab="VPD_Leaf")
+lines(DATARV$VPD_Leaf[1:24], type='l', col =2)
 
+plot(DATA$leafTemperature[2:25], type='l', ylim=c(15,35), ylab="Leaf temp")
+lines(DATARV$T_leaf[1:24], type='l', ylim=c(15,35), col =2)
+
+plot(DATA$Emin,type='l')
+lines(DATARV$E_cuti_m2,col=2)
 
 
 plot(DATARV$g_canopy[1:48], type='l', ylim=c(0,200))
