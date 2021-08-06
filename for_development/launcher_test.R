@@ -11,15 +11,16 @@ mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))        
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                             # do not modify 
 
 # climate data 
-climateData_path          <- paste0(mainDir,'/for_tests/Climat_constant_test.csv') # <-- indicate here the path to input climate data 
+climateData_path          <- paste0(mainDir,'/for_development/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
+
 
 # Vegetation and soil parameters
-soilParameters_path       <- paste0(mainDir,'/for_tests/Soil_test.csv')
-vegetationParameters_path <- paste0(mainDir,'/for_tests/Parameters_test_quercus_evergreen.csv')
+soilParameters_path       <- paste0(mainDir,'/for_developement/Soil_test.csv')
+vegetationParameters_path <- paste0(mainDir,'/for_developement/Parameters_test_quercus_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 
 # output
-output_path               <- paste0(mainDir,'/for_tests/test.csv')        
+output_path               <- paste0(mainDir,'/for_development/test.csv')        
 
 # create input lists to run SureauR --------------------------------------------
 modeling_options  <- create.modeling.options(timeStepForEvapo=1,

@@ -75,25 +75,19 @@ read.vegetation.file <- function(filePath, modeling_options){
     "P50_VC_Trunk",
     "slope_VC_Trunk",
     "EpsilonSymp_Leaf", # [MPa]            / Modulus of elasticity in leaves
-    "PiFullTurgor_Leaf", # [MPa]          / Osmotic Potential at full turgor in leaves
+    "PiFullTurgor_Leaf", # [MPa]           / Osmotic Potential at full turgor in leaves
     "ApoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
-    "LDMC", # [mgMS/g]                / Leaf dry matter content (measured for fully watered leaves)
+    "LDMC", # [mgMS/g]                     / Leaf dry matter content (measured for fully watered leaves)
     "LMA", # [g/m2leaf]                   / Leaf mass per area
-    "K", # [-]                        / Light extinction coefficient of the vegetation layer
+    "K", # [-]                            / Light extinction coefficient of the vegetation layer
     "kPlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
     "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
-    "gmin_T",  #  conductance (gmin) of the trunk
+    "gmin_T",     #  conductance (gmin) of the trunk
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
     "k_TSymInit",
-    "gCrown0", 
-    "gsMax",      # parameter in Jarvis model (currently default to 200) 
-    "gsNight",    # parameter in jarvis gs model (currently default to 20 
-    "JarvisPAR",  # parameter in Jarvis gs mdoel (currently default is 0.006) 
-    "Tgs_sens",   # temperature parameter in Jarvis model (currently default Value is 17)
-    "Tgs_optim",  # temperature parameter in Jarvis model (currently default value is 25)
     "fRootToLeaf", # root to leaf ratio 
     "rootRadius",  #  radius of roots (m)
     "betaRootProfile", # parameter for the distribution of roots in the soil 
@@ -162,6 +156,32 @@ read.vegetation.file <- function(filePath, modeling_options){
   }
   
   
+
+# Parameters according to EvaporationMod --------------------------------------
+
+  if (modeling_options$transpirationModel=='Jarvis')
+  {
+  params_transpirationMod <- c("gCrown0", "gsMax","gsNight","JarvisPAR","Tgs_sens","Tgs_optim")
+  
+  
+  for (i in 1:length(params_transpirationMod)) {
+    AAA <- which(io$Name == params_transpirationMod[i]) ## line number of the variable
+    
+    if (length(AAA) == 0) # checking that it exists n input file/otherwise stop running
+    {
+      stop(paste0("'", params_transpirationMod[i], "' is not provided in input vegetation parameter file, check presence or spelling\n", filePath))
+    } else if (length(AAA) > 1) {
+      stop(paste0("'", params_transpirationMod[i], "' is provided several times in input vegetation parameter file, correct \n", filePath))
+    } else if (length(AAA) == 1) {
+      if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
+        eval(parse(text = paste0("TTT$", params_transpirationMod[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+      } else {
+        stop(paste0(params_transpirationMod[i], "must be numeric"))
+      }
+    }
+  }
+  }
+  
   
   ##### Foliage Type  ####
   AAA <- io[which(io$Name == "Foliage"), "Value"]
@@ -201,6 +221,10 @@ read.vegetation.file <- function(filePath, modeling_options){
   
   
   
+  
+  
+  
+  
   # ETP parameters for PT or PM
   if (modeling_options$ETPFormulation == "PT") {
     params_PT <- c("PTcoeff")
@@ -222,6 +246,8 @@ read.vegetation.file <- function(filePath, modeling_options){
       }
     }
   }
+  
+
   
   return(TTT)
   

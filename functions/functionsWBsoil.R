@@ -76,7 +76,7 @@ compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K
     E_Soil3 <- min(E_Soil1, E_Soil2)
     WBsoil$Evaporation <- convertFluxFrom_mmolm2s_To_mm(E_Soil3,timeStep=Nhours) # Conversion from mmol/m2/s to mm
   }
-  # print(paste0('E_Soil3=',E_Soil3))
+
 
   WBsoil$EvaporationSum <- sum(WBsoil$Evaporation)
   

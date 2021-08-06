@@ -57,7 +57,6 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
       for (tt in 1:length(climHour$ETP)) # first hour is 0, last hour is 23 for a day
       {
-
         # set climate
         Clim_current <- lapply(climHour, function(x) x[max(tt - 1, 1)]) # select climate of the h
         Clim_next <- lapply(climHour, function(x) x[tt]) # select climate of the next time step

@@ -46,7 +46,8 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     soilEvap=T,
                                     defoliation =F,
                                     thresholdMortality = 90,
-                                    ETPFormulation = c("PT", "PM"),
+                                    transpirationModel = c('Jarvis','Granier'),
+                                    ETPFormulation = c("PT", "Penman"),
                                     RnFormulation = c("Linacre", "Linear"),
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate","Fast", "Custom"),
@@ -101,6 +102,9 @@ create.modeling.options <- function(timeStepForEvapo = 1,
 
   numericalScheme <-  match.arg(numericalScheme)
   
+  transpirationModel <- match.arg(transpirationModel)
+  
+  
   if (compOptionsForEvapo == "Normal") { # every 10 min, 6 min, 3min, 1min
     compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
   }
@@ -128,6 +132,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$soilEvap <- soilEvap
   modeling_options$defoliation <- defoliation
   modeling_options$thresholdMortatliy <- thresholdMortality
+  modeling_options$transpirationModel <- transpirationModel
   
   return(modeling_options)
 }

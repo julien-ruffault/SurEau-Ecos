@@ -42,6 +42,7 @@ Eprime;WBveg;Eprime;1;4
 Emin;WBveg;Emin;1;4
 EminT;WBveg;EminT;1;4
 Elim;WBveg;Elim;1;4
+Ebound;WBveg;Ebound;1;4
 transpiration_mm;WBveg;transpiration_mm;1;4
 Emin_mm;WBveg;Emin_mm;1;4
 EminT_mm;WBveg;EminT_mm;1;4

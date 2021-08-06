@@ -46,18 +46,20 @@ new.WBveg <- function(veg_params) {
   WBveg$C_LApo <- WBveg$params$C_LApoInit     # Capacitance apoplasmique Leaf (mmol/m2 of leaf/s/MPA) ref: Sureau-param-Cochard
   WBveg$C_TApo <- WBveg$params$C_TApoInit     # Capacitance apoplasmique Trunk (mmol/m2 of leaf/s/MPA) ref: Sureau-param-Cochard
   
-  
+
   # Leaf and canopy conductance
   WBveg$gmin <- 0 # initialised at 0 to compute Tleaf on first time step considering gs =0 and not NA s
   WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
+  WBveg$regulFact <- 0.01 #  TODO voir si y'a besoin d'initialiser 
+  
+  # TODO voir pour mettre tout en NA si TranspirationMod = 0 
   WBveg$gs_bound <- NA
-  WBveg$gs_lim   <- 0 # initialised to 0 to compute Tleaf on first time step considering gs =0 and not NA 
+  WBveg$gs_lim   <- 0 # initialised to 0 to compute Tleaf on first time step considering gs = 0 and not NA 
   WBveg$gcanopy_Bound <- NA
   WBveg$gcanopy_lim <- NA
   WBveg$gBL <- NA
   WBveg$gCrown <- NA
-  WBveg$regulFact <- 0.01 #  TODO voir si y'a besoin d'initialiser 
-  
+
   
   # Fluxes
   WBveg$Eprime = 0
@@ -361,22 +363,61 @@ update.capaSym.WBveg <- function(WBveg) {
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute transpiration
+# needed values for the rest of the code  : 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
 
-  # calculate Tleaf, leafVPD and gBL 
-  TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
-                             PAR=WBclim$PAR, 
-                             POTENTIAL_PAR = WBclim$Potential_PAR,
-                           WS = WBclim$WS, 
-                           RH = WBclim$RHair_mean,
-                           gs = WBveg$gs_lim, 
-                           g_cuti = WBveg$gmin,
-                           PsiLeaf =WBveg$Psi_LSym,  
-                           leaf_size=50, 
-                           leaf_angle=45, 
-                           TurnOffEB=F) 
+  if (modeling_options$transpirationModel == 'Granier'){
   
+    
+    Einst= WBveg$Elim + WBveg$Emin
+    
+    TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
+                               PAR=WBclim$PAR, 
+                               POTENTIAL_PAR = WBclim$Potential_PAR,
+                               WS = WBclim$WS, 
+                               RH = WBclim$RHair_mean,
+                               Einst =Einst,
+                               PsiLeaf =WBveg$Psi_LSym,  
+                               leaf_size=50, 
+                               leaf_angle=45, 
+                               TurnOffEB=F) 
+  
+      
+    WBveg$leafTemperature <-TGbl_Leaf [1]
+    WBveg$gBL = TGbl_Leaf[2]
+    WBveg$leafVPD = TGbl_Leaf[3]
+    
+    WBveg$Ebound = calculate.Ebound.Granier(ETP = WBclim$ETP,LAI = WBveg$LAI,timeStep = Nhours)
+    
+    
+    # Cuticular conductances and transpiration 
+    WBveg$gmin  <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
+    WBveg$Emin  <- WBveg$gmin* WBveg$leafVPD /101.3
+    WBveg$EminT <-  WBveg$params$fTRBToLeaf * WBveg$gmin_T* WBveg$leafVPD /101.3
+    #compute current stomatal regulation
+    regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
+    WBveg$regulFact = regul$regulFact
+    WBveg$Elim = WBveg$Ebound * WBveg$regulFact
+    dbxmin = 1e-100
+    WBveg$Eprime = WBveg$Ebound * regul$regulFactPrime + dbxmin
+    
+    }else if (modeling_options$transpirationModel=='Jarvis'){
+  # calculate Tleaf, leafVPD and gBL 
+      
+      Einst= WBveg$Elim + WBveg$Emin
+      
+      TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
+                                 PAR=WBclim$PAR, 
+                                 POTENTIAL_PAR = WBclim$Potential_PAR,
+                                 WS = WBclim$WS, 
+                                 RH = WBclim$RHair_mean,
+                                 Einst =Einst,
+                                 PsiLeaf =WBveg$Psi_LSym,  
+                                 leaf_size=50, 
+                                 leaf_angle=45, 
+                                 TurnOffEB=F) 
+      
   WBveg$leafTemperature <-TGbl_Leaf [1]
   WBveg$gBL = TGbl_Leaf[2]
   WBveg$leafVPD = TGbl_Leaf[3]
@@ -433,6 +474,9 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   WBveg$gBL = TGbl_Leaf[2]
   WBveg$leafVPD = TGbl_Leaf[3]
   
+
+  
+  }
   
   return(WBveg) 
 }
@@ -474,11 +518,8 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation)# TODO check why recomputed? should be in WBveg_tmp
       deltaRegulMax = max(deltaRegulMax,abs(regul_np1$regulFact-regul_n$regulFact))
       # 2. PLC at n and np1
-      #print(c(signif(WBveg_np1$PLCAbove, digits = 5),signif(WBveg_n$PLCAbove, digits = 5),signif(WBveg_np1$PLCBelow, digits = 5),signif(WBveg_n$PLCBelow, digits = 5)))
       deltaPLCMax = max(deltaPLCMax,WBveg_np1$PLC_Leaf-WBveg_n$PLC_Leaf,WBveg_np1$PLC_Trunk-WBveg_n$PLC_Trunk)
-      # Update WBveg_n
-      WBveg_n = WBveg_np1
-      
+      WBveg_n = WBveg_np1 # Update WBveg_n
       
       # 3. update of soil on small time step (done by FP in version 16)
       fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil_n$PsiSoil-WBveg_np1$Psi_TApo)
@@ -552,6 +593,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   Emin_T_nph = WBveg$EminT
   
   #Compute K_L_Cav et K_T_Cav
+  
   PLC_prime_L = PLCPrime.comp(WBveg$PLC_Leaf,WBveg$params$slope_VC_Leaf)
   K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
   PLC_prime_T = PLCPrime.comp(WBveg$PLC_Trunk,WBveg$params$slope_VC_Trunk)
@@ -588,7 +630,7 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
    
     if (opt$numericalScheme=="Implicit") {
       # 2.1 Compute intermediates
-      #print (c(Eprime_nph ,C_LApo/dt , 1/(1/K_LSym + dt/C_LSym) , delta_L_cav*K_L_Cav))
+
       # compute Psi_L_tilda and K_L_tilda and E_L_tilda
       klsym = kseriesum(K_LSym, C_LSym/dt+0.5 * Eprime_nph) # for Psi_LSym_n
       K_L_td =  C_LApo/dt + klsym + delta_L_cav*K_L_Cav
@@ -734,16 +776,9 @@ calculate.gsJarvis.WBveg <- function(WBveg, PAR, Ca=400, option =1){
   #}
   
   WBveg$gs_bound=   gsNight2 + (gsMax2-gsNight2)*(1-exp(-WBveg$params$JarvisPAR*PAR))
-  #print(gs_Jarvis)
   return(WBveg)
 }
 
-# calculate Ebound (mmol.m-2.s-1) with Granier formulation 
-calculate.EboundGranier.WBveg <- function(WBveg,ETP,timeStep){
-  ebound_mm = calculate.Ebound_mm.Granier(ETP = ETP, LAI=WBveg$LAI)
-  WBveg$Ebound = ConvertFluxFrom_mm_To_mmolm2s(x = ebound_mm, timeStep= timeStep, LAI =WBveg$LAI)
-  return(WBveg)
-  }
 
 
 

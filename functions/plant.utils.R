@@ -140,7 +140,15 @@ compute.gCrown <- function(gCrown0, windSpeed){
 
 
 
-
+# time step : hours
+# LAI : m2.m^-2
+# ETP : mm
+# 
+calculate.Ebound.Granier <- function(ETP,LAI,timeStep){
+  ebound_mm = calculate.Ebound_mm.Granier(ETP = ETP, LAI=LAI)
+  Ebound = ConvertFluxFrom_mm_To_mmolm2s(x = ebound_mm, timeStep = timeStep, LAI = LAI)
+  return(Ebound)
+}
 
 calculate.Ebound_mm.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
   ET_Granier <- pmax(0, ETP * (a * LAI^2 + b * LAI + c))
@@ -194,10 +202,6 @@ convertFluxFrom_mmolm2s_To_mm <- function(x, timeStep, LAI=1) {
 kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
 
 
-# not used for now
-calculate.Ebound.Granier <- function(ETP, LAI, a = -0.006, b = 0.134, c = 0) {
-  return(pmax(0, ETP * (a * LAI^2 + b * LAI + c)))
-}
 
 
 
@@ -218,13 +222,12 @@ convert.FtoV <- function(x, rock_fragment_content = 0, layer_thickness) {
 
 
 # New verion of compute Tleaf corrected for bugs by Nicolas Martin (04/08/2021) : corrected cloud cover calculation  / Changed input parameters also
-compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, PsiLeaf,  leaf_size=50, leaf_angle=45, TurnOffEB=F) 
+compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, Einst ,PsiLeaf,  leaf_size=50, leaf_angle=45, TurnOffEB=F) 
 {
   #Compute Tleaf and VPDLeaf
   # SWR  // short-wave radiation    (W/m2)
   # WS   // windspeed    (m/s)
   # Tair // air temperature (degC)
-  # VPD  // Vapor pressure deficit (kPa)
   # leaf_angle // # leaf angle (depuis le plan horizontal : 0-90 deg)
   # leaf_size  // characteristic dimension from vegetation params in mm (1 - 3000 : pine needle - banana leaf)
   
@@ -295,7 +298,13 @@ compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, PsiLeaf,
   g_bl <- 1 / rbl * 1000 * 40 #      #leaf boundary layer conductance in mmol/s/m2
   rblr <- 1 / (1 / rbl + 1 / rr) # 
   
-  if ((gs+g_cuti)>0) {rst = 1/(gs+g_cuti)*1000*40} else {rst = 9999.99}
+  if (missing(Einst)){
+  if ((gs+g_cuti)>0) {rst = 1/(gs+g_cuti)*1000*40} else {rst = 9999.99}}
+  
+  if (!missing(Einst)){
+    g = Einst/VPDx*101.3
+    if (g>0) {rst = 1/(g)*1000*40} else {rst = 9999.99}}
+    
   
   ym <- y * (rst / rblr) # 
   

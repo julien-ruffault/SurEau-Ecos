@@ -62,8 +62,6 @@ legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
 
-plot(DATA$LFMCSymp)
-
 
 # plot meteorological conditions 
 plot(DATA$Time,DATA$Tair,type='l',col='firebrick4',ylab='Air temperature (degC)', xlab='Time')
@@ -81,13 +79,13 @@ legend('topright',legend=c('Transpiration','Emin','EminT','Soil'),
        col=c('blue','forestgreen','brown4','grey30'),lty=1,lwd=2,cex=0.8)
 
 # plot cavitation 
-plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,50),xlab='Time',ylab='PLC')
+plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,70),xlab='Time',ylab='PLC')
 lines(DATA$Time,DATA$PLC_Trunk,type='l',col='brown')
 legend('topleft',legend=c('PLC_Leaf','PLC_Trunk'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
 
 # plot fuel moisture 
-plot(DATA$Time,DATA$LFMCSymp,type='l', col='springgreen4',xlab='Time',ylab='Fuel moisture content (% dry weight)',ylim=c(40,80))
+plot(DATA$Time,DATA$LFMCSymp,type='l', col='springgreen4',xlab='Time',ylab='Fuel moisture content (% dry weight)',ylim=c(20,80))
 lines(DATA$Time,DATA$LFMCApo,type='l',col='brown3',lwd=2)
 lines(DATA$Time,DATA$LFMC,col='grey30')
 legend('bottomleft',legend=c('LFMC_Symplasm','LFMC_Apoplasm','LFMC'),

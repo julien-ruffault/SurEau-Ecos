@@ -98,13 +98,19 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
       rhmax = WBclim$RHair_max+0.000001 # to prevent crash when RHair_min = RHair_max
     )
   })
+  
+  # Wind speed -----------------------------------------------------------------
+  WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
   # VPD -----------------------------------------------------------------------
   WBclimHour$VPD <- compute.VPDfromRHandT(relative_humidity = WBclimHour$RHair_mean, temperature = WBclimHour$Tair_mean)
   # ETP -----------------------------------------------------------------------
+  if(modeling_options$ETPFormulation=='PT'){
   WBclimHour$ETP <- compute.ETP.PT(Tmoy = WBclimHour$Tair_mean, NetRadiation = WBclimHour$Rn, PTcoeff = PTcoeff)
-  # Wind speed -----------------------------------------------------------------
-  WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
+  } else if (modeling_options$ETPFormulation=='Penman'){
+    WBclimHour$ETP <- compute.ETP.PM(Tmoy = WBclimHour$Tair_mean, NetRadiation = WBclimHour$Rn,u =WBclim$WS,vpd=WBclim$VPD)}
   
+    
+
   WBclimHour$TIME <- modeling_options$TIME
   WBclimHour$nHours = c(base::diff(c(WBclimHour$TIME[length(WBclimHour$TIME)],24)),base::diff(as.numeric(WBclimHour$TIME)))
   # nhours for the first time period is equal to midnight minus the last hour of the previous day 

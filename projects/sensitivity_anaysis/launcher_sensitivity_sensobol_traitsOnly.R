@@ -3,7 +3,6 @@
 # compute sobol indices with the 'sensobol' package 
 # uses parameters from the CompaSurEauC simulation 
 # each parameters can vvary from -30 to 30 % of its initial value 
-
 # notes : pour la RU, on sample La RU et on fait varier le DETPH du sol de maniere à correpsondre à la RU selectionnée
 
 

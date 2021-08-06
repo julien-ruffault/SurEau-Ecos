@@ -55,8 +55,51 @@ compute.ETP.PT <- function(Tmoy, NetRadiation, PTcoeff = 1.26, G = 0) {
   return(ETP)
 }
 
+  
+  
 
 
+
+#' compute reference ETP from penmman formulation
+#' @param air_pressure air pressure (kPa)
+#' @param Tmean mean temperature (degC)
+#' @param VPD  Vapor pressure deficit (kpa)
+#' @Rn net radiation (MJ.)
+#' @u wind speed (m.s-1)
+
+compute.ETP.PM <- function(Tmoy, NetRadiation,u,vpd,G=0)
+### ### ### ### ### ###
+{
+  SBconstant <- 4.903 * 10^9 # Stefan-Boltzman constant [MJ.K^-4.m^-2.day^-1]
+  gamma <- 0.0666 # Psychometer constant
+  lambda <- 2.45 # Latent heat of vaporisation
+  
+  #  s: slope of the saturation vapour pressure function (AO 1998)
+  delta = 4098 * 0.6108 * exp((17.27 * Tmoy) / (Tmoy + 237.3)) / ((Tmoy + 237.3)^2)
+  
+  ga = 0.34*max(u,0.001)
+  
+  u2=u*(4.87/log(67.8*10-5.42))
+  u2
+  N1 = 0.408*delta*NetRadiation
+  N2 = gamma*(37/(Tmoy+273))*u2*vpd
+  D = delta+gamma*(1+0.34*u2)
+  E = (N1+ N2)/(D)
+  
+  
+  return(E)
+}
+
+
+# comparaison ETP Penmman et Priestley-Taylor
+# Rn=1
+# vpd=2
+# Tmean = 20
+# E1 = compute.ETP.PM(Tmean=Tmean, NetRadiation=Rn,u=2,vpd=2,G=0)
+# E1
+# 
+# E2 = compute.ETP.PT(Tmoy=Tmean, NetRadiation=Rn, PTcoeff = 1.14) 
+# E2 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### 
 #' # Calculated diurnal pattern of temperature assuming a sinusoidal pattern with T = tmin at sunrise
 #  and T = (tmin+tmax)/2 at sunset. From sunset to sunrise follows a linear trend 
@@ -113,98 +156,8 @@ calculate.rhDiurnalPattern <- function(temperature, rhmin, rhmax, tmin, tmax) {
 }
 
 
-compute.Tleaf <- function(Tair, SWR, WS, VPD, RH, gs, Einst, leaf_size=50, leaf_angle=45) 
-  {
-  # SWR  // short-wave radiation    (W/m2)
-  # WS   // windspeed    (m/s)
-  # Tair // air temperature (degC)
-  # VPD  // Vapor pressure deficit (kPa)
-  # leaf_angle // # leaf angle (depuis le plan horizontal : 0-90 deg)
-  # leaf_size  // characteristic dimension from vegetation params in mm (1 - 3000 : pine needle - banana leaf)
-  WS = max(WS,0.1)  # Force minimum wind speed to avoid excessive heating
-  
-  aSWR <- 0.5 #  //  absorptance to SWR %
-  
-  gflat <- 0.00662
-  gcyl <- 0.00403 # //  coefficient in rbl equation    m
-  jflat <- 0.5 #
-  jcyl <- 0.6 # //  coefficient in rbl equation  none
-  
-  
-  em_leaf <- 0.97 #    //emissivity    none
-  SB <- 5.6704e-8 #    //  Stefan-Boltzman constant    W m-2 K-4
-  p <- 1.292      #   // density of dry air    kg/m3
-  Cp <- 1010      #  // heat capacity of dry air    J kg-1 K-1
-  y <- 0.066      # //psychrometric constant    kPa K-1
-  a <- 0.61121    # //coefficient in esat equation    kPa
-  b <- 17.502     # //coefficient in esat equation    none
-  z <- 240.97     # //coefficient in esat equation    °C
-  
-  # VARAIBLE CALCULEES
-  # rst  #   // stomatal resistance s m-1 (not needed)
-  # esat # //// saturation vapor pressure    kPa
-  # ea   #//water vapor pressure of the air    kPa
-  # em_air #//air emissivity
-  # s   #// slope of esat/T curve    kPa oC-1
-  # SWRabs#  // absorbed short-wave radiation    W m-2
-  # LWRin  #// incoming long-wave radiation    W m-2
-  # LWRouti #  // isothermal outgoing long-wave radiation    W m-2
-  # Rni # //  isothermal net radiation    W m-2
-  # rr # // radiative resistance    s m-1
-  # rblr #  // boundary-layer + radiative resistance    s m-1
-  # ym #//  modified psychrometric constant    kPa K-1
-  # rbl # // leaf boundary-layer resistance    s m-1
-  # Delta_T  #// leaf-to-air temperature difference    degC
-  # Tleaf, Tleaf_NonLinear#  //leaf temperature    degC
-  
-  cloud_cover=1
-  
-  esat <- a * exp(b * Tair / (Tair + z)) # ; #kPa
-  ea <- esat * (RH / 100) # ;
-  s <- esat * b * z / ((Tair + z)^2) # ;
-  em_air <- ((1 - 0.84 * cloud_cover) * 1.31 * ((10 * ea / (Tair + 273.15))^0.14285714) + 0.84 * cloud_cover) # ;
-  
-  # Bilan radiatif
-  SWRabs <- aSWR * cos(leaf_angle * 3.1416 / 180) * SWR # Radiation absorbed by leaves
-  LWRin <- em_air * SB * (Tair + 273.15)^4 # Incoming long-wave radiation (W m-2) for clear and cloudy sky
-  LWRouti <- em_leaf * SB * (Tair + 273.15)^4 # Outcoming long-wave radiation (W m-2) for clear and cloudy sky
-  Rni <- SWRabs + LWRin - LWRouti # isothermal net radiation
-  rr <- p * Cp / (4 * em_leaf * SB * (Tair + 273.15)^3) # Radiative resistance
-  
-  # Boundary layer resistance
-  if (leaf_size > 3) {
-    rbl <- 1 / (1.5 * gflat * ((WS^jflat) / ((leaf_size / 1000)^(1 - jflat))))
-  } else {
-    rbl <- 1 / (1.5 * gcyl * ((WS^jcyl) / ((leaf_size / 1000)^(1 - jcyl)))) # A flat leaf if > 3mm
-  } #                    # a needle, formula for a cylinder
-  
-  g_bl <- 1 / rbl * 1000 * 40 #      #leaf boundary layer conductance in mmol/s/m2
-  rblr <- 1 / (1 / rbl + 1 / rr) # 
-  
-  # If gs is directly computed
-  # if (g_s) {
-  #   rst <- 1 / g_s * 1000 * 40
-  # } # conversion fromm mmol/s/m2 to s/m
-  # # Else we used transpiration
-  
-  if(gs) {rst=1/gs*1000*40} else {rst=9999.99 }
 
-  #gs <- (Einst / VPD * 101.3) 
-  
-  ym <- y * (rst / rblr) # 
-  
-  # compute Tleaf with linear approximation
-  Delta_T <- (ym * Rni * rblr / (p * Cp) - VPD) / (s + ym) # 
-  Tleaf <- Tair + Delta_T # 
-  T_Leaf <- Tleaf # 
-
-  return(c(T_Leaf, g_bl))
-}
-
-
-PPFD_umol.to.Rg_Watt <- function (PPFD, J_to_mol = 4.6, frac_PAR = 0.5) 
-
-  {
+PPFD_umol.to.Rg_Watt <- function (PPFD, J_to_mol = 4.6, frac_PAR = 0.5) {
   Rg <- PPFD/frac_PAR/J_to_mol
   return(Rg)
 }
@@ -222,8 +175,7 @@ PPFD_umol.to.Rg_Watt <- function (PPFD, J_to_mol = 4.6, frac_PAR = 0.5)
 #' @export
 #'
 #' @examples
-Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5) 
-{
+Rg_Watt.to.PPFD_umol <- function (Rg, J_to_mol = 4.6, frac_PAR = 0.5) {
   PPFD <- Rg * frac_PAR * J_to_mol
   return(PPFD)
 }
