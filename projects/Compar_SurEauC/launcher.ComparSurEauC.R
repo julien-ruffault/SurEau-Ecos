@@ -1,7 +1,7 @@
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### #
-# Test Launcher to run SurEau-ECOS (V4.0) on Champenoux
-# Authors : <Julien Ruffault (julien.ruff@gmail.com)>
-#           <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
+# Test Launcher to compare SurEau-ECOS with Sureau-C (Cochard et al 2021 AFS)
+# Authors : <Nicolas Martin-StPaul (nicolas.martin@inrae.fr)>
+#           <Julien Ruffault (julien.ruff@gmail.com)>
 #           <Francois Pimont (francois.pimont@inrae.fr)>
 # ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
@@ -24,20 +24,15 @@ output_path               <- paste0(mainDir,'/projects/Compar_SurEauC/test.csv')
 
 # create model input files --------------------------------------------------
 modeling_options     <- create.modeling.options(timeStepForEvapo=1,
-                                                constantClimate=T,
-                                                stomatalRegFormulation = "Sigmoid",
-                                                numericalScheme = 'Implicit',
-                                                defoliation = F,
-                                                resetSWC = T)       
-
-modeling_options     <- create.modeling.options(timeStepForEvapo=1,
                                                 compOptionsForEvapo = 'Normal',
                                                 numericalScheme = 'Implicit',
                                                 constantClimate=T,
                                                 stomatalRegFormulation = "Sigmoid",
-                                                defoliation = F, resetSWC=T)     
+                                                defoliation = F, 
+                                                thresholdMortality =100,
+                                                resetSWC=T,
+                                                transpirationModel="Jarvis")     
 
-modeling_options$thresholdMortatliy <- 100
 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                        
                                                       endYearSimulation = 1990,
@@ -60,11 +55,11 @@ vegetation_parameters <- create.vegetation.parameters(listOfParameters=TTT, stan
 
 vegetation_parameters$kPlantInit
 
+#On mets le gmin Tronc à 0 pour limiter les interférence avec gmin root+Trunk+Branch
 vegetation_parameters$gmin_T<-0
 vegetation_parameters$k_LSymInit <- 1.5
 vegetation_parameters$k_TSymInit <- 0.26
 vegetation_parameters$VolumeLiving_TRB <- 7
-
 
 vegetation_parameters$LDMC <- 500
 
@@ -88,7 +83,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 # DATARV=read.table(paste0(mainDir,"/Projects/Compar_SurEauC/nico_out4_ter.csv"), dec=",", sep=";", h=T)
 # DATARV=read.table(paste0(mainDir,"/Projects/Compar_SurEauC/nico_out2.csv"), dec=",", sep=";", h=T)
 # DATARV=read.table(paste0(mainDir,"/Projects/Compar_SurEauC/nico11_gbark0.csv"), dec=",", sep=";", h=T)
-DATARV=read.table(paste0(mainDir,"/Projects/Compar_SurEauC/nico12.csv"), dec=",", sep=";", h=T)
+DATARV = read.table(paste0(mainDir,"/Projects/Compar_SurEauC/nico12.csv"), dec=",", sep=";", h=T)
 
 head(DATARV)
 
@@ -96,6 +91,23 @@ head(DATARV)
 # # for analyses / subdaily time scales 
 filename  = paste0(mainDir,"/Projects/Compar_SurEauC/test.csv")
 DATA = read.csv(filename,header=T, dec='.',sep="")
+
+FluxTot= DATA$fluxSoilToCollar1_mm+DATA$fluxSoilToCollar2_mm+DATA$fluxSoilToCollar3_mm
+Fluxmol=DATA$Elim+DATA$Emin
+plot(FluxTot, type='l')
+lines(DATA$transpiration_mm, col=2)
+plot(FluxTot~Fluxmol)
+
+quartz()
+plot(DATA$Elim, type='l')
+lines(DATA$Emin, type='l', col=2)
+
+
+quartz()
+plot(DATA$k_Plant, type='l')
+
+
+
 DATA$DD = as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
 
 SWStot = DATA$SWS1+DATA$SWS2+DATA$SWS3
@@ -147,13 +159,10 @@ par(mfrow=c(2,3))
 plot(DATA$Tair[2:25], type='l', ylim=c(15,35), ylab="Air temp")
 lines(DATARV$T_air[1:24], type='l', ylim=c(15,35), col =2)
 legend(1, 35,  c("SurEau.Ecos", "SurEau.C"), col=c(1,2), lty=1)
-
 plot(DATA$leafTemperature[2:25], type='l', ylim=c(15,35), ylab="Leaf temp")
 lines(DATARV$T_leaf[1:24], type='l', ylim=c(15,35), col =2)
-
 plot(DATA$leafVPD[2:25], type='l', ylab="VPD_Leaf")
 lines(DATARV$VPD_Leaf[1:24], type='l', col =2)
-
 plot(DATA$Elim[2:49]-DATA$Emin[2:49],type='l', ylab="E_stom", ylim=c(0,1.3))
 lines(DATARV$E_stomata[1:48]-DATARV$E_cuti_m2[1:48], col=adjustcolor('firebrick1', alpha.f=0.6))
 
@@ -163,6 +172,17 @@ lines(DATARV$E_cuti_m2[1:48],type='l',col=adjustcolor('firebrick1', alpha.f=0.6)
 plot(DATA$Psi_LSym [2:49], type="l", ylab="P_l_sym", ylim=c(-1.9,0) )
 lines(DATARV$P_leaf_sym [1:48], type='l', col =2)
 lines(DATARV$P_evap_apo [1:48], type='l', col =2, lty=2)
+
+quartz()
+par(mfrow=c(2,3))
+plot(DATA$gs_lim[2:49], type="l", ylab="gs")
+lines(DATARV$g_s [1:48],type='l',col=adjustcolor('firebrick1', alpha.f=0.6))
+plot(DATA$gcanopy_lim [2:49], type="l", ylab="gs")
+lines(DATARV$g_canopy [1:48],type='l',col=adjustcolor('firebrick1', alpha.f=0.6))
+plot(DATA$Psi_LSym [2:49], type="l", ylab="P_l_sym", ylim=c(-1.9,0) )
+lines(DATARV$P_leaf_sym [1:48], type='l', col =2)
+lines(DATARV$P_evap_apo [1:48], type='l', col =2, lty=2)
+
 
 
 
@@ -214,6 +234,10 @@ legend(20, 3, c("OutPut", "recompute"), col=c(1,2), lty=1)
 plot(VPD_Leaf_Nico[1:48], col=2, type='l', main = "Nico")
 lines(DATA$leafTemperature[1:48])
 
+<<<<<<< HEAD
+
+
+=======
 plot(DATA$gmin,type='l')
 lines(DATARV$g_cuti,col=2)
 
@@ -225,6 +249,7 @@ lines(DATARV$T_leaf[1:24], type='l', ylim=c(15,35), col =2)
 
 plot(DATA$Emin,type='l')
 lines(DATARV$E_cuti_m2,col=2)
+>>>>>>> 08c3efe5c6c2cbb942d927b024362df4d9c3c6ce
 
 
 plot(DATARV$g_canopy[1:48], type='l', ylim=c(0,200))

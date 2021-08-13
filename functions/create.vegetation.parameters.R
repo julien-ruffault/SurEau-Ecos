@@ -20,13 +20,21 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   
   if (!missing(filePath))
   {TTT = read.vegetation.file(filePath,modeling_options=modeling_options)}
-
-  if(missing(filePath) &  !missing(listOfParameters))
+  
+  if(!missing(listOfParameters))
   {TTT=listOfParameters}
-
+  
+  
+  if(!missing(listOfParameters) & !missing(filePath))
+  {TTT=listOfParameters
+  warning("list of parameters are given by user")
+  }
+  
+  
   if(missing(filePath) &  missing(listOfParameters))
   {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
-
+  
+  
 
   TTT$LAImax =stand_parameters$LAImax
     
@@ -49,6 +57,8 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   TTT$k_TLInit <- conduc$k_TLInit
   TTT$k_RTInit <- conduc$k_RTInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
+  TTT$kPlantInit <- conduc$kPlantInit
+  
   
   TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB/TTT$LAImax # convert from L/m2soil to L/m2leaf
   

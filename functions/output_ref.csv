@@ -8,6 +8,7 @@ k_RT3;WBveg;k_RT;3;4
 k_TL;WBveg;k_TL;1;4
 k_LSym;WBveg;k_LSym;1;4
 k_TSym;WBveg;k_TSym;1;4
+k_Plant;WBveg;k_Plant;1;4
 C_LSym;WBveg;C_LSym;1;4
 C_TSym;WBveg;C_TSym;1;4
 C_LApo;WBveg;C_LApo;1;4
@@ -28,6 +29,10 @@ Q_LApo_sat_mmol;WBveg;Q_LApo_sat_mmol;1;4
 Q_TApo_sat_mmol;WBveg;Q_TApo_sat_mmol;1;4
 Q_LSym_sat_mmol;WBveg;Q_LSym_sat_mmol;1;4
 Q_TSym_sat_mmol;WBveg;Q_TSym_sat_mmol;1;4
+Q_LApo_L;WBveg;Q_LApo_L;1;4
+Q_TApo_L;WBveg;Q_TApo_L;1;4
+Q_LSym_L;WBveg;Q_LSym_L;1;4
+Q_TSym_L;WBveg;Q_TSym_L;1;4
 gmin_T;WBveg;gmin_T;1;4
 gmin;WBveg;gmin;1;4
 gs;WBveg;gs;1;4

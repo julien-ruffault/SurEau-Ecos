@@ -31,6 +31,7 @@ new.WBveg <- function(veg_params) {
   WBveg$Psi_AllSoil = 0
   #----Conductance & capacitance (mmol/m2/s/MPa) Here on leaf area basis but they are to be updated as a function symplasm conductance and leaf area
   # hydraulic conductances
+  WBveg$k_Plant <-  WBveg$params$kPlantInit  # constant value during simulation  
   WBveg$k_LSym <-  WBveg$params$k_LSymInit  # constant value during simulation   
   WBveg$k_TSym <-  WBveg$params$k_TSymInit  # constant value during simulation 
   WBveg$k_RT   <-  NA # is updated in compute.kplant.WBveg
@@ -127,6 +128,11 @@ new.WBveg <- function(veg_params) {
   WBveg$Q_TSym_sat_mmol   <- 0
   WBveg$Q_TSym_sat_L      <- 0
 
+  # Q Trunk and Leaf apo and symp in liter/kg TODO 13/08/2021: better in mmol?
+  WBveg$Q_LApo_L      <- 0
+  WBveg$Q_TApo_L      <- 0
+  WBveg$Q_LSym_L      <- 0
+  WBveg$Q_TSym_L      <- 0
   
   WBveg$Delta_Q_LApo_mmol_diag <- 0
   
@@ -269,24 +275,37 @@ compute.interception.WBveg <- function(WBveg, ppt) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute water stocks in leaves/wood in SUREAU_ECOS (one vegetation layer only)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-compute.waterStorage.WBveg <- function(WBveg, VPD) {
+compute.waterStorage.WBveg <- function(WBveg, VPD)
+{
   
-  # Dead FMC [%]
-  WBveg$DFMC <- compute.DFMC(VPD)
   
   #----Symplasmic canopy water content of the leaves----
   RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
   Q_LSym <- max(0,  RWC_LSym) * WBveg$Q_LSym_sat_L
+  WBveg$Q_LSym_L <- Q_LSym
   WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000))
   
-  #---Apoplasmic water content-------------------------------------------------
+  #---Apoplasmic water content of the leaves-------------------------------------------------
   Q_LApo = (1-WBveg$PLC_Leaf/100) *  WBveg$Q_LApo_sat_L
+  WBveg$Q_LApo_L <- Q_LApo
   WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac_Leaf / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
-  #------LFMC total---- (Apo+Symp) --------------------------------------------
+  #------LFMC leaf total---- (Apo+Symp) --------------------------------------------
   WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
   
-  #- FMCcanopy 
+  #----Symplasmic canopy water content of the trunk----
+  RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Trunk, Esymp = WBveg$params$EpsilonSymp_Trunk, Pmin = WBveg$Psi_TSym) # Relative water content (unitless)
+  Q_TSym <- max(0,  RWC_TSym) * WBveg$Q_TSym_sat_L
+  WBveg$Q_TSym_L <- Q_TSym
+  
+  #----Apoplasmic water content of the trunk-----
+  Q_TApo = (1-WBveg$PLC_Trunk/100) *  WBveg$Q_TApo_sat_L
+  WBveg$Q_TApo_L <- Q_TApo
+  
+  
+  #- FMCcanopy
+  # Dead FMC [%]
+  WBveg$DFMC <- compute.DFMC(VPD)
   # Water quantity of dead foliage (l/m2 sol ou mm)
   Q_LDead <- (WBveg$DFMC / 100) * WBveg$DMDeadCanopy / 1000
   WBveg$FMCCanopy <- 100 * (Q_LApo + Q_LSym + Q_LDead) / (WBveg$DMLiveCanopy / 1000 + WBveg$DMDeadCanopy / 1000)
@@ -316,14 +335,19 @@ compute.evapoIntercepted.WBveg <- function(WBveg, ETP) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # updateKplant
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-update.kplant.WBveg <- function(WBveg,WBsoil) {
+update.kplant.WBveg <- function(WBveg, WBsoil) {
+  
   # calculate k_RT and k_TL with cavitation
   WBveg$k_RT   = WBveg$params$k_RTInit * (1-WBveg$PLC_Trunk/100)
+  
   WBveg$k_TL   = WBveg$params$k_TLInit * (1-WBveg$PLC_Leaf/100)
   
   # Root from root length
-  WBveg$kSoilToCollar    <- kseriesum(WBsoil$kSoil, WBveg$k_RT) # conductance from soil to collar (two resitances in series Rsoil and Rroot)
-
+  WBveg$kSoilToCollar    <- kseriesum(WBsoil$kSoil, WBveg$k_RT) # conductance from soil to collar (two resistances in series Rsoil and Rroot)
+  
+  # Compute k_plant (from root to leaf) for diagnostic only
+  WBveg$k_Plant <-  1/ (1 /sum(WBveg$k_RT) + 1/WBveg$k_TL + 1/WBveg$k_LSym)
+  
   return(WBveg) 
 }
 
@@ -381,7 +405,8 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
                                PsiLeaf =WBveg$Psi_LSym,  
                                leaf_size=50, 
                                leaf_angle=45, 
-                               TurnOffEB=F) 
+                               TurnOffEB=F,
+                               transpirationModel = modeling_options$transpirationModel) 
   
       
     WBveg$leafTemperature <-TGbl_Leaf [1]
@@ -390,9 +415,9 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
     
     WBveg$Ebound = calculate.Ebound.Granier(ETP = WBclim$ETP,LAI = WBveg$LAI,timeStep = Nhours)
     
-    
     # Cuticular conductances and transpiration 
-    WBveg$gmin  <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
+    WBveg$gmin  <- compute.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
+    #TODO : ATTENTION PAS DE CALCUL DE GCROWN ici....:
     WBveg$Emin  <- WBveg$gmin* WBveg$leafVPD /101.3
     WBveg$EminT <-  WBveg$params$fTRBToLeaf * WBveg$gmin_T* WBveg$leafVPD /101.3
     #compute current stomatal regulation
@@ -402,22 +427,27 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
     dbxmin = 1e-100
     WBveg$Eprime = WBveg$Ebound * regul$regulFactPrime + dbxmin
     
-    }else if (modeling_options$transpirationModel=='Jarvis'){
+    } 
+  else if (modeling_options$transpirationModel=='Jarvis')
+      {
   # calculate Tleaf, leafVPD and gBL 
-      
-      Einst= WBveg$Elim + WBveg$Emin
-      
-      TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
-                                 PAR=WBclim$PAR, 
-                                 POTENTIAL_PAR = WBclim$Potential_PAR,
-                                 WS = WBclim$WS, 
-                                 RH = WBclim$RHair_mean,
-                                 Einst =Einst,
-                                 PsiLeaf =WBveg$Psi_LSym,  
-                                 leaf_size=50, 
-                                 leaf_angle=45, 
-                                 TurnOffEB=F) 
-      
+  Einst= WBveg$Elim + WBveg$Emin
+  
+  # calculate Tleaf, leafVPD and gBL 
+  TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
+                             PAR=WBclim$PAR, 
+                             POTENTIAL_PAR = WBclim$Potential_PAR,
+                             WS = WBclim$WS, 
+                             RH = WBclim$RHair_mean,
+                             gs = WBveg$gs_lim, 
+                             g_cuti = WBveg$gmin,
+                             PsiLeaf =WBveg$Psi_LSym,  
+                             leaf_size=50, 
+                             leaf_angle=45, 
+                             TurnOffEB=F,
+                             transpirationModel = modeling_options$transpirationModel) 
+  
+
   WBveg$leafTemperature <-TGbl_Leaf [1]
   WBveg$gBL = TGbl_Leaf[2]
   WBveg$leafVPD = TGbl_Leaf[3]
@@ -428,7 +458,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   WBveg$gCrown  = compute.gCrown(gCrown0 = WBveg$params$gCrown0, windSpeed = WBclim$WS)
   
   # Cuticular conductances and transpiration 
-  WBveg$gmin <- calcul.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
+  WBveg$gmin <- compute.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- compute.Emin(gmin = WBveg$gmin, gBL=WBveg$gBL, gCrown = WBveg$gCrown, VPD = WBveg$leafVPD)
   WBveg$EminT <-  WBveg$params$fTRBToLeaf * compute.Emin(gmin = WBveg$gmin_T,gBL=WBveg$gBL, gCrown=WBveg$gCrown, VPD= WBclim$VPD)
   #compute current stomatal regulation
@@ -458,17 +488,18 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   
   
   # update Tleaf according to new conductance to avoid large gaps (comestic)
-  TGbl_Leaf <- compute.Tleaf(Tair = WBclim$Tair_mean, 
-                             PAR = WBclim$PAR, 
+  TGbl_Leaf <- compute.Tleaf(Tair=WBclim$Tair_mean, 
+                             PAR=WBclim$PAR, 
                              POTENTIAL_PAR = WBclim$Potential_PAR,
                              WS = WBclim$WS, 
                              RH = WBclim$RHair_mean,
                              gs = WBveg$gs_lim, 
                              g_cuti = WBveg$gmin,
-                             PsiLeaf = WBveg$Psi_LSym,  
-                             leaf_size = 50, 
-                             leaf_angle = 45, 
-                             TurnOffEB = F) 
+                             PsiLeaf =WBveg$Psi_LSym,  
+                             leaf_size=50, 
+                             leaf_angle=45, 
+                             TurnOffEB=F,
+                             transpirationModel = modeling_options$transpirationModel) 
   
   WBveg$leafTemperature <-TGbl_Leaf [1]
   WBveg$gBL = TGbl_Leaf[2]
@@ -545,7 +576,6 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
   # B. SAVING SOLUTION AT NEXT TIME STEP IN WBveg
   WBveg = WBveg_np1
   
-
   WBveg <- compute.transpiration.WBveg(WBveg, WBclim_next, Nhours,modeling_options=modeling_options) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
   
 
@@ -738,6 +768,7 @@ compute.regulFact <- function(psi, params, regulationType) {
     rs <- Rs.Comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$EpsilonSymp_Leaf, Pmin = psi)
     turgor <- turgor.comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$EpsilonSymp_Leaf, Rstemp = rs)
     regulFact <- max(0, min(1, turgor / params$turgorPressureAtGsMax))
+    #regulFact <- max(0, min(1, turgor / params$minTurgorAtGsMax))
 
     if (regulFact == 1 | regulFact == 0) {
       regulFactPrime <- 0
@@ -750,7 +781,7 @@ compute.regulFact <- function(psi, params, regulationType) {
 
 yearlyInitialisation.WBveg <- function(WBveg){
   
-  if(WBveg$PLC_Trunk >85 | WBveg$PLC_Leaf>85)
+  if(WBveg$PLC_Trunk >85 | WBveg$PLC_Leaf >85)
   {
   WBveg <- new.WBveg(WBveg$params) 
   }
