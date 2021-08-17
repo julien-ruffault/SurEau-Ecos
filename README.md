@@ -1,6 +1,6 @@
 --  SurEau-Ecos_v1.x.x  --
  
-SurEau-Ecos is a mechanistic plant water model designed to simulate water fluxes, fuel moisture content and plant mortality at stand level according to a set of vegetation traits and soil physical properties 
+SurEau-Ecos is a mechanistic plant water model designed plant hydraulic failure. It computes water fluxes, turgor loss, cavitation, water content of symplas and apoplasm for canopy leaves and stems. It uses soil preroperties, daily/hourly climate inputs and bunch of leaf and hydraulic traits.
  
 Authors : Julien Ruffault (julien.ruff@gmail.com)
           François Pimont (francois.pimont@inrae.fr)
