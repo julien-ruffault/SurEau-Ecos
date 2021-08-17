@@ -44,7 +44,7 @@ climate_data          <- create.climate.data(filePath = climateData_path,
                                              modeling_options = modeling_options,
                                              simulation_parameters = simulation_parameters) #
 stand_parameters      <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
-soil_parameters       <- create.soil.parameters(filePath=soilParameters_path, depths = c(0.35 ,0.7,1.05)) 
+soil_parameters       <- create.soil.parameters(filePath=soilParameters_path) 
 vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, 
                                                       stand_parameters = stand_parameters, 
                                                       soil_parameter = soil_parameters,
@@ -69,6 +69,7 @@ DATA = read.csv(filename,header=T, dec='.',sep="")
 head(DATA)
 strptime(DATA$Time,format=)
 DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+
 # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='springgreen4')

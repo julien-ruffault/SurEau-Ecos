@@ -99,8 +99,11 @@ lines(DATA$transpiration_mm, col=2)
 plot(FluxTot~Fluxmol)
 
 quartz()
-plot(DATA$Elim, type='l')
-lines(DATA$Emin, type='l', col=2)
+par(mfrow=c(2,2))
+plot(DATA$Q_LSym_L, type='l')
+plot(DATA$Q_LApo_L, type='l')
+plot(DATA$Q_TSym_L, type='l')
+plot(DATA$Q_TApo_L, type='l')
 
 
 quartz()

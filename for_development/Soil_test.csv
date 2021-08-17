@@ -2,6 +2,9 @@ Name;Value
 RFC_1;0
 RFC_2;0
 RFC_3;0
+depth1;0.35
+depth2;0.7
+depth3;1.05
 field_capacity;0.2776
 wilting_point;0.12379
 alpha_vg;0.0005

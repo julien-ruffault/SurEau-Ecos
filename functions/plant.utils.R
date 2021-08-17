@@ -365,7 +365,7 @@ compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, Einst ,P
   e_sat = 611.21*exp((18.678-Tleaf/234.5)*Tleaf/(257.14+Tleaf))   #;    // saturation vapour water pressure at Tair in Pa from Buck's equation
   e = e_sat*exp(PsiLeaf*2.16947115/(Tleaf+273.15))
   #// effect of leaf water potential on e
-  VPD_Leaf = (e-e_air)/1000 #//vpd between leaf and air in kPa
+  VPD_Leaf = max(0, (e-e_air)/1000) #//vpd between leaf and air in kPa
 
 
 

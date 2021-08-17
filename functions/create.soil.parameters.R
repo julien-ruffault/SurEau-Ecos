@@ -10,24 +10,22 @@
 #' @export
 #'
 #' @examples
-create.soil.parameters<- function(filePath, listOfParameters, depths = c(0.3, 1, 4), default_soil = F) {
+create.soil.parameters<- function(filePath, listOfParameters, default_soil = F) {
   
    # note : warning("if run on puechabon : add an Offset  on psisoil (-0.3) to match observations --> / modify  in function 'computeSoilConductanceAndPsi.WBsoil'  ") 
     
-    .soilParams <- list()
-    .soilParams$depth =depths
-    .soilParams$layer_thickness <- numeric(3)
-    .soilParams$layer_thickness[1] <- depths[1]
-    .soilParams$layer_thickness[2] <- depths[2] - depths[1]
-    .soilParams$layer_thickness[3] <- depths[3] - depths[2]
-    
-    
     if (default_soil == T) # default if no file is provided
     {
-      .soilParams$rock_fragment_content <- c(40, 80, 93) # coarse elements (stones/rocks) in each layer (%)
-      
-      # derniers reglages sol sur Puechabon
+      # .soilParams$rock_fragment_content <- c(40, 80, 93) # coarse elements (stones/rocks) in each layer (%)
+      #derniers reglages sol sur Puechabon
       .soilParams$rock_fragment_content <- c(40, 75, 90)
+      
+      .soilParams$depth = c(0.3, 1, 4)
+      
+      .soilParams$layer_thickness <- numeric(3)
+      .soilParams$layer_thickness[1] <- .soilParams$depth[1]
+      .soilParams$layer_thickness[2] <- .soilParams$depth[2] - .soilParams$depth[1]
+      .soilParams$layer_thickness[3] <- .soilParams$depth[3] - .soilParams$depth[2]
       
       #--------------
       # A calculer pour diagnostique
@@ -69,10 +67,24 @@ create.soil.parameters<- function(filePath, listOfParameters, depths = c(0.3, 1,
       if(missing(filePath) &  !missing(listOfParameters))
       {TTT=listOfParameters}
       
+      if(!missing(listOfParameters) & !missing(filePath))
+      {TTT=listOfParameters
+      warning("list of parameters are given by user")
+      }
+      
       if(missing(filePath) &  missing(listOfParameters))
       {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
       
-    
+      
+      .soilParams <- list()
+      
+      .soilParams$depth =c(TTT$depth1, TTT$depth2, TTT$depth3)
+      
+      .soilParams$layer_thickness <- numeric(3)
+      .soilParams$layer_thickness[1] <- .soilParams$depth[1]
+      .soilParams$layer_thickness[2] <- .soilParams$depth[2] - .soilParams$depth[1]
+      .soilParams$layer_thickness[3] <- .soilParams$depth[3] - .soilParams$depth[2]
+      
       .soilParams$gSoil0 <- TTT$gSoil0
       
       .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
@@ -116,7 +128,8 @@ create.soil.parameters<- function(filePath, listOfParameters, depths = c(0.3, 1,
     return(.soilParams)
   } # end of the function
   
-read.soil.file <- function(filePath){ 
+read.soil.file <- function(filePath)
+  { 
   if (file.exists(filePath)) {
     io <- data.frame(read.csv(filePath,header=T,sep=';',dec='.'))
   } else {
@@ -129,6 +142,9 @@ read.soil.file <- function(filePath){
     "RFC_1",
     "RFC_2",
     "RFC_3",
+    "depth1",
+    "depth2",
+    "depth3",
     "field_capacity",
     "wilting_point",
     "alpha_vg",
