@@ -588,7 +588,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
   
   WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
   WBveg$fluxSoilToCollar_mm  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
-  WBveg$transpiration_mm     <- convertFluxFrom_mmolm2s_To_mm(WBveg$Emin+WBveg$Emin_T+ WBveg$ELim) # total flux in mm 
+  WBveg$transpiration_mm     <- convertFluxFrom_mmolm2s_To_mm((WBveg$Emin + WBveg$EminT + WBveg$Elim),LAI = WBveg$LAI, timeStep = Nhours) # total flux in mm 
 
   
   

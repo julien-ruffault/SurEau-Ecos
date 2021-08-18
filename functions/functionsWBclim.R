@@ -99,6 +99,7 @@ new.WBclimHour <- function(WBclim, WBveg, modeling_options, lat, lon, PTcoeff) {
     )
   })
   
+  WBclimHour$RHair_mean[WBclimHour$RHair_mean<0] = 0.5
   # Wind speed -----------------------------------------------------------------
   WBclimHour$WS <- rep(WBclim$WS_mean, each = 24) # no time interpolation for now
   # VPD -----------------------------------------------------------------------
