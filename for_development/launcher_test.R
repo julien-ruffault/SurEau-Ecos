@@ -11,12 +11,12 @@ mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))        
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                             # do not modify 
 
 # climate data 
-climateData_path          <- paste0(mainDir,'/for_development/Climat_constant_test_champenoux.csv') # <-- indicate here the path to input climate data 
+climateData_path          <- paste0(mainDir,'/for_development/Climat_constant_test.csv') # <-- indicate here the path to input climate data 
 
 
 # Vegetation and soil parameters
-soilParameters_path       <- paste0(mainDir,'/for_developement/Soil_test.csv')
-vegetationParameters_path <- paste0(mainDir,'/for_developement/Parameters_test_quercus_evergreen.csv')
+soilParameters_path       <- paste0(mainDir,'/for_development/Soil_test.csv')
+vegetationParameters_path <- paste0(mainDir,'/for_development/Parameters_test_quercus_evergreen.csv')
 #standParameters_path      <- paste0(mainDir,'datasets/test_data/stand_champenoux_test.csv')  
 
 # output
@@ -64,11 +64,10 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 # output  Analysis -------------------------------------------------------------
 
 # for analyses / subdaily time scales 
-filename  = paste0(mainDir,"/for_tests/test.csv")
+filename  = paste0(mainDir,"/for_development/test.csv")
 DATA = read.csv(filename,header=T, dec='.',sep="")
 head(DATA)
-strptime(DATA$Time,format=)
-DATA$DD= as.POSIXct(DATA$Time,origin = "1970-01-01",tz = "UTC")
+DATA$DD= as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 
 # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')

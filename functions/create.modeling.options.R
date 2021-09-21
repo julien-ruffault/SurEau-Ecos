@@ -55,7 +55,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     Lcav = 1,
                                     Tcav = 1,
                                     Eord=1,
-                                    numericalScheme = c("Implicit","Semi-Implicit"),
+                                    numericalScheme = c("Implicit","Semi-Implicit","Explicit"),
                                     stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor")) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
