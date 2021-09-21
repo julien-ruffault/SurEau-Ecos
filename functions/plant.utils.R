@@ -279,10 +279,10 @@ compute.Tleaf <- function(Tair, PAR, POTENTIAL_PAR, WS, RH, gs, g_cuti, Einst ,P
   jcyl  <- 0.6 # //  coefficient in rbl equation  none
 
 
-  em_leaf <- 0.97 #    // emissivity    none
-  SB <- 5.6704e-8 #    //  Stefan-Boltzman constant    W m-2 K-4
+  em_leaf <- 0.97  #    // emissivity    none
+  SB <- 5.6704e-8  #    //  Stefan-Boltzman constant    W m-2 K-4
   p  <- 1.292      #   // density of dry air    kg/m3
-  Cp <- 1010      #  // heat capacity of dry air    J kg-1 K-1
+  Cp <- 1010       #  // heat capacity of dry air    J kg-1 K-1
   y  <- 0.066      # // psychrometric constant    kPa K-1
 
   a  <- 0.61121    # // coefficient in esat equation    kPa

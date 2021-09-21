@@ -85,7 +85,17 @@ create.climate.data <- function(filePath, climateData, modeling_options, simulat
     warning("Several values of RHair_min were >100% in the input climate data and were set to 100 %.")
   }
 
-
+  if (any(climate_data$Tair_min > (climate_data$Tair_mean-0.5))) {
+    climate_data[climate_data$Tair_min > (climate_data$Tair_mean-0.5), "Tair_min"] <-climate_data[climate_data$Tair_min > (climate_data$Tair_mean-0.5), "Tair_mean"] -0.5
+    warning(" values of Tair_min were > Tair_mean in the input climate data and set to 'Tair_mean'")
+  }
+  
+  if (any(climate_data$Tair_max < (climate_data$Tair_mean+0.5))) {
+    climate_data[climate_data$Tair_max < (climate_data$Tair_mean+0.5), "Tair_max"] <-climate_data[climate_data$Tair_max < (climate_data$Tair_mean+0.5), "Tair_mean"] +0.5
+    warning(" values of Tair_max were < Tair_mean in the input climate data and set to 'Tair_mean'")
+  }
+  
+  
   # Select rows of climate_data according to simulation parameters--------------
   if (modeling_options$constantClimate == F) {
     # check and format  DATES
