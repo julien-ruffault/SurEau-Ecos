@@ -46,7 +46,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
       }
       climDay <- new.WBclim(climate_data = climate_data, YEAR = YEAR, DOY = DAY) # Create WBclim for the day
       veg_var_list <- compute.pheno.WBveg(WBveg = veg_var_list, temperature = climDay$Tair_mean, DOY = DAY) # LAI and update
-      veg_var_list <- updateLAIandStocks.WBveg(WBveg = veg_var_list, modeling_options = modeling_options)
+      veg_var_list <- updateLAIandStocks.WBveg(WBveg = veg_var_list, modeling_options = modeling_options) # update reservoirs, Q and C 
       climDay <- compute.RnAndETP.WBclim(WBclim = climDay, WBveg = veg_var_list, RnFormulation = modeling_options$RnFormulation, ETPFormulation = modeling_options$ETPFormulation) # calculate Rn and ETP
       veg_var_list <- compute.interception.WBveg(WBveg = veg_var_list, ppt = climDay$PPT) # vegetation interceptedWaterAmount  and pptSoil with Interpception by the canopy
       #browser()

@@ -20,7 +20,7 @@ new.WBveg <- function(veg_params) {
   WBveg$params$PsiTlp_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
   WBveg$params$PsiTlp_Trunk <-  WBveg$params$PiFullTurgor_Trunk*WBveg$params$EpsilonSymp_Trunk/(WBveg$params$PiFullTurgor_Trunk+WBveg$params$EpsilonSymp_Trunk)
   
-  
+
   # potentials 
   WBveg$Psi_LApo = 0
   WBveg$Psi_TApo = 0
@@ -39,13 +39,16 @@ new.WBveg <- function(veg_params) {
   WBveg$kSoilToCollar <- c("NA","NA","NA") # / conductance rhisophere for each soil layer
   
   #Capacitances 
-  #Symplasm capacitance updated as a function of water content and Leaf area (mmol/m2/MPa)
+  #Symplasm capacitance updated as a function of water content and Leaf area (mmol/m2leaf/MPa) /updated in update.capacitancesSymAndApo()  (NM : 25/10/2021)
   WBveg$C_LSym = NA 
   WBveg$C_TSym = NA
   
-  # For now, the aploplasmic cpacicantes are set to their initial values and not modified trouhgout the simulation. 
-  WBveg$C_LApo <- WBveg$params$C_LApoInit     # Capacitance apoplasmique Leaf (mmol/m2 of leaf/s/MPA) ref: Sureau-param-Cochard
-  WBveg$C_TApo <- WBveg$params$C_TApoInit     # Capacitance apoplasmique Trunk (mmol/m2 of leaf/s/MPA) ref: Sureau-param-Cochard
+  #Symplasm capacitance are initialised per m2sol and are updated acording to LAI for conversion in m2leaf (updated in update.capacitancesSymAndApo())  (NM : 25/10/2021)
+  WBveg$C_LApo = NA 
+  WBveg$C_TApo = NA
+  
+  # WBveg$C_LApo <- WBveg$params$C_LApoInit     # Capacitance apop Leaf (mmol/m2leaf/s/MPA) 
+  # WBveg$C_TApo <- WBveg$params$C_TApoInit     # Capacitance apo Trunk (mmol/m2leaf/s/MPA) 
   
 
   # Leaf and canopy conductance
@@ -112,19 +115,19 @@ new.WBveg <- function(veg_params) {
   WBveg$DMDeadCanopy    <- 0 # Dead Canopy dry matter [gMS/m2 soil]
   
   #---------------------# 
-  # Q leaf apo 
+  # Q leaf apo (mol/m2leaf)
   WBveg$Q_LApo_sat_mmol  <- 0
   WBveg$Q_LApo_sat_L <- 0
 
-  # Q trunk apo 
+  # Q trunk apo  (mol/m2leaf)
   WBveg$Q_TApo_sat_mmol <- 0
   WBveg$Q_TApo_sat_L <- 0
 
-  # Q leaf symplasm
+  # Q leaf symplasm (mol/m2leaf)
   WBveg$Q_LSym_sat_mmol   <- 0
   WBveg$Q_LSym_sat_L      <- 0
 
-  # Q Trunk symplasm
+  # Q Trunk symplasm (mol/m2leaf)
   WBveg$Q_TSym_sat_mmol   <- 0
   WBveg$Q_TSym_sat_L      <- 0
 
@@ -136,7 +139,6 @@ new.WBveg <- function(veg_params) {
   
   WBveg$Delta_Q_LApo_mmol_diag <- 0
   
-  
   WBveg$F_L_Cav <- 0
   WBveg$F_T_Cav <- 0
  
@@ -144,10 +146,6 @@ new.WBveg <- function(veg_params) {
 
   WBveg$PLC_Leaf  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
   WBveg$PLC_Trunk = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
-  
-  # initialize capacitance
-  WBveg <- update.capaSym.WBveg(WBveg) 
-  # NB conductance are computed after when soil, pheno, etc are done
   
   return(WBveg)
 }
@@ -203,6 +201,7 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY) {
     }
     
   }
+
   return(WBveg)
 }
 
@@ -234,15 +233,24 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   
   WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
-  
-  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
-  WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
+  WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / WBveg$LAI
   
   WBveg$Q_TSym_sat_L <- WBveg$params$VolumeLiving_TRB *WBveg$params$SymplasmicFrac_Trunk
   WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
+  WBveg$Q_TSym_sat_mmol_perLeafArea <- WBveg$Q_TSym_sat_mmol / max(1,WBveg$LAI)  #  used max(1,LAI) to avoid that Q_TSym_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf) 
   
+
+  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
+  WBveg$Q_LApo_sat_mmol_perLeafArea = WBveg$Q_LApo_sat_mmol/WBveg$LAI # modified by NM (25/10/2021)
+  
+
   WBveg$Q_TApo_sat_L <- WBveg$params$VolumeLiving_TRB*WBveg$params$ApoplasmicFrac_Trunk 
   WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
+  WBveg$Q_TApo_sat_mmol_perLeafArea = WBveg$Q_TApo_sat_mmol / max(1,WBveg$LAI) #used max(1,LAI) to avoid that Q_TApo_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf)  modified by NM (25/10/2021)
+  
+  
+  WBveg <- update.capacitancesApoAndSym.WBveg(WBveg)
   
   return(WBveg)
   
@@ -354,7 +362,7 @@ update.kplant.WBveg <- function(WBveg, WBsoil) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # update symplasmic plant capacitances for Trunk and leaves 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-update.capaSym.WBveg <- function(WBveg) {
+update.capacitancesApoAndSym.WBveg <- function(WBveg) {
   dbxmin <- 1e-100 # NM minimal double to avoid-INF
 
   #----Compute the relative water content of the symplasm----
@@ -366,8 +374,10 @@ update.capaSym.WBveg <- function(WBveg) {
     RWC_LSym_prime <- -WBveg$params$PiFullTurgor_Leaf / WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
   }
   # Compute the leaf capacitance (mmol/MPa/m2_sol)
-  WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol * RWC_LSym_prime
-
+  #WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol * RWC_LSym_prime
+  if (WBveg$LAI==0){ WBveg$C_LSym = 0 }else{ WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol_perLeafArea * RWC_LSym_prime} # changed 25/10/2021 by NM 
+ 
+  
   #----Trunk symplasmic canopy water content----
   RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Trunk, Esymp = WBveg$params$EpsilonSymp_Trunk, Pmin = WBveg$Psi_TSym - dbxmin) 
 
@@ -379,8 +389,18 @@ update.capaSym.WBveg <- function(WBveg) {
     RWC_TSym_prime <- -WBveg$params$PiFullTurgor_Trunk / WBveg$Psi_TSym^2
   }
   # Compute the capacitance (mmol/MPa/m2_sol)
-  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol * RWC_TSym_prime
-
+  #WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol * RWC_TSym_prime
+  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol_perLeafArea * RWC_TSym_prime #  changed 25/10/2021 by NM. --> Trunk capacitance per leaf area can only decrease with LAI (cannot increase when LAI<1 )
+  
+  
+  # update Capacitances Apo (NM : 25/10/2021) --> 
+  # WBveg$C_TApo = WBveg$params$C_TApoInit * (1/max(WBveg$LAI,1))
+  # WBveg$C_LApo = WBveg$params$C_LApoInit * (1/max(WBveg$LAI,1))
+  # 
+  WBveg$C_TApo = WBveg$params$C_TApoInit 
+  WBveg$C_LApo = WBveg$params$C_LApoInit 
+  
+  
   return(WBveg)
 }
 
@@ -540,7 +560,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       WBveg_tmp <- compute.transpiration.WBveg(WBveg_n, WBclim, Nhours, modeling_options) # transpi with climate at nph
       WBveg_np1 <- implicit.temporal.integration.atnp1(WBveg_tmp,  WBsoil_n, dt = Nhours * 3600 / nts, opt = opt)
       WBveg_np1 <- update.kplant.WBveg(WBveg_np1,WBsoil_n)
-      WBveg_np1 <- update.capaSym.WBveg(WBveg_np1)
+      WBveg_np1 <- update.capacitancesApoAndSym.WBveg(WBveg_np1)
       
       #browser()
       # QUANTITIES TO CHECK IF THE RESOLUTION IS OK
@@ -637,10 +657,10 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   
   PLC_prime_L = PLCPrime.comp(WBveg$PLC_Leaf,WBveg$params$slope_VC_Leaf)
   #K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
-  K_L_Cav = 0.05*(-opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt ) # avec WBveg$Q_LSym_sat en l/m2 sol
+  K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol_perLeafArea * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol # changed by NM (25/10/2021)
   PLC_prime_T = PLCPrime.comp(WBveg$PLC_Trunk,WBveg$params$slope_VC_Trunk)
   #K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
-  K_T_Cav = 0.05*(-opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt ) #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
+  K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol_perLeafArea * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign herehanged by NM (25/10/2021)
   
   
   # 2. While loop in order to decide if cavitation or not :
