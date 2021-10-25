@@ -27,7 +27,9 @@ modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                                 constantClimate=T,
                                                 stomatalRegFormulation = "Sigmoid",
                                                 thresholdMortality = 99,
-                                                numericalScheme = 'Semi-Implicit',
+                                                numericalScheme = 'Explicit',
+                                                compOptionsForEvapo = "Custom" ,
+                                                customSmallTimeStepInSec = 0.0001,
                                                 defoliation = F,
                                                 resetSWC=T)       
 

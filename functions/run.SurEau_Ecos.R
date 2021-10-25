@@ -72,7 +72,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
 
         # Compute plant hydraulic to the next time step
-        veg_var_list <- compute.plantNextTimeStep.WBveg(WBveg = veg_var_list, WBsoil = soil_var_list, Nhours = Clim_next$nHours, WBclim_current = Clim_current, WBclim_next = Clim_next, modeling_options = modeling_options)
+        veg_var_list <- compute.plantNextTimeStep.WBveg(WBveg = veg_var_list, WBsoil = soil_var_list, Nhours = Clim_next$nHours, WBclim_current = Clim_current, WBclim_next = Clim_next, modeling_options = modeling_options,WBoutput=model_output)
         # compute water storage in vegetation
         veg_var_list <- compute.waterStorage.WBveg(veg_var_list, VPD = Clim_next$VPD)
         # update soil water stocks after T and water release and update psi and conductance

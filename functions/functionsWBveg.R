@@ -516,7 +516,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute integration over time - checked FP 11/03/2021
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, modeling_options) {
+compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, modeling_options,WBoutput) {
   
   opt=modeling_options$compOptions
   # A. LOOP ON THE IMPLICIT SOLVER IN PSI, trying different time steps until results are OK
@@ -558,6 +558,12 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       WBveg_np1$fluxSoilToCollar_mm = convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
       WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar_mm)
       fluxSoilToCollarLargeTimeStep = fluxSoilToCollarLargeTimeStep + fluxSoilToCollar/nts # mean flux over one large time step
+      
+      # if (opt$numericalScheme == "Explicit" ) {
+      #   write.WBoutput(Date = NA, WBoutput = WBoutput, WBsoil = WBsoil, WBveg = WBveg_n, WBclim = WBclim_next)
+      # }
+      
+      
     } # end loop small time step
     # TESTS ON RESOLUTION
     WBveg_np1$Diag_deltaRegulMax = deltaRegulMax
@@ -625,12 +631,17 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   Emin_L_nph = WBveg$Emin 
   Emin_T_nph = WBveg$EminT
   
+
+  
   #Compute K_L_Cav et K_T_Cav
   
   PLC_prime_L = PLCPrime.comp(WBveg$PLC_Leaf,WBveg$params$slope_VC_Leaf)
-  K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
+  #K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
+  K_L_Cav = 0.05*(-opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt ) # avec WBveg$Q_LSym_sat en l/m2 sol
   PLC_prime_T = PLCPrime.comp(WBveg$PLC_Trunk,WBveg$params$slope_VC_Trunk)
-  K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
+  #K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
+  K_T_Cav = 0.05*(-opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt ) #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
+  
   
   # 2. While loop in order to decide if cavitation or not :
   # In order to account for the cavitation that occurs only when potentials go below their lowest value "cav" (formerly called "mem" in an earlier version)
@@ -652,7 +663,10 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     delta_L_cavs=c(0,1,0,1,0) # the fifth case is here in case no solution with others...
     delta_T_cavs=c(0,0,1,1,0)
   }
-
+  if (opt$numericalScheme=="Explicit"){ # in case of explicit we do the computation only once
+    delta_L_cavs=c(opt$Lcav)
+    delta_T_cavs=c(opt$Tcav)
+  }
   nwhilecomp = 0 # count the number of step in while loop (if more than 4 no solution and warning)
   while (((!LcavitWellComputed)|(!TcavitWellComputed))&(nwhilecomp<length(delta_L_cavs))) {
     #browser()
@@ -694,6 +708,25 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       Psi_td = (K_TL*Psi_LApo_n + K_TSym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil)+ delta_T_cav*K_T_Cav*Psi_TApo_cav)/(K_TL + K_TSym+sum(WBveg$kSoilToCollar)+delta_T_cav*K_T_Cav + dbxmin) # dbxmin to avoid 0/0
       Psi_TApo_np1 = alpha * Psi_TApo_n +(1-alpha) * Psi_td
       
+    } else if (opt$numericalScheme=="Explicit"){
+      # NB for cavitation we use the min(cav-current) because here cav is at time n-1
+      # psi L_apo
+      if (Psi_LApo_cav > Psi_LApo_n) {
+        print(paste0("Lcav",opt$Lcav))
+      }
+      if (Psi_TApo_cav > Psi_TApo_n) {
+        print(paste0("Tcav",opt$Tcav))
+      }
+      Psi_LApo_np1 = Psi_LApo_n + (dt/C_LApo) * (K_TL * (Psi_TApo_n - Psi_LApo_n) + K_LSym * (Psi_LSym_n - Psi_LApo_n) + delta_L_cav*K_L_Cav * max(Psi_LApo_cav - Psi_LApo_n,0))
+      # psi T_apo
+      Psi_TApo_np1 = Psi_TApo_n + (dt/C_TApo) * (K_TL * (Psi_LApo_n - Psi_TApo_n) + K_TSym * (Psi_TSym_n - Psi_TApo_n) + delta_T_cav*K_T_Cav * max(Psi_TApo_cav - Psi_TApo_n,0) + sum(WBveg$kSoilToCollar * (WBsoil$PsiSoil - Psi_TApo_n)))
+      
+    # determine the cfl for each cell 
+      cfl_LApo = C_LApo/(2*max(K_TL,K_LSym,K_L_Cav))
+      #cfl_LApo = C_LApo/(2*max(K_TL,K_LSym))
+      cfl_TApo = C_TApo/(2*max(K_TL,K_TSym,K_T_Cav,max(WBveg$kSoilToCollar)))
+    
+  
     }
       
     # 2.4 check if cavitation is well computed according to delta_cav, np1 and "cav"
@@ -717,7 +750,33 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     alpha = exp(-K_TSym/C_TSym*dt)
     Psi_td = (K_TSym*Psi_TApo_n - Emin_T_nph)/(K_TSym + dbxmin) # dbxmin to avoid 0/0
     Psi_TSym_np1 = alpha * Psi_TSym_n +(1-alpha) * Psi_td
-  }
+  } else if (opt$numericalScheme=="Explicit"){
+    # psi L_Sym_np1 and cfl
+
+    if(C_LSym==0){ Psi_LSym_np1 = ((K_LSym * Psi_LApo_n) - E_nph - Emin_L_nph)/(K_LSym ) # cas stationnaire lorsque C_Lsymp=0
+       cfl_LSym = 10
+    }else { 
+      Psi_LSym_np1 =  Psi_LSym_n + (dt/(C_LSym)) * (K_LSym * (Psi_LApo_n - Psi_LSym_n) - E_nph - Emin_L_nph)
+    cfl_LSym = C_LSym/(2*K_LSym)}
+   
+    # psi T_Sym_np1 and cfls
+    if (C_TSym==0){Psi_TSym_np1 = ((K_TSym * Psi_TApo_n) - Emin_T_nph)/(K_TSym )# cas stationnaire lorsque C_Lsymp=0
+    cfl_TSym = 10 # cfl non limitante
+    }else{Psi_TSym_np1 =  Psi_TSym_n + (dt/(C_TSym)) * (K_TSym * (Psi_TApo_n - Psi_TSym_n) - Emin_T_nph)
+    cfl_TSym = C_TSym/(2*K_TSym)}
+  
+
+    # print(paste0("cfl_LSym = ",cfl_LSym))
+    # print(paste0("cfl_TSym = ",cfl_TSym))
+    # print(paste0("cfl_LApo = ",cfl_LApo))
+    # print(paste0("cfl_TApo = ",cfl_TApo))
+    
+    cfl_all = min(cfl_LSym,cfl_TSym,cfl_LApo,cfl_TApo)
+    print(paste0("cfl_all = ",cfl_all))
+    if (cfl_all<=dt)
+    {stop('execution stopped because cfl<dt')}
+    
+    }
 
   
   #Step 4 : set computed values in WBveg and update Psi_cav, PLC and Psi_AllSoil
@@ -727,15 +786,26 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   WBveg$Psi_TSym<-min(-0.00001,Psi_TSym_np1)
   
   # Cavitation
-  if (WBveg$Psi_LApo < Psi_LApo_cav) {
-    WBveg$Psi_LApo_cav = WBveg$Psi_LApo
-    WBveg$PLC_Leaf = PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
+  if (opt$numericalScheme=="Explicit"){
+    psiref = min(-0.00001,Psi_LApo_n)  # the reference is at previous time step
+  } else {
+    psiref = WBveg$Psi_LApo  # the reference is at current time step for other modes
   }
-  if (WBveg$Psi_TApo < Psi_TApo_cav) {
-    WBveg$Psi_TApo_cav = WBveg$Psi_TApo
-    WBveg$PLC_Trunk = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
+  if (psiref < Psi_LApo_cav) {
+    WBveg$Psi_LApo_cav = psiref
+    WBveg$PLC_Leaf = PLC.comp(Pmin = psiref, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
+  }
+  if (opt$numericalScheme=="Explicit"){
+    psiref = min(-0.00001,Psi_TApo_n)  # the reference is at previous time step
+  } else {
+    psiref = WBveg$Psi_TApo  # the reference is at current time step for other modes
+  }
+  if (psiref < Psi_TApo_cav) {
+    WBveg$Psi_TApo_cav = psiref
+    WBveg$PLC_Trunk = PLC.comp(Pmin = psiref, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
   }
   
+ # browser()
   WBveg$Psi_AllSoil <- sum (WBveg$kSoilToCollar * WBsoil$PsiSoil)/sum (WBveg$kSoilToCollar)
   return(WBveg)
 }
