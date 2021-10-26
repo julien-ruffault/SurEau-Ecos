@@ -113,7 +113,7 @@ PsiTSymp_Ecos = DATA$Psi_TSym[1:(nrow(DATA)-1)]
 dQ_TSymp_Ecos = (DATA$Q_TSym_L[1:(nrow(DATA)-1)] - DATA$Q_TSym_L[2:(nrow(DATA))]) *1000000/18
 dPsi_TSymp_Ecos = DATA$Psi_TSym[1:(nrow(DATA)-1)] - DATA$Psi_TSym[2:(nrow(DATA))]
 C_TSymp_Ecos = dQ_TSymp_Ecos/dPsi_TSymp_Ecos
-
+C_TSymp_EcosInt = DATA$C_TSym[2:24]*6
 
 #RV
 PsiTSymp_RV = DATARV$P_trunk_s
@@ -129,24 +129,13 @@ barplot(c(Q_S_InitRV = Q_TSymp_RV[1]*1000000/18,
 
 par(mar=c(4.1,4.1,4.1,4.1))
 plot(C_TSymp_RV[1:24], col=adjustcolor(2, 1), type='b', ylab="C_TSymp_RV", col.axis=2)
-legend(5, 16650, c("RV","Ecos","Ecos_Recomp"), col=c(2,1,4), pch=1, cex=0.3, bty="n")
-par(new=T)
-plot(DATA$C_TSym[2:24], yaxt='n', ylab="", type='b', xaxt="n")
+points(C_TSymp_EcosInt, yaxt='n', ylab="", type='b', xaxt="n")
 points(C_TSymp_Ecos[2:24],type='b', col=4)
-axis(4, col=4)
-mtext("C_TSymp_Ecos", 4,1.8, col=4, cex=0.7)
-
-# quartz()
-# par(mfrow=c(2,1))
-# plot(C_TSymp_RV[1:48], col=adjustcolor(2, 1), type='b', ylab="C_TSymp_RV", col.axis=2)
-# points(DATA$C_TSym[1:48], yaxt='n', ylab="", type='b')
-# plot(C_TSymp_RV[1:48], ylim=c(15000, 20000),col=adjustcolor(2, 1), type='b', ylab="C_TSymp_RV", col.axis=2)
-# points(DATA$C_TSym[1:48], yaxt='n', ylab="", type='b')
-
+legend(1, 16600, c("RV","Ecos","Ecos_Recomp"), col=c(2,1,4), pch=1, cex=0.6, bty="n")
 
 #Comparaison des dQ
 dPsi_TSymp_Ecos =  DATA$Psi_TSym[2:(nrow(DATA))]-DATA$Psi_TSym[1:(nrow(DATA)-1)]
-dQ_Tsymp_Ecos = DATA$C_TSym[1:(nrow(DATA)-1)] * dPsi_TSymp_Ecos
+dQ_Tsymp_Ecos = DATA$C_TSym[1:(nrow(DATA)-1)] * dPsi_TSymp_Ecos * 6
 dQ_TSymp_RV = (Q_TSymp_RV[2:(nrow(DATARV))]-Q_TSymp_RV[1:(nrow(DATARV)-1)]) *1000000/18
 plot(dQ_TSymp_RV[1:24], typ="b", col=2, ylab="dQ")
 points(dQ_Tsymp_Ecos[2:24], type='b', col=1)
@@ -169,9 +158,7 @@ vegetation_parameters$k_TLInit
 FluxEcos_Ts_Ta = vegetation_parameters$k_TSymInit*(DATA$Psi_TSym-DATA$Psi_TApo)
 FluxEcos_Ta_La=vegetation_parameters$k_TLInit*(DATA$Psi_TApo-DATA$Psi_LApo)
 FluxEcos_La_Ls=vegetation_parameters$k_LSymInit*(DATA$Psi_LApo-DATA$Psi_LSym)
-
 FluxRV_Ta_Ts = vegetation_parameters$k_TSymInit*10.5 *(DATARV$P_trunk_a-DATARV$P_trunk_s)
-
 FluxEcos_Ta_Ts = vegetation_parameters$k_TSymInit*(DATA$Psi_TApo-DATA$Psi_TSym)*10.5
 
 
@@ -186,6 +173,8 @@ lines(DATARV_48$E_cuti_m2, col=2)
 
 lines(DATA1$Elim[2:48], type='b')
 lines(DATA1$Emin[2:48], type='l', lty=3)
+
+
 
 
 quartz()
