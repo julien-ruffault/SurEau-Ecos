@@ -136,3 +136,4 @@ yearly_Rn;WByearly;Rn;1;2
 yearly_ETP;WByearly;ETP;1;1
 yearly_VPDmax;WByearly;VPDmax;1;2
 yearly_dayOfDeath;WByearly;dayOfDeath;1;1
+yearly_dayOfStomatalClosure;WByearly;dayOfStomatalClosure;1;1

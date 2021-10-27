@@ -107,9 +107,9 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
       }
       if (simulation_parameters$resolutionOutput == "yearly") {
         if (stopDeadPlant == T) {
-          output_yearly <- update.WByearly(WByearly = output_yearly, WBdaily = output_daily, dayOfDeath = DAY)
+          output_yearly <- update.WByearly(WByearly = output_yearly, WBdaily = output_daily, WBveg = veg_var_list, dayOfDeath = DAY)
         } else {
-          output_yearly <- update.WByearly(WByearly = output_yearly, WBdaily = output_daily)
+          output_yearly <- update.WByearly(WByearly = output_yearly, WBdaily = output_daily, WBveg = veg_var_list , DAY = DAY)
         }
       }
 

@@ -159,6 +159,7 @@ new.WByearly <- function(){
   
   
   WByearly$dayOfDeath = NA
+  WByearly$dayOfStomatalClosure = NA
   return(WByearly)
   
 }
@@ -197,7 +198,7 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   return(WBdaily)
 }
 
-update.WByearly <- function(WByearly,WBdaily,dayOfDeath){
+update.WByearly <- function(WByearly,WBdaily,dayOfDeath,WBveg,DAY){
 
   WByearly$transpiration_mm = WByearly$transpiration_mm  + WBdaily$transpiration_mm 
   WByearly$evaporation_mm   = WByearly$evaporation_mm + WBdaily$evaporation_mm
@@ -225,6 +226,12 @@ update.WByearly <- function(WByearly,WBdaily,dayOfDeath){
   
   if (!missing(dayOfDeath))
       {WByearly$dayOfDeath = dayOfDeath}
+  
+  #print(WBdaily$Psi_LApoMin)
+  if(is.na(WByearly$dayOfStomatalClosure)==T & WBdaily$Psi_LApoMin<WBveg$params$P88_gs){
+    WByearly$dayOfStomatalClosure=DAY
+    }
+  
   
   return(WByearly)
 }
