@@ -53,7 +53,7 @@ create.vegetation.parameters <- function(filePath,listOfParameters,stand_paramet
   TTT$Lv = TTT$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
   
   ##### calculate the different conductance of the plant from kPlantInit 
-  conduc <- distribute.conductances(kPlantInit=TTT$kPlantInit, ri = TTT$rootDistribution) 
+  conduc <- distribute.conductances(kPlantInit=TTT$kPlantInit, ri = TTT$rootDistribution, fracLeafSym = TTT$fracLeafSym) 
   TTT$k_TLInit <- conduc$k_TLInit
   TTT$k_RTInit <- conduc$k_RTInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
@@ -128,6 +128,23 @@ read.vegetation.file <- function(filePath, modeling_options){
     }
   }
   
+  
+  # check if fracLeafSum is given/attribute default value otherwise 
+  
+  
+  AAA <- which(io$Name == "fracLeafSym") ## line number of the variable
+  if (length(AAA) == 0) # checking that it exists n input file/otherwise stop running
+  {
+    TTT$fracLeafSym = 0.4 # default value 
+  } else if (length(AAA) > 1) {
+    stop(paste0("'", params[i], "' is provided several times in input vegetation parameter file, please correct \n", filePath))
+  } else if (length(AAA) == 1) {
+    if (!is.na(as.numeric(io[AAA, "Value"]))) { # checking that parameter is numeric in input file /stop running otherwise
+      eval(parse(text = paste0("TTT$", params[i], "<-", as.numeric(as.character(io[AAA, "Value"])))))
+    } else {
+      stop(paste0(params[i], "must be numeric"))
+    }
+  }
   
   
   # Gestion des parameters de vegetaion pour la regulation stomatique selon  les options 
@@ -228,10 +245,6 @@ read.vegetation.file <- function(filePath, modeling_options){
       }
     }
   }
-  
-  
-  
-  
   
   
   
