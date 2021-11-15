@@ -11,9 +11,8 @@ gc()            # Clear memory
 SECONDS=2
 
 # User options  ----------------------------------------------------------------
-mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))                  # <-- indicate here the main directory of SurEau_Ecos
+mainDir <- dirname(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))                  # <-- indicate here the main directory of SurEau_Ecos
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                             # do not modify 
-
 
 
 ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####   
@@ -91,11 +90,6 @@ vegetationParameters_path <- paste0(mainDir,'/projects/Compar_SurEauC/Vegetation
                   vegetation_parameters = vegetation_parameters)
 
 
-  
-  
-  
-  
-  
   ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####   
   # en explicit   no cavitatioin 
   # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### 
@@ -292,6 +286,9 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 filename  = paste0(mainDir,'/for_development/test_explicit_V2_cav_',SECONDS,'s.csv')               
 io_Explicit= read.csv(filename,header=T, dec='.',sep="")
 io_Explicit$DD= as.POSIXct(io_Explicit$Time,format='%Y-%m-%d/%H:%M:%S')
+plot(io_Explicit$Psi_LApo,type='l')
+
+
 
 filename  = paste0(mainDir,'/for_development/test_explicit_V2_cav_SC',SECONDS,'s.csv')               
 io_Explicit_SC= read.csv(filename,header=T, dec='.',sep="")

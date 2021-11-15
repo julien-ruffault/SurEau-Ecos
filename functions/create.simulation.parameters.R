@@ -40,7 +40,7 @@ create.simulation.parameters <- function(mainDir,
   } else {
     stop("'mainDir' is missing.")
   }
-  if (!resolutionOutput %in% c("subdaily", "daily", "yearly")) {
+  if (!resolutionOutput %in% c("none","subdaily", "daily", "yearly")) {
     error("resolutionOutput should be set 'subdaily (default), 'daily' 'yearly'")
   }
 

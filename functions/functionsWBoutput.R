@@ -1,6 +1,8 @@
 # Creation WB_ouput
 new.WBoutput <- function(simulation_parameters) {
 
+  if (!simulation_parameters$resolutionOutput == "none"){
+  
   # Read output files / (can be built by the user)
   if (file.exists(paste0(simulation_parameters$mainDir,"/functions/output_types/", simulation_parameters$outputType, ".csv"))) {
     outputvar <- read.csv(paste0(simulation_parameters$mainDir,"/functions/output_types/", simulation_parameters$outputType, ".csv"), dec = ".", sep = ";", header = F, stringsAsFactors = F)
@@ -43,7 +45,13 @@ new.WBoutput <- function(simulation_parameters) {
   cat(c("Time", contingencyTable[, 1]), "\n", file = testcon) # add variable names at the top of the output file
 
   return(list(filename = filename, contingencyTable = contingencyTable, testcon = testcon))
+  }
 }
+
+
+
+
+
 # writing outputs in output file
 write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   

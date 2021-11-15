@@ -150,17 +150,20 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
 #' (trunk, leaf and root) according to predetermined rules 
 #' @param kPlantInit conductance of the plant from root to leaf 
 #' @param ri root distribution within the soil layers.
-#'
+#' @param fractLeafSym proportion of kPlantInit assigned to the leaf (apoplasm to symplasm pathway)
 #' @return
 #' @export
 #'
 #' @examples
-distribute.conductances <- function(kPlantInit,ri)
+distribute.conductances <- function(kPlantInit,ri,fracLeafSym = 0.4)
 {
   
-  k_RTInit   = 1 /( 0.4 / kPlantInit) *ri
-  k_TLInit = 1/(0.2/kPlantInit)
-  k_LSymInit = 1/(0.4/kPlantInit)
+  fracRT   = (2/3)*(1-fracLeafSym)
+  fractTL  =  (1/3)*(1-fracLeafSym)
+  
+  k_RTInit   = 1 /(fracRT / kPlantInit) *ri
+  k_TLInit = 1/(fractTL/kPlantInit)
+  k_LSymInit = 1/(fracLeafSym/kPlantInit)
   
   #TODO: AJOUTE UN CALCUL DES CONDUCTANCE ICI POUR CHECK DU CALCUL? e.g.:
   #kPlantInit <-  1/ (1 /sum(k_RTInit) + 1/k_TLInit + 1/k_LSymInit)

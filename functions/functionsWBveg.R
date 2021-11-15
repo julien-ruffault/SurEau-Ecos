@@ -731,12 +731,12 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     } else if (opt$numericalScheme=="Explicit"){
       # NB for cavitation we use the min(cav-current) because here cav is at time n-1
       # psi L_apo
-      if (Psi_LApo_cav > Psi_LApo_n) {
-        print(paste0("Lcav",opt$Lcav))
-      }
-      if (Psi_TApo_cav > Psi_TApo_n) {
-        print(paste0("Tcav",opt$Tcav))
-      }
+      # if (Psi_LApo_cav > Psi_LApo_n) {
+      #   print(paste0("Lcav",opt$Lcav))
+      # }
+      # if (Psi_TApo_cav > Psi_TApo_n) {
+      #   print(paste0("Tcav",opt$Tcav))
+      # }
       Psi_LApo_np1 = Psi_LApo_n + (dt/C_LApo) * (K_TL * (Psi_TApo_n - Psi_LApo_n) + K_LSym * (Psi_LSym_n - Psi_LApo_n) + delta_L_cav*K_L_Cav * max(Psi_LApo_cav - Psi_LApo_n,0))
       # psi T_apo
       Psi_TApo_np1 = Psi_TApo_n + (dt/C_TApo) * (K_TL * (Psi_LApo_n - Psi_TApo_n) + K_TSym * (Psi_TSym_n - Psi_TApo_n) + delta_T_cav*K_T_Cav * max(Psi_TApo_cav - Psi_TApo_n,0) + sum(WBveg$kSoilToCollar * (WBsoil$PsiSoil - Psi_TApo_n)))
@@ -792,10 +792,11 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     # print(paste0("cfl_TApo = ",cfl_TApo))
     
     cfl_all = min(cfl_LSym,cfl_TSym,cfl_LApo,cfl_TApo)
-    print(paste0("cfl_all = ",cfl_all))
-    if (cfl_all<=dt)
-    {stop('execution stopped because cfl<dt')}
-    
+    #print(paste0("cfl_all = ",cfl_all))
+    # if (cfl_all<=dt)
+    #   {
+    #   stop('execution stopped because cfl<dt')
+    #   }
     }
 
   
