@@ -80,6 +80,20 @@ PLCPrime.comp <- function(PLC , slope) {
 }
 
 
+#VCCURVE Same function as above for plotting some diagnostic
+VCCurve <- function(x, slope , P50) {
+  PLC  = 100 / (1 + exp(slope / 25 * (x - P50)))
+  return(PLC)
+}
+
+GsCurve <- function(x, slope_gs, P50_gs, gsmax) {
+  
+  PL_gs <- 1 / (1 + exp(slope_gs / 25 * (x - P50_gs)))
+  Gs <- (1 - PL_gs)*gsmax
+  return(Gs)
+}
+
+
 
 #' calculate minimum conductance (gmin) following Cochard et al. (2019)
 #'
