@@ -1,0 +1,47 @@
+Name;Value;Value;Value;;;Unit;;;Name_2;Value_2
+P50_VC_Leaf; -6.66;  -4.84; -5.22;;;Mpa;;;P50_VC_Leaf;-3.4
+slope_VC_Leaf;29.5;41.5;37.5;;;%/Mpa;;;slope_VC_Leaf;60
+EpsilonSymp_Leaf;12;5.98;11.4;;;Mpa;;;EpsilonSymp_Leaf;10
+PiFullTurgor_Leaf; -2.8; -1.7; -2.9;;;Mpa;;;PiFullTurgor_Leaf;-2.1
+ApoplasmicFrac_Leaf;0.45;0.68;0.25;;;-;;;ApoplasmicFrac_Leaf;0.4
+P50_VC_Trunk; -6.66;  -4.84; -5.22;;;Mpa;;;P50_VC_Trunk;-3.4
+slope_VC_Trunk;29.5;41.5;37.5;;;%/Mpa;;;slope_VC_Trunk;60
+EpsilonSymp_Trunk;12;5.98;11.4;;;Mpa/%;;;EpsilonSymp_Trunk;10
+PiFullTurgor_Trunk; -2.8; -1.7; -2.9;;;Mpa;;;PiFullTurgor_Trunk;-2.1
+ApoplasmicFrac_Trunk;0.4;0.4;0.4;;;-;;;ApoplasmicFrac_Trunk;0.4
+SymplasmicFrac_Trunk;0.2;0.2;0.2;;;-;;;SymplasmicFrac_Trunk;0.2
+LDMC;500;500;500;;;fraction;;;LDMC;570
+Succulence;100;100;100;;;g/m2;;;;
+LMA;182;252;110;;;g/m2;;;LMA;106
+kPlantInit;0.62;0.62;0.62;;;mmol/m2/s/Mpa;;;kPlantInit;0.62
+k_TSymInit;0.26;0.26;0.26;;;mmol/m2/s/Mpa;;;k_TSymInit;0.26
+VolumeLiving_TRB;18.2;18.2;18.2;;;(mm or sapwood litre/m2 of soil);;;VolumeLiving_TRB;5
+fRootToLeaf;1;1;1;;;-;;;fRootToLeaf;1
+rootRadius;0.0002;0.0002;0.0002;;;m;;;rootRadius;0.0002
+betaRootProfile;0.97;0.97;0.97;;;-;;;betaRootProfile;0.97
+C_LApoInit; 0.00001; 0.00001; 0.00001;;;mmol/m2 leaf/Mpa;;;C_LApoInit;1,00E-05
+C_TApoInit; 0.00002; 0.00002; 0.00002;;;mmol/m2 leaf/Mpa;;;C_TApoInit;2,00E-05
+gCrown0;45;45;45;;;mmol/m2/s;;;gCrown0;45
+gsMax;225;300;250;;;mmol/m2/s;;;gsMax;200
+gsNight;20;20;20;;;mmol/m2/s;;;gsNight;20
+JarvisPAR;0.006;0.006;0.006;;;-;;;JarvisPAR;0.006
+Tgs_sens;17;17;17;;;-;;;Tgs_sens;17
+Tgs_optim;25;25;25;;;-;;;Tgs_optim;25
+P12_gs; -1.5; -1.5; -1.5;;;Mpa;;;P12_gs;-2.07
+P88_gs; -2.9; -2.5; -2.9;;;Mpa;;;P88_gs;-2.62
+turgorPressureAtGsMax;1;1;1;;;Mpa;;;turgorPressureAtGsMax;2
+gmin20;4;4;4;;;mmol/m2/s;;;gmin20;4
+TPhase_gmin;45.839556;40;40;;;¡C;;;TPhase_gmin;37.5
+Q10_1_gmin;1.04270568062456;1.2;1.2;;;mmol/m2/s /10¡C;;;Q10_1_gmin;1.2
+Q10_2_gmin;1.64129642314098;4.8;4.8;;;mmol/m2/s /10¡C;;;Q10_2_gmin;4.8
+fTRBToLeaf;0.8;0.8;0.8;;;m2 wood exposed/m2leaf;;;fTRBToLeaf;0.8
+gmin_T;1;1;1;;;mmol/m2/s;;;gmin_T;3
+Foliage;Evergreen;Evergreen;Evergreen;;;-;;;Foliage;Evergreen
+DayStart;55;55;55;;;doy;;;Fcrit;450
+Tbase;3;3;3;;;¡C;;;Tbase;3
+Fcrit;450;450;450;;;¡C;;;DayStart;55
+nbdayLAI;21;21;21;;;;;;nbdayLAI;21
+PTcoeff;1.14;1.14;1.14;;;-;;;PTcoeff;1.14
+CanopyStorageParam;1.5;1.5;1.5;;;mm/m2 leaf;;;CanopyStorageParam;1.5
+K;0.5;0.5;0.5;;;-;;;K;0.5
+Species;Quercus ilex;Pinus halepensis;Quercus pubescens;;;;;;;

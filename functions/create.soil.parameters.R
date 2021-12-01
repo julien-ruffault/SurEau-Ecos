@@ -121,8 +121,8 @@ create.soil.parameters<- function(filePath, listOfParameters, default_soil = F) 
     .soilParams$V_soil_storage_capacity <- sum(.soilParams$V_field_capacity) - sum(.soilParams$V_wilting_point)
     .soilParams$V_soil_storage_capacity_vg <- sum(.soilParams$V_saturation_capacity_vg) - sum(.soilParams$V_residual_capacity_vg)
     
-    print(paste0("Available water capacity : ", .soilParams$V_soil_storage_capacity, ' mm'))
-    print(paste0("Available water capacity : ", .soilParams$V_soil_storage_capacity_vg, ' mm'))
+    print(paste0("Available water capacity Wilting: ", .soilParams$V_soil_storage_capacity, ' mm'))
+    print(paste0("Available water capacity Residual: ", .soilParams$V_soil_storage_capacity_vg, ' mm'))
   
     
     return(.soilParams)
