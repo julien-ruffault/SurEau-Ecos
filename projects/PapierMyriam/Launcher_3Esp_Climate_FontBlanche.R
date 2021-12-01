@@ -14,6 +14,8 @@ source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                         
 #--------------------------------------------------------------------------------
 # set paths
 climateData_path          <- paste0(mainDir,'/projects/PapierMyriam/Climat/FontBlanche/data_FON_corrected.csv')
+climateData_path_Safran          <- paste0(mainDir,'/projects/PapierMyriam/Climat/FontBlanche/Font Blanche_SAFRAN_histo.csv')
+
 
 soilParameters_path       <- paste0(mainDir,'/projects/PapierMyriam/Sol/Soil_Puechabon.csv')
 vegetationParameters_path <- paste0(mainDir,'/projects/PapierMyriam/Vegetation/VegetationParams_Qilex.csv')
@@ -27,7 +29,7 @@ output_path               <-  paste0(mainDir,'/projects/PapierMyriam/Output_Qile
 
 # create model input files --------------------------------------------------
 modeling_options     <- create.modeling.options(timeStepForEvapo=1,
-                                                compOptionsForEvapo = 'Normal',
+                                                compOptionsForEvapo = 'Fast',
                                                 numericalScheme = 'Implicit',
                                                 constantClimate=F,
                                                 stomatalRegFormulation = "Turgor",
@@ -39,7 +41,7 @@ modeling_options     <- create.modeling.options(timeStepForEvapo=1,
 
 
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 2010,                        
-                                                      endYearSimulation = 2010,
+                                                      endYearSimulation = 2018,
                                                       mainDir= mainDir,
                                                       resolutionOutput = "subdaily",
                                                       outputType = 'simple_subdaily',
@@ -49,13 +51,13 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 2010
 
 climate_data     <- create.climate.data(filePath = climateData_path, modeling_options = modeling_options, simulation_parameters = simulation_parameters) #
 
-stand_parameters_Puechabon <- create.stand.parameters(LAImax = 2. , lat = 43.74, lon = 3.59)
+stand_parameters_FontBlanche <- create.stand.parameters(LAImax = 2. , lat = 43.74, lon = 3.59)
 
 soil_parameters  <- create.soil.parameters(filePath= soilParameters_path) 
 
 
 TTT = read.vegetation.file(filePath=vegetationParameters_path ,modeling_options=modeling_options)
-vegetation_parameters <- create.vegetation.parameters(listOfParameters=TTT, stand_parameters = stand_parameters, soil_parameter = soil_parameters, modeling_options = modeling_options)
+vegetation_parameters <- create.vegetation.parameters(listOfParameters=TTT, stand_parameters = stand_parameters_FontBlanche, soil_parameter = soil_parameters, modeling_options = modeling_options)
 
 
 #On mets le gmin Tronc à 0 pour limiter les interférence avec gmin root+Trunk+Branch
@@ -69,36 +71,13 @@ vegetation_parameters$SymplasmicFrac_Trunk * vegetation_parameters$VolumeLiving_
 run.SurEau_Ecos(modeling_options = modeling_options ,
                 simulation_parameters = simulation_parameters, 
                 climate_data = climate_data,
-                stand_parameters = stand_parameters, 
+                stand_parameters = stand_parameters_FontBlanche, 
                 soil_parameters = soil_parameters,
                 vegetation_parameters = vegetation_parameters)
 
-filenameQilClimPuech  = paste0(mainDir,"/Projects/PapierMyriam/Output_Qilex_PapierMyriam_Climat_FontBlanche.csv")
+filenamePhClimFB  = paste0(mainDir,"/Projects/PapierMyriam/Output_Qilex_PapierMyriam_Climat_FontBlanche.csv")
 # filenameQPub  = paste0(mainDir,"/Projects/PapierMyriam/Output_QPub_PapierMyriam.csv")
 # filenamePHal  = paste0(mainDir,"/Projects/PapierMyriam/Output_Phalepensis_PapierMyriam.csv")
 
-DATAQil = read.csv(filenameQilClimPuech,header=T, dec='.', sep="")
-# DATAQPub = read.csv(filenameQPub, header=T, dec='.',sep="")
-# DATAPHal = read.csv(filenamePHal, header=T, dec='.',sep="")
-
-
-# plot(DATAQil$PLC_Leaf, type='l', col="dark green", lwd=3)
-# lines(DATAPHal$PLC_Leaf, type='l', col="orange",lty=2, lwd=3)
-# lines(DATAQPub$PLC_Leaf, type='l', col="brown",lty=2, lwd=3)
-# plot(DATAQil$daily_Psi_LSymMax, type='l', col="dark blue")
-# lines(DATAQil$daily_Psi_LSymMin, type='l', col="orange")
-
-plot(DATAQil$Psi_LApo, type='l', col="dark green", lwd=3)
-lines(DATAPHal$Psi_LApo, type='l', col="orange",lty=2, lwd=3)
-lines(DATAQPub$Psi_LApo, type='l', col="brown",lty=2, lwd=3)
-
-plot(DATAQil$Psi_LSym, type='l', col="dark green", lwd=3)
-lines(DATAPHal$Psi_LSym, type='l', col="orange",lty=2, lwd=3)
-lines(DATAQPub$Psi_LSym, type='l', col="brown",lty=2, lwd=3)
-par(new=T)
-plot(DATAQil$PLC_Leaf, type='l', col="dark green", lwd=3, yaxt="n", ylab="")
-lines(DATAPHal$PLC_Leaf, type='l', col="orange",lty=2, lwd=3)
-lines(DATAQPub$PLC_Leaf, type='l', col="brown",lty=2, lwd=3)
-
-#lines(DATA$PLC_Leaf, type='l', col="dark green",lty=2, lwd=3)
-
+DATAPh = read.csv(filenamePhClimFB,header=T, dec='.', sep="")
+plot(DATAPh$Psi_LApo, type='l', col="dark green", lwd=3)

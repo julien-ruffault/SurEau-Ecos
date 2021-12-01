@@ -77,9 +77,9 @@ DATA = read.csv(filename,header=T, dec='.', sep="")
 DATAQPub = read.csv(filenameQPub, header=T, dec='.',sep="")
 DATAPHal = read.csv(filenamePHal, header=T, dec='.',sep="")
 
-
-lines(DATAPHal$PLC_Leaf, type='l', col="orange",lty=2, lwd=3)
-lines(DATAQPub$PLC_Leaf, type='l', col="brown",lty=2, lwd=3)
+plot(DATA$PLC_Leaf, type='l', col="dark green", lwd=3)
+lines(DATAPHal$PLC_Leaf, type='l', col="orange",lty=1, lwd=3)
+lines(DATAQPub$PLC_Leaf, type='l', col="brown",lty=1, lwd=3)
 
 lines(DATA$PLC_Leaf, type='l', col="dark green",lty=2, lwd=3)
-plot(DATA$PLC_Leaf, type='l', col="dark green", lwd=3)
+
