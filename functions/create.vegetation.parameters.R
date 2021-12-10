@@ -14,9 +14,14 @@
 #' @export
 #' @examples
 #'
-create.vegetation.parameters <- function(filePath,listOfParameters,stand_parameters, soil_parameters, modeling_options) {
+#'
+create.vegetation.parameters <- function(filePath, listOfParameters, stand_parameters, soil_parameters, modeling_options) {
 
  
+  filePath = vegetationParameters_path
+  stand_parameters = stand_parameters
+  soil_parameter = soil_parameters
+  modeling_options = modeling_options
   
   if (!missing(filePath))
   {TTT = read.vegetation.file(filePath,modeling_options=modeling_options)}
@@ -130,8 +135,6 @@ read.vegetation.file <- function(filePath, modeling_options){
   
   
   # check if fracLeafSum is given/attribute default value otherwise 
-  
-  
   AAA <- which(io$Name == "fracLeafSym") ## line number of the variable
   if (length(AAA) == 0) # checking that it exists n input file/otherwise stop running
   {
@@ -147,7 +150,7 @@ read.vegetation.file <- function(filePath, modeling_options){
   }
   
   
-  # Gestion des parameters de vegetaion pour la regulation stomatique selon  les options 
+  # Set parameters for stomatal regulation of vegetation according to the type of stomatal regulation
   if (modeling_options$stomatalRegFormulation=='PiecewiseLinear')
   {
     params_regulation <- c("PsiStartClosing", "PsiClose")
@@ -177,8 +180,8 @@ read.vegetation.file <- function(filePath, modeling_options){
     }
   }
   
-  if (modeling_options$stomatalRegFormulation=='Sigmoid')
-  {TTT$P50_gs  = (TTT$P12_gs + TTT$P88_gs)/2
+  if (modeling_options$stomatalRegFormulation=='Sigmoid'){
+  TTT$P50_gs  = (TTT$P12_gs + TTT$P88_gs)/2
   TTT$slope_gs = 100/(TTT$P12_gs-TTT$P88_gs)
   }
   

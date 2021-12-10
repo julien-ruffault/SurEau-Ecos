@@ -179,6 +179,8 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY) {
   {
     if (is.na(WBveg$budburstDate) == T) # si pas de debourrement
     {
+      
+      
       if (temperature > WBveg$params$Tbase & DOY >= WBveg$params$DayStart) {
         WBveg$sumTemperature <- WBveg$sumTemperature + temperature # update SumTemp si T>tbase
       }
@@ -190,7 +192,7 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY) {
     
     else if (DOY >= 280) # perte des feuilles au jour 270
     {
-      WBveg$LAIpheno= max(0,WBveg$LAI-max(0, WBveg$params$LAImax / WBveg$params$nbdayLAI))
+      WBveg$LAIpheno = max(0, WBveg$LAI - max(0, WBveg$params$LAImax / WBveg$params$nbdayLAI))
     }
     
     else if (is.na(WBveg$budburstDate) == F) {
@@ -216,7 +218,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   {
     #  leaf shedding because of cavitation  // starts only if PLCabove > 10 % 
     if (WBveg$PLC_Leaf > 10){
-      WBveg$LAIdead <- max(0, WBveg$LAIpheno *WBveg$PLC_Leaf / 100) # defoliation in LAI unit
+      WBveg$LAIdead <- max(0, WBveg$LAIpheno * WBveg$PLC_Leaf / 100) # defoliation in LAI unit
     }else {WBveg$LAIdead = 0}
   }
   
@@ -225,7 +227,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   
   # update LAI-dependent variables 
   WBveg$FCC <- (1 - exp(-WBveg$params$K * WBveg$LAI))
-  WBveg$canopyStorageCapacity  <- 1.5 * WBveg$LAI
+  WBveg$canopyStorageCapacity  <- 1.5 * WBveg$LAI 
   
   # update water storing capacities of the dead and living canopy
   WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA      # water storing capacities of the living component
@@ -233,7 +235,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   
   WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
-  WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / WBveg$LAI
+  if(WBveg$LAI) {WBveg$Q_LSym_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
   WBveg$Q_TSym_sat_L <- WBveg$params$VolumeLiving_TRB *WBveg$params$SymplasmicFrac_Trunk
   WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
@@ -242,7 +244,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
 
   WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
-  WBveg$Q_LApo_sat_mmol_perLeafArea = WBveg$Q_LApo_sat_mmol/WBveg$LAI # modified by NM (25/10/2021)
+  if(WBveg$LAI) {WBveg$Q_LApo_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LApo_sat_mmol_perLeafArea <- WBveg$Q_LApo_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
 
   WBveg$Q_TApo_sat_L <- WBveg$params$VolumeLiving_TRB*WBveg$params$ApoplasmicFrac_Trunk 
@@ -411,7 +413,7 @@ update.capacitancesApoAndSym.WBveg <- function(WBveg) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options) {
 
-  if (modeling_options$transpirationModel == 'Granier'){
+  if (modeling_options$transpirationModel == 'Granier') {
   
     
     Einst= WBveg$Elim + WBveg$Emin
@@ -536,7 +538,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 # Compute integration over time - checked FP 11/03/2021
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
-compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, modeling_options,WBoutput) {
+compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim_next, Nhours, modeling_options, WBoutput) {
   
   opt=modeling_options$compOptions
   # A. LOOP ON THE IMPLICIT SOLVER IN PSI, trying different time steps until results are OK

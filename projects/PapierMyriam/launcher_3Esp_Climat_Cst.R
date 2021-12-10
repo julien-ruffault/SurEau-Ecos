@@ -27,11 +27,11 @@ output_path               <-  paste0(mainDir,'/projects/PapierMyriam/Output_Phal
 modeling_options     <- create.modeling.options(timeStepForEvapo=1,
                                                 compOptionsForEvapo = 'Normal',
                                                 numericalScheme = 'Implicit',
-                                                constantClimate=T,
+                                                constantClimate = T,
                                                 stomatalRegFormulation = "Turgor",
                                                 defoliation = F, 
-                                                thresholdMortality =100,
-                                                resetSWC=T,
+                                                thresholdMortality = 100,
+                                                resetSWC = T,
                                                 transpirationModel="Jarvis")     
 
 
@@ -50,9 +50,10 @@ stand_parameters <- create.stand.parameters(LAImax = 6, lat = 48.73, lon = 6.23)
 soil_parameters  <- create.soil.parameters(filePath=soilParameters_path) 
 
 
-TTT = read.vegetation.file(filePath=vegetationParameters_path ,modeling_options=modeling_options)
-vegetation_parameters <- create.vegetation.parameters(listOfParameters=TTT, stand_parameters = stand_parameters, soil_parameter = soil_parameters, modeling_options = modeling_options)
 
+vegetation_parameters <- create.vegetation.parameters(filePath=vegetationParameters_path, stand_parameters = stand_parameters, soil_parameter = soil_parameters, modeling_options = modeling_options)
+
+vegetation_parameters$Foliage
 
 #On mets le gmin Tronc à 0 pour limiter les interférence avec gmin root+Trunk+Branch
 vegetation_parameters$VolumeLiving_TRB <- 39.9 # 18.2 #/20
@@ -73,9 +74,29 @@ filename  = paste0(mainDir,"/Projects/PapierMyriam/Output_PapierMyriam.csv")
 filenameQPub  = paste0(mainDir,"/Projects/PapierMyriam/Output_QPub_PapierMyriam.csv")
 filenamePHal  = paste0(mainDir,"/Projects/PapierMyriam/Output_Phalepensis_PapierMyriam.csv")
 
+filename  = paste0(mainDir,"/Projects/PapierMyriam/Output_Phalepensis_PapierMyriam.csv")
+
 DATA = read.csv(filename,header=T, dec='.', sep="")
 DATAQPub = read.csv(filenameQPub, header=T, dec='.',sep="")
 DATAPHal = read.csv(filenamePHal, header=T, dec='.',sep="")
+
+quartz()
+par(mfrow=c(2,1), pty="s")
+plot(DATA$LAI, type='l', col="dark green", lwd=3)
+par(new=T)
+plot(DATA$transpiration_mm, type='l', col=4, yaxt="n", ylab="")
+par(new=T)
+plot(DATA$Psi_LApo, type='l', col=1, ylab="", yaxt="n")
+
+SWS= DATA$SWS1+DATA$SWS2+DATA$SWS3
+plot(DATA$gs_lim, type='l', col=1, ylab="gs")
+par(new=T)
+plot(SWS, type='l',  ylab="", yaxt="n", lwd=4, col=2)
+axis(4)
+par(new=T)
+plot(DATA$Psi_LApo, type='l', col=4, ylab="", yaxt="n")
+
+
 
 plot(DATA$PLC_Leaf, type='l', col="dark green", lwd=3)
 lines(DATAPHal$PLC_Leaf, type='l', col="orange",lty=1, lwd=3)

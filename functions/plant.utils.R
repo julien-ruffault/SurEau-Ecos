@@ -50,7 +50,7 @@ osmo.comp <- function(PiFT, Rstemp) {
 
 # Total potential
 psiTotalSymp.comp <- function(PiFT, Esymp, Rstemp) {
-  A <- Comp.Pturg(PiFT = PiFT, Esymp = Esymp, Rstemp = Rstemp) + Comp.Osmo(PiFT = PiFT, Rstemp = Rstemp)
+  A <- turgor.comp(PiFT = PiFT, Esymp = Esymp, Rstemp = Rstemp) + osmo.comp(PiFT = PiFT, Rstemp = Rstemp)
   return(A)
 }
 
