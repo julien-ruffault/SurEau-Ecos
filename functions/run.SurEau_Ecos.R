@@ -12,9 +12,9 @@
 #'
 #' @examples
 #'
-run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters) { # start loop on years
+run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters, printProg) { # start loop on years
 
-  if (!nargs() == 6) {
+  if (!nargs() == 7) {
     stop("One or several input parameters were missing")
   }
   soil_var_list <- new.WBsoil(soil_parameters, vegetation_parameters) #  create soil from input parameters
@@ -23,7 +23,8 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
   # @run@ ####
   for (YEAR in (simulation_parameters$startYearSimulation:simulation_parameters$endYearSimulation)) { # start loop on year
-
+    
+    
     print(paste0("SurEau running, year = ", YEAR))
 
     stopDeadPlant <- FALSE # set breaking conditions to allow to run on following years after death
@@ -40,7 +41,8 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
     for (DAY in climate_data$Doy[climate_data$Year == YEAR]) # Loop on days ####
     {
-       print(paste0("day ", DAY))
+      if(printProg==T) {print(paste0("day ", DAY))}
+      
       if (simulation_parameters$resolutionOutput %in% c("daily", "yearly")) {
         output_daily <- new.WBdaily() # create list for yearly outputs
       }
