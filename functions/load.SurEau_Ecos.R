@@ -20,5 +20,6 @@ source(paste0(mainDir, "/functions/create.soil.parameters.R"))
 source(paste0(mainDir, "/functions/create.vegetation.parameters.R"))
 
 source(paste0(mainDir, "/functions/climate.utils.R"))
-#source(paste0(mainDir, "/functions/leafandSoilFunctions.R"))
 source(paste0(mainDir, "/functions/plant.utils.R"))
+source(paste0(mainDir, "/functions/soil.utils.R"))
+source(paste0(mainDir, "/functions/plot.utils.R"))

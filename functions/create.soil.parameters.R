@@ -28,10 +28,7 @@ create.soil.parameters<- function(filePath, listOfParameters, default_soil = F) 
       .soilParams$layer_thickness[3] <- .soilParams$depth[3] - .soilParams$depth[2]
       
       #--------------
-      # A calculer pour diagnostique
-      .soilParams$field_capacity <- c(0.4, 0.4, 0.4) # Fraction of water at field capacity (cm3/cm3)
-      .soilParams$wilting_point <- c(0.2, 0.2, 0.2) # Fraction of water at wilting point (cm3/cm3)
-      
+        
       # Ricthie parameters
       #.soilParams$gamma <- 1 # Ritchie parameter
       
@@ -40,11 +37,20 @@ create.soil.parameters<- function(filePath, listOfParameters, default_soil = F) 
       # Van Genuchten parameters
       .soilParams$alpha_vg <- rep(0.0035, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
       .soilParams$n_vg <- rep(1.55, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
+      .soilParams$m <- (1 - 1 / .soilParams$n_vg) #m parameters Van Genuchten equations
       .soilParams$I_vg <- rep(0.5, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
       .soilParams$Ksat_vg <- rep(1.69, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
       .soilParams$saturation_capacity_vg <- c(0.5, 0.5, 0.5) # Fraction of water at saturation capacity (cm3/cm3)
       .soilParams$residual_capacity_vg <- c(0.1, 0.1, 0.1) # Fraction of residual water  (cm3/cm3)
       
+      # # A calculer pour diagnostique
+      # .soilParams$field_capacity <- c(0.4, 0.4, 0.4) # Fraction of water at field capacity (cm3/cm3)
+      # .soilParams$wilting_point <- c(0.2, 0.2, 0.2) # Fraction of water at wilting point (cm3/cm3)
+      
+      #NM 11/12/2021 add computation of wilting and field capacity from functions implemented in soil.utils.r
+      .soilParams$wilting_point <- compute.thetaAtGivenPSoil (PsiTarget=1.5,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg)
+      .soilParams$field_capacity <- compute.thetaAtGivenPSoil (PsiTarget=0.033,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg) 
+       
       # Campbell parameters
       # .soilParams$b_camp <- rep(6, 3) # exponent (Campbell 1974)
       # .soilParams$psie_camp <- rep(0.025, 3) # desequilibrium potential (Campbell 1974)
@@ -90,23 +96,32 @@ create.soil.parameters<- function(filePath, listOfParameters, default_soil = F) 
       .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
       
       #--------------
-      # A calculer pour diagnostique
-      .soilParams$field_capacity <- rep(TTT$field_capacity, 3) # Fraction of water at field capacity (cm3/cm3)
-      .soilParams$wilting_point <- rep(TTT$wilting_point, 3) # Fraction of water at wilting point (cm3/cm3)
-    
+      # # A calculer pour diagnostique
+      # .soilParams$field_capacity <- rep(TTT$field_capacity, 3) # Fraction of water at field capacity (cm3/cm3)
+      # .soilParams$wilting_point <- rep(TTT$wilting_point, 3) # Fraction of water at wilting point (cm3/cm3)
+      # 
+      
       
       # Van Genuchten parameters
       .soilParams$alpha_vg <- rep(TTT$alpha_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
       .soilParams$n_vg <- rep(TTT$n_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
       .soilParams$I_vg <- rep(TTT$I_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
       .soilParams$Ksat_vg <- rep(TTT$Ksat_vg, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
+      .soilParams$m <- (1 - 1 / .soilParams$n_vg)
+      
       .soilParams$saturation_capacity_vg <- rep(TTT$saturation_capacity_vg, 3) # Fraction of water at saturation capacity (cm3/cm3)
       .soilParams$residual_capacity_vg <- rep(TTT$residual_capacity_vg, 3) # Fraction of residual water  (cm3/cm3)
+      
+      #NM 11/12/2021 add computation of wilting and field capacity from functions implemented in soil.utils.r
+      .soilParams$wilting_point <- compute.thetaAtGivenPSoil (PsiTarget=1.5,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg)
+      .soilParams$field_capacity <- compute.thetaAtGivenPSoil (PsiTarget=0.033,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg) 
+      
+      
     } # end  loop default soil = F
     
     
 
-    .soilParams$m <- (1 - 1 / .soilParams$n_vg)
+    
     
 
     .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
