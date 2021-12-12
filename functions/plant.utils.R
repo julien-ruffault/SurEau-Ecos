@@ -86,10 +86,39 @@ VCCurve <- function(x, slope , P50) {
   return(PLC)
 }
 
-GsCurve <- function(x, slope_gs, P50_gs, gsmax) {
+GsCurve <- function(x, slope_gs, P50_gs, PsiStartClosing, PsiClose, PiFT, Esymp, turgorPressureAtGsMax, gsmax, stomatalRegFormulation=NULL) {
+#To obtain plots of the gs regulation curve 
   
-  PL_gs <- 1 / (1 + exp(slope_gs / 25 * (x - P50_gs)))
-  Gs <- (1 - PL_gs)*gsmax
+  if(stomatalRegFormulation=="Sigmoid") {
+    PL_gs <- 1 / (1 + exp(slope_gs / 25 * (x - P50_gs)))
+    regulFact <- (1 - PL_gs)
+    }
+  
+   
+  if(stomatalRegFormulation=="PiecewiseLinear") {
+    regulFact <- (x - PsiClose) / (PsiStartClosing - PsiClose)
+    regulFact[regulFact<0] <- 0
+    regulFact[regulFact>1] <- 1
+  
+  }
+   
+   if(stomatalRegFormulation=="Turgor") {
+     #Only Rs1 is needed above TLP.
+     rs1 <- (-1 * (x + PiFT - Esymp) - sqrt((x + PiFT - Esymp)^2 + 4 * (x * Esymp))) / (2 * Esymp)
+     tlp = (PiFT * Esymp)/(PiFT + Esymp)
+     # rs2 <- 1 - PiFT / x
+     # rs1[rs1<rs2] = rs2
+     # turgor <- -PiFT - Esymp * rs1
+     # rs <- Rs.Comp(PiFT, Esymp , Pmin =x)
+     # 
+     turgor <- -PiFT - Esymp * rs1
+     regulFact <- turgor/turgorPressureAtGsMax
+     regulFact[regulFact<0] <- 0
+     regulFact[regulFact>1] <- 1
+   }
+   
+  Gs <- regulFact*gsmax
+   
   return(Gs)
 }
 
