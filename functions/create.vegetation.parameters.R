@@ -42,7 +42,6 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   
 
   TTT$LAImax =stand_parameters$LAImax
-    
   
   # calculate root distribution within each soil layer (Jackson et al. 1996)
   TTT$rootDistribution <-numeric(3)
@@ -50,8 +49,55 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   TTT$rootDistribution[2] = (1-TTT$betaRootProfile^(soil_parameters$depth[2]*100))-TTT$rootDistribution[1]
   TTT$rootDistribution[3] = 1-(TTT$rootDistribution[1]+TTT$rootDistribution[2] )
   
-
-  # determine root lenght (La gardner cowan)
+  TLP = TTT$PiFullTurgor_Leaf*TTT$EpsilonSymp_Leaf/(TTT$PiFullTurgor_Leaf+TTT$EpsilonSymp_Leaf)
+  
+  # Compute TAW @Tlp @P12 & @P50 (Diagnoostic)
+  
+  if(modeling_options$PedoTransferFormulation=="VG")
+    {
+    
+  theta_AtTLP <- compute.thetaAtGivenPSoil (PsiTarget = abs(TLP),  
+                                            thetaRes = soil_parameters$residual_capacity_vg , 
+                                            thetaSat = soil_parameters$saturation_capacity_vg, 
+                                            alpha_vg = soil_parameters$alpha_vg, 
+                                            n_vg = soil_parameters$n_vg)
+  
+  theta_AtP50 <- compute.thetaAtGivenPSoil (PsiTarget=abs(TTT$P50_VC_Leaf), 
+                                            thetaRes=soil_parameters$residual_capacity_vg , 
+                                            thetaSat=soil_parameters$saturation_capacity_vg,
+                                            alpha_vg=soil_parameters$alpha_vg, n_vg=soil_parameters$n_vg) 
+  
+  TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+  TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+  
+  print(paste0("Available water capacity @Tlp (VG): ", TTT$TAW_AtTLP, ' mm'))
+  print(paste0("Available water capacity @P50 (VG): ", TTT$TAW_AtP50, ' mm'))
+  
+  }
+  
+  if(modeling_options$PedoTransferFormulation=="Campbell")
+  {
+    
+    
+    theta_AtTLP <- .soilParams$wilting_point <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TLP, 
+                                                                                thetaSat=soil_parameters$saturation_capacity_campbell, 
+                                                                                psie=soil_parameters$psie, 
+                                                                                b_camp=soil_parameters$b_camp)
+    
+    theta_AtP50 <- .soilParams$wilting_point <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TTT$P50_VC_Leaf, 
+                                                                                thetaSat=soil_parameters$saturation_capacity_campbell, 
+                                                                                psie=soil_parameters$psie, 
+                                                                                b_camp=soil_parameters$b_camp)
+    
+    TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+    TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+    
+    print(paste0("Available water capacity @Tlp (Campbell): ", TTT$TAW_AtTLP, ' mm'))
+    print(paste0("Available water capacity @P50  (Campbell): ", TTT$TAW_AtP50, ' mm'))
+    
+  }
+  
+   # determine root lenght (La gardner cowan)
   RAI = TTT$LAImax*TTT$fRootToLeaf
   
   TTT$La = RAI*TTT$rootDistribution / (2*pi*TTT$rootRadius)
@@ -63,15 +109,14 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   TTT$k_RTInit <- conduc$k_RTInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
   TTT$kPlantInit <- conduc$kPlantInit
-  
-  
   TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB
   
   
   return(TTT)
 }
 
-read.vegetation.file <- function(filePath, modeling_options){
+read.vegetation.file <- function(filePath, modeling_options)
+  {
   
   if (file.exists(filePath)) {
     io <- read.csv(file = filePath, sep = ";", dec='.',head = T)
@@ -273,7 +318,7 @@ read.vegetation.file <- function(filePath, modeling_options){
     }
   }
   
-
+ 
   
   return(TTT)
   

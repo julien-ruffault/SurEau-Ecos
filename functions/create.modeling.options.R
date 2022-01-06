@@ -49,6 +49,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     transpirationModel = c('Jarvis','Granier'),
                                     ETPFormulation = c("PT", "Penman"),
                                     RnFormulation = c("Linacre", "Linear"),
+                                    PedoTransferFormulation = c("VG", "Campbell"),
                                     constantClimate = F,
                                     compOptionsForEvapo = c("Normal", "Accurate","Fast", "Custom"),
                                     customSmallTimeStepInSec = 600,
@@ -56,7 +57,8 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     Tcav = 1,
                                     Eord=1,
                                     numericalScheme = c("Implicit","Semi-Implicit","Explicit"),
-                                    stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor")) {
+                                    stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor"),
+                                    printProg=T) {
   if (timeStepForEvapo == "Variable") {
     TIME <- c(0, 6, 12, 14, 16, 22)
     print("time step for evapotranspiration is variable and set to 6/12/14/18/24")
@@ -96,13 +98,14 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   
   ETPFormulation <- match.arg(ETPFormulation)
   RnFormulation <- match.arg(RnFormulation)
+  RnFormulation <- match.arg(RnFormulation)
 
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
   stomatalRegFormulation <- match.arg(stomatalRegFormulation)
 
   numericalScheme <-  match.arg(numericalScheme)
   
-  transpirationModel <- match.arg(transpirationModel)
+  PedoTransferFormulation <- match.arg(PedoTransferFormulation)
   
   
   if (compOptionsForEvapo == "Normal") { # every 10 min, 6 min, 3min, 1min
@@ -123,6 +126,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$constantClimate <- constantClimate
   modeling_options$ETPFormulation <- ETPFormulation
   modeling_options$RnFormulation <- RnFormulation
+  modeling_options$PedoTransferFormulation <- PedoTransferFormulation 
   modeling_options$timeStepForEvapo <- timeStepForEvapo
   modeling_options$TIME <- TIME
   modeling_options$resetSWC <- resetSWC
@@ -133,6 +137,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   modeling_options$defoliation <- defoliation
   modeling_options$thresholdMortatliy <- thresholdMortality
   modeling_options$transpirationModel <- transpirationModel
+  modeling_options$printProg <- printProg
   
   return(modeling_options)
 }

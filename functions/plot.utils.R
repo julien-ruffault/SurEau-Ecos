@@ -39,9 +39,9 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
     stomatalRegFormulation = modeling_options$stomatalRegFormulation), 
     from=0, to= vegetation_parameters$P50_VC_Leaf-3 , col=4, yaxt="n", ylab="",xlab="")
   
-  axis(4)
+    axis(4,  col = 4)
+    mtext("gs",4,1.8,cex=.8, col=4)
   
-  mtext("gs",4,1.8,cex=.8)
   barplot(c(vegetation_parameters$kPlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kp", "LAI", "gmin"), cex.lab=0.8)
   if(modeling_options$stomatalRegFormulation=="Sigmoid"){
   barplot(c(vegetation_parameters$P50_gs,vegetation_parameters$P50_VC_Leaf), names.arg = c("P50gs", "P50x"), cex.lab=0.8)}
@@ -52,7 +52,21 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
     barplot(c(vegetation_parameters$PiFullTurgor_Leaf ,tlp, vegetation_parameters$P50_VC_Leaf,vegetation_parameters$P50_VC_Trunk), names.arg = c("Pi0","TLP", "P50L","P50S" ), col = c(4,3,2,1), cex.lab = 0.5)}
   
   
-  barplot(soil_parameters$V_soil_storage_capacity, names.arg="TAW", density=10, ylim=c(0, soil_parameters$V_soil_storage_capacity+50))
+#  barplot(soil_parameters$V_soil_storage_capacity, names.arg="TAW", density=10, ylim=c(0, soil_parameters$V_soil_storage_capacity+50))
+  TAW = as.data.frame(matrix(ncol =4, nrow=1))
+  
+  VECTAW = c(soil_parameters$V_soil_storage_capacity, 
+             vegetation_parameters$TAW_AtTLP-soil_parameters$V_soil_storage_capacity,
+             vegetation_parameters$TAW_AtP50-vegetation_parameters$TAW_AtTLP)
+  
+  TAW[,c(1:3)] =VECTAW
+  TAW[,4] = "TAW"
+  a= barplot(cbind(V1,V2,V3)~V4, data=TAW, density =c(20,40, 60), col=c(4,3,2) ,ylim=c(0,(vegetation_parameters$TAW_AtP50+40)), names.arg="Total available water (TAW)", ylab="")
+  text(a,cumsum(VECTAW)[1]-10,"TAW@pF4.2" )  
+  text(a,cumsum(VECTAW)[2]-10,"TAW@TLP" )
+  text(a,cumsum(VECTAW)[3]-10,"TAW@P50" )
+  
   
 }
+  
 

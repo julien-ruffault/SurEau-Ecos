@@ -1,13 +1,11 @@
 # create a list of type WBsoil that contains all variables and parameters 
-new.WBsoil <- function(soil_params,vegetation_parameters, initialisation = "Full") {
+new.WBsoil <- function(soil_params, vegetation_parameters, initialisation = "Full") {
   WBsoil <- list()
   WBsoil$params <- soil_params # add parameters 
 
   #calculate B of the gardnar cowen model with information from the vegetation parameters
   b <- 1 / sqrt(pi * vegetation_parameters$Lv)
   WBsoil$params$B_GC <- vegetation_parameters$La * 2 * pi / (log(b / vegetation_parameters$rootRadius))
-    
-
 
   if (initialisation == "Full") {
     WBsoil$soilWaterStock <- soil_params$V_field_capacity
@@ -25,7 +23,7 @@ new.WBsoil <- function(soil_params,vegetation_parameters, initialisation = "Full
 }
 
 # Soil Evaporation from ETP /  # compute soil evaporation and update Soil water content in each soil layer
-compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
+compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI, Nhours) {
   # date    : 30/03/2020
   # updated : 05/01/2020 by JR (gamma dependence on Nhours) 
  
@@ -59,8 +57,9 @@ compute.evaporation.WBsoil <- function(WBsoil, ETP, K, LAI,Nhours) {
 compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K) {
   # created 03/01/2021 by JR / based on SurEau.C with gsoil0
   # such as Esoil = gSoil0 * REW1 * VPDsoil/Patm
-#browser()
+  # browser()
   
+  #TODO: improve this relation....
   Tsoil = 0.6009*Tair+3.59 # from relation fitted on O3HP 
   
   VPDsoil <- compute.VPDfromRHandT(RHair, Tsoil)
@@ -74,7 +73,7 @@ compute.evaporationG.WBsoil <- function(WBsoil, RHair, Tair, Nhours, LAI, ETP, K
     ETP_mmol_s <- 10^6 * ETP / (3600 * Nhours * 18)
     E_Soil2 <- (g_Soil / WBsoil$params$gSoil0) * ETP_mmol_s * exp(-K * LAI) # limitation by ETP depending on radiation reaching the soil
     E_Soil3 <- min(E_Soil1, E_Soil2)
-    WBsoil$Evaporation <- convertFluxFrom_mmolm2s_To_mm(E_Soil3,timeStep=Nhours) # Conversion from mmol/m2/s to mm
+    WBsoil$Evaporation <- convertFluxFrom_mmolm2s_To_mm(E_Soil3, timeStep=Nhours) # Conversion from mmol/m2/s to mm
   }
 
 
@@ -181,37 +180,42 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
 # Compute conductance and Psi
 compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
 
-  # Compute soil hydraulic conductivity with Van Genuchten
- # if (WBsoil$params$method == "vg") {
-    # Soil water holding capacity  (volumetric)
-    totalavailwater <- (WBsoil$params$V_saturation_capacity_vg - WBsoil$params$V_residual_capacity_vg)
-
-    # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
-    actualavailwater <- (WBsoil$soilWaterStock - WBsoil$params$V_residual_capacity_vg)
-
-    REW <- actualavailwater / totalavailwater  #/ numeric [ncouches
-    REW[REW <= 0.001] <- 0.001
-  
-
-    KSoil_temp <- REW^(WBsoil$params$I_vg) * (1 - (1 - REW^(1 / WBsoil$params$m))^WBsoil$params$m)^2
-  
-    #PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)-0.3 # for Puechabon only 
+    # Compute soil hydraulic conductivity with Van Genuchten
+     if (WBsoil$params$PedoTransferFormulation == "VG") {
     
-    PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000)  # diviser par 10000 pour passer de cm à MPa
+       # Soil water holding capacity  (volumetric)
+       totalavailwater <- (WBsoil$params$V_saturation_capacity_vg - WBsoil$params$V_residual_capacity_vg)
+       # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
+       actualavailwater <- (WBsoil$soilWaterStock - WBsoil$params$V_residual_capacity_vg)
+       REW <- actualavailwater / totalavailwater  #/ numeric [ncouches
+       REW[REW <= 0.0001] <- 0.0001
+       REW[REW>1] <- 1 #Added NM 12/12/2021 to avoid issues when influx to the soil lead to REW >1
+
+       KSoil_temp <- REW^(WBsoil$params$I_vg) * (1 - (1 - REW^(1 / WBsoil$params$m))^WBsoil$params$m)^2
+       PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000) - WBsoil$params$offSetPsoil  # diviser par 10000 pour passer de cm à MPa
     
-
-  # Compute soil hydraulic conductivity with campbell
-  # if (WBsoil$params$method == "camp") {
-  #   Ks <- WBsoil$params$Ksat_camp * WBsoil$params$B_GC
-  #   kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^(WBsoil$params$b_camp * 2 + 2)
-  #   PsiSoil <- -1 * (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_camp)^-WBsoil$params$b_camp))
-  #   REW <- NA
-  # }
-
-  # Compute Soil conductance
-  WBsoil$kSoil <- 1000 * WBsoil$params$Ksat_vg * WBsoil$params$B_GC * KSoil_temp
-  WBsoil$PsiSoil <- PsiSoil
-  WBsoil$REW <- REW
+       # Compute Soil conductance
+       WBsoil$kSoil <- 1000 * WBsoil$params$Ksat_vg * WBsoil$params$B_GC * KSoil_temp
+       WBsoil$PsiSoil <- PsiSoil
+       WBsoil$REW <- REW
+     }
+  
+    # Compute soil hydraulic conductivity with campbell
+     if (WBsoil$params$PedoTransferFormulation == "Campbell") {
+       # Soil water holding capacity  (volumetric)
+       totalavailwater <- (WBsoil$params$V_saturation_capacity_campbell - WBsoil$params$V_residual_capacity_campbell)
+       # Compute the relative water content (m3 water/m3 soil) based on Water Reserve and soil volume
+       actualavailwater <- (WBsoil$soilWaterStock - WBsoil$params$V_residual_capacity_campbell)
+       REW <- actualavailwater / totalavailwater  #/ numeric [ncouches
+       REW[REW <= 0.0001] <- 0.0001
+       REW[REW>1] <- 1 #Added NM 12/12/2021 to avoid issues when influx to the soil lead to REW >1
+       
+       Ks <- WBsoil$params$Ksat_campbell * WBsoil$params$B_GC
+       WBsoil$kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^(WBsoil$params$b_camp * 2 + 2)
+       WBsoil$PsiSoil <- (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^WBsoil$params$b_camp))
+       WBsoil$REW <- REW
+    }
+  
 
   return(WBsoil)
 }

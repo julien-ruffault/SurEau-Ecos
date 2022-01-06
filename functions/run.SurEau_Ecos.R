@@ -12,7 +12,8 @@
 #'
 #' @examples
 #'
-run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters, printProg) { # start loop on years
+run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters,
+                            printProg=T) { # start loop on years
 
   if (!nargs() == 7) {
     stop("One or several input parameters were missing")
@@ -41,18 +42,20 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
     for (DAY in climate_data$Doy[climate_data$Year == YEAR]) # Loop on days ####
     {
-      if(printProg==T) {print(paste0("day ", DAY))}
+     
+      if(modeling_options$printProg) {print(paste("Day=",DAY))}
       
       if (simulation_parameters$resolutionOutput %in% c("daily", "yearly")) {
         output_daily <- new.WBdaily() # create list for yearly outputs
       }
+      
       climDay <- new.WBclim(climate_data = climate_data, YEAR = YEAR, DOY = DAY) # Create WBclim for the day
       veg_var_list <- compute.pheno.WBveg(WBveg = veg_var_list, temperature = climDay$Tair_mean, DOY = DAY) # LAI and update
       veg_var_list <- updateLAIandStocks.WBveg(WBveg = veg_var_list, modeling_options = modeling_options) # update reservoirs, Q and C 
       climDay <- compute.RnAndETP.WBclim(WBclim = climDay, WBveg = veg_var_list, RnFormulation = modeling_options$RnFormulation, ETPFormulation = modeling_options$ETPFormulation) # calculate Rn and ETP
       veg_var_list <- compute.interception.WBveg(WBveg = veg_var_list, ppt = climDay$PPT) # vegetation interceptedWaterAmount  and pptSoil with Interpception by the canopy
       #browser()
-      veg_var_list$interceptedWaterAmount=0
+      veg_var_list$interceptedWaterAmount = 0
       soil_var_list <- compute.infiltration.WBsoil(WBsoil = soil_var_list, pptSoil = veg_var_list$pptSoil) # Infiltration / update soil water stocks / PsiSoil and KSoil
       climHour <- new.WBclimHour(WBclim = climDay, WBveg = veg_var_list, modeling_options = modeling_options, lat = stand_parameters$lat, lon = stand_parameters$lon, PTcoeff = veg_var_list$params$PTcoeff)
 
@@ -61,6 +64,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
 
       for (tt in 1:length(climHour$ETP)) # first hour is 0, last hour is 23 for a day
       {
+        
         # set climate
         Clim_current <- lapply(climHour, function(x) x[max(tt - 1, 1)]) # select climate of the h
         Clim_next <- lapply(climHour, function(x) x[tt]) # select climate of the next time step

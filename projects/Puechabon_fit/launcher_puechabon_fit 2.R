@@ -14,7 +14,8 @@ library(readxl)
 
 # set paths
 climateData_path          <- paste0(mainDir,'/projects/Puechabon_fit/Climat_Puechabon_site.csv')
-soilParameters_path       <- paste0(mainDir,'/projects/Puechabon_fit/Soil_Puechabon.csv')
+#climateData_path          <- paste0(mainDir,'/projects/Puechabon_fit/ERA_land_5.68E-43.24N_2020-2020_daily.csv')
+soilParameters_path       <- paste0(mainDir,'/projects/Puechabon_fit/Soil_Puechabon_OK.csv')
 vegetationParameters_path <- paste0(mainDir,'/projects/Puechabon_fit/vegetation_Puechabon.csv')
 output_path               <-  paste0(mainDir,'/projects/Puechabon_fit/test_Puechabon.csv')
 
@@ -22,10 +23,11 @@ output_path               <-  paste0(mainDir,'/projects/Puechabon_fit/test_Puech
 modeling_options  <- create.modeling.options(compOptionsForEvapo = "Fast",
                                              transpirationModel = 'Jarvis',
                                              defoliation = T,
-                                             stomatalRegFormulation = "Sigmoid") #PiecewiseLinear
+                                             stomatalRegFormulation = "Sigmoid",
+                                             PedoTransferFormulation="Campbell") #PiecewiseLinear
 
-simulation_parameters <- create.simulation.parameters(startYearSimulation = 2016,                       
-                                                      endYearSimulation = 2018,
+simulation_parameters <- create.simulation.parameters(startYearSimulation = 2020,                       
+                                                      endYearSimulation = 2020,
                                                       mainDir = mainDir,
                                                       outputType = 'diagnostic_subdaily',
                                                       overWrite = T,
@@ -36,12 +38,13 @@ stand_parameters      <- create.stand.parameters(LAImax = 2.2, lat = 43.75, lon 
 climate_data          <- create.climate.data(filePath = climateData_path, 
                                              modeling_options = modeling_options,
                                              simulation_parameters = simulation_parameters) #
-soil_parameters       <- create.soil.parameters(filePath=soilParameters_path)
+soil_parameters       <- create.soil.parameters(filePath=soilParameters_path, modeling_options = modeling_options, offSetPsoil = .3)
 vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, 
                                                       stand_parameters = stand_parameters, 
                                                       soil_parameter = soil_parameters,
                                                       modeling_options = modeling_options)
-
+#soil_parameters$V_soil_storage_capacity
+vegetation_parameters$rootDistribution
 #vegetation_parameters$paramsRegulation
 vegetation_parameters$gsMax = 220
 vegetation_parameters$gCrown0 = 150
@@ -49,7 +52,7 @@ vegetation_parameters$gmin20 = .5
 # vegetation_parameters$P12_gs = -.5
 # vegetation_parameters$P88_gs = -1
 head(climate_data)
-PlotTheStandAndPlant(vegetation_parameters, soil_parameters,modeling_options, openWindow=T)
+PlotTheStandAndPlant(vegetation_parameters, soil_parameters, modeling_options, openWindow=T)
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -64,6 +67,11 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 filename  = paste0(mainDir,"/projects/Puechabon_fit/test_Puechabon.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
 DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
+par(mfrow=c(1,3), pty="s")
+plot(DATA$transpiration_mm, type='l', ylab="Transpi (mm/h)")
+plot(DATA$Psi_LSym, type='l', col=2, ylab="Water potential Leaf (MPa)")
+plot(DATA$PLC_Leaf, type='l', col=2, ylim=c(0,100), ylab="PLC")
+
 # Loading potential dataset -------------------------------------------
 data_potential = read.csv(paste0(mainDir,'/projects/Puechabon_fit/validation_data/Water_Potential_MIND_Control-1.csv'),dec=',',sep=';')  
 data_potential = data_potential[data_potential$Treatment=='Control',]
@@ -149,7 +157,7 @@ plot(DATA$PLC_Leaf,type='l',col=1 , main=year,)
 
 #--------------
 #Nice Plots
-year=2017
+year=2016
   for (year in 2016:2018){
 
   io =year(simu_DD$Date)==year
