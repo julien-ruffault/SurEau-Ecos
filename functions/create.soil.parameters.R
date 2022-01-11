@@ -233,8 +233,7 @@ read.soil.file <- function(filePath, PedoTransferFormulation=.soilParams$PedoTra
     "Ksat_vg",
     "saturation_capacity_vg",
     "residual_capacity_vg",
-    "gSoil0",
-    "offSetPsoil")
+    "gSoil0")
   }
 
 if(PedoTransferFormulation=="Campbell") {  
