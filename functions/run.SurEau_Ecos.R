@@ -12,10 +12,9 @@
 #'
 #' @examples
 #'
-run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters,
-                            printProg=T) { # start loop on years
+run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_data, soil_parameters, vegetation_parameters, stand_parameters) { # start loop on years
 
-  if (!nargs() == 7) {
+  if (!nargs() == 6) {
     stop("One or several input parameters were missing")
   }
   soil_var_list <- new.WBsoil(soil_parameters, vegetation_parameters) #  create soil from input parameters

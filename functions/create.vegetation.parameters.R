@@ -17,11 +17,6 @@
 #'
 create.vegetation.parameters <- function(filePath, listOfParameters, stand_parameters, soil_parameters, modeling_options) {
 
- 
-  filePath = vegetationParameters_path
-  stand_parameters = stand_parameters
-  soil_parameter = soil_parameters
-  modeling_options = modeling_options
   
   if (!missing(filePath))
   {TTT = read.vegetation.file(filePath,modeling_options=modeling_options)}
@@ -29,16 +24,13 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   if(!missing(listOfParameters))
   {TTT=listOfParameters}
   
-  
   if(!missing(listOfParameters) & !missing(filePath))
   {TTT=listOfParameters
   warning("list of parameters are given by user")
   }
   
-  
   if(missing(filePath) &  missing(listOfParameters))
   {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
-  
   
 
   TTT$LAImax =stand_parameters$LAImax

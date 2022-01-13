@@ -6,46 +6,41 @@
 #' @param listOfParameters a list containing the necessary input parameterr instead of reading them  in file. Will only be used if 'filePath' arguement is not provided
 #' @param depths maximum depth (in m) of the soil layers (default : 0.3, 1 and 4 meters) 
 #' @param default_soil a logical value indicating whether a default soil should be used  to run tests (default =F) 
+#' @param offSetPsoil a numerical value indicating the offset in soil water potential (default = 0)
 #' @return
 #' @export
 #'
 #' @examples
-create.soil.parameters <- function(filePath, listOfParameters, default_soil = F, offSetPsoil, modeling_options) {
+create.soil.parameters <- function(filePath, listOfParameters, modeling_options, default_soil = F, offSetPsoil = 0) {
   
-   # note : warning("if run on puechabon : add an Offset  on psisoil (-0.3) to match observations --> / modify  in function 'computeSoilConductanceAndPsi.WBsoil'  ") 
+  .soilParams <- list() # Initialize output 
     
-    if (default_soil == T) # default if no file is provided
+  # check offSetPsoil
+  if(missing(offSetPsoil)) {
+    .soilParams$offSetPsoil <- 0
+  } 
+  if(!missing(offSetPsoil)) {
+    if (is.numeric(offSetPsoil)==T){
+    .soilParams$offSetPsoil <- offSetPsoil
+    print(paste("There is an offset on Psoil of",.soilParams$offSetPsoil, "MPa"))
+    }else{
+      error('offSetPsoil is provided but is not of class numeric')
+    }
+  }
+  
+
+    if (default_soil == T) # default soil for tests 
     {
       
-      warning("Default soil = Puechabon with Van-Genuchten Pedo transfer")
+      warning("Default soil used (Van-Genuchten Formulation)")
       
       .soilParams$PedoTransferFormulation <- "VG"
-      
-      # Offset Psoil
-      if(missing(offSetPsoil)) {
-        .soilParams$offSetPsoil <- 0
-      } 
-      if(!missing(offSetPsoil)) {
-        .soilParams$offSetPsoil <- offSetPsoil
-        print(paste("There is an offset on PSOIL of",.soilParams$offSetPsoil, "MPa"))
-      }
-      
-      #.soilParams$rock_fragment_content <- c(40, 80, 93) # coarse elements (stones/rocks) in each layer (%)
-      #derniers reglages sol sur Puechabon
       .soilParams$rock_fragment_content <- c(40, 75, 90)
-      
       .soilParams$depth = c(0.3, 1, 4)
-      
       .soilParams$layer_thickness <- numeric(3)
       .soilParams$layer_thickness[1] <- .soilParams$depth[1]
       .soilParams$layer_thickness[2] <- .soilParams$depth[2] - .soilParams$depth[1]
       .soilParams$layer_thickness[3] <- .soilParams$depth[3] - .soilParams$depth[2]
-      
-      #--------------
-        
-      # Ricthie parameters
-      #.soilParams$gamma <- 1 # Ritchie parameter
-      
       .soilParams$gSoil0 = 30
       
       # Van Genuchten parameters
@@ -56,35 +51,23 @@ create.soil.parameters <- function(filePath, listOfParameters, default_soil = F,
       .soilParams$Ksat_vg <- rep(1.69, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
       .soilParams$saturation_capacity_vg <- c(0.5, 0.5, 0.5) # Fraction of water at saturation capacity (cm3/cm3)
       .soilParams$residual_capacity_vg <- c(0.1, 0.1, 0.1) # Fraction of residual water  (cm3/cm3)
-      
-      # # A calculer pour diagnostique
-      # .soilParams$field_capacity <- c(0.4, 0.4, 0.4) # Fraction of water at field capacity (cm3/cm3)
-      # .soilParams$wilting_point <- c(0.2, 0.2, 0.2) # Fraction of water at wilting point (cm3/cm3)
-      
-      #NM 11/12/2021 add computation of wilting and field capacity from functions implemented in soil.utils.r
+    
+      # add computation of wilting and field capacity from functions implemented in soil.utils.r (NM 11/12/2021)
       .soilParams$wilting_point <- compute.thetaAtGivenPSoil (PsiTarget=1.5,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg)
       .soilParams$field_capacity <- compute.thetaAtGivenPSoil (PsiTarget=0.033,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg) 
        
-      .soilParams$offSetPsoil <- 0
-      
-      # Campbell parameters
-      # .soilParams$b_camp <- rep(6, 3) # exponent (Campbell 1974)
-      # .soilParams$psie_camp <- rep(0.025, 3) # desequilibrium potential (Campbell 1974)
-      # .soilParams$Ksat_camp <- rep(2.27, 3) # desequilibrium potential (Campbell 1974)
-      # .soilParams$saturation_capacity_camp <- c(0.5, 0.5, 0.5) # Fraction of water at saturaction capacity (cm3/cm3)
-      # modele de Gardnar-Wowen for soil-root conductance (uses both soil and vegetation parameters)
-      # .soilParams$La <- c(3000, 1700, 1700)
-      # .soilParams$Lv <- c(7000, 3000, 3000)
-      # .soilParams$r <- c(0.002, 0.002, 0.002)
+      .soilParams$offSetPsoil <- offSetPsoil
+
     }
-    if (default_soil == F) #
+  
+  
+    else if(default_soil == F) #
     {
-            
-      .soilParams <- list()
+    
       # Selection of the PedoTransfer function from modelling option or VanGenuchten (by default)
       if(missing(modeling_options)){
       .soilParams$PedoTransferFormulation <- "VG"
-      warning("modelling option is missing. Van Genuchten used as default")
+      warning("'modeling_options' is missing. Van Genuchten used as default")
       }
       
       if(!missing(modeling_options)){
@@ -98,24 +81,25 @@ create.soil.parameters <- function(filePath, listOfParameters, default_soil = F,
         } 
       if(!missing(offSetPsoil)) {
         .soilParams$offSetPsoil <- offSetPsoil
-        print(paste("There is an offset on PSOIL of",.soilParams$offSetPsoil, "MPa"))
+        print(paste("There is an offset on Psoil of",.soilParams$offSetPsoil, "MPa"))
         }
       
       if (!missing(filePath))
-      {TTT = read.soil.file(filePath, PedoTransferFormulation=.soilParams$PedoTransferFormulation)}
+      {TTT = read.soil.file(filePath, modeling_options)}
       
       if(missing(filePath) &  !missing(listOfParameters))
       {TTT=listOfParameters}
       
       if(!missing(listOfParameters) & !missing(filePath))
       {TTT=listOfParameters
-      warning("list of parameters are given by user")
+      error("'filePath' and 'ListOfParameters' are both provided, only one of these two arguments should be used")
       }
       
       if(missing(filePath) &  missing(listOfParameters))
       {error("'filePath' and 'ListOfParameters' are both missing, please provide one of these two arguments")}
       
       
+      # set soil parameters that are independent of the Pedo-tranfert Formulation 
       .soilParams$depth =c(TTT$depth1, TTT$depth2, TTT$depth3)
       .soilParams$layer_thickness <- numeric(3)
       .soilParams$layer_thickness[1] <- .soilParams$depth[1]
@@ -124,12 +108,6 @@ create.soil.parameters <- function(filePath, listOfParameters, default_soil = F,
       .soilParams$gSoil0 <- TTT$gSoil0
       .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
       
-      
-      #--------------
-      # # A calculer pour diagnostique
-      # .soilParams$field_capacity <- rep(TTT$field_capacity, 3) # Fraction of water at field capacity (cm3/cm3)
-      # .soilParams$wilting_point <- rep(TTT$wilting_point, 3) # Fraction of water at wilting point (cm3/cm3)
-      # 
       
       if(.soilParams$PedoTransferFormulation == "VG")
         {
@@ -162,8 +140,8 @@ create.soil.parameters <- function(filePath, listOfParameters, default_soil = F,
       .soilParams$V_soil_storage_capacity <- .soilParams$V_soil_storage_capacity_wilt
       
       
-      print(paste0("Available water capacity Wilting: ", .soilParams$V_soil_storage_capacity_wilt, ' mm'))
-      print(paste0("Available water capacity Residual: ", .soilParams$V_soil_storage_capacity_res, ' mm'))
+   #   print(paste0("Available water capacity Wilting: ", .soilParams$V_soil_storage_capacity_wilt, ' mm'))
+    #  print(paste0("Available water capacity Residual: ", .soilParams$V_soil_storage_capacity_res, ' mm'))
       }
   
       if(.soilParams$PedoTransferFormulation == "Campbell") 
@@ -207,7 +185,7 @@ create.soil.parameters <- function(filePath, listOfParameters, default_soil = F,
 
 
   
-read.soil.file <- function(filePath, PedoTransferFormulation=.soilParams$PedoTransferFormulation)
+read.soil.file <- function(filePath, modeling_options)
   { 
   if (file.exists(filePath)) {
     io <- data.frame(read.csv(filePath,header=T,sep=';',dec='.'))
@@ -217,7 +195,7 @@ read.soil.file <- function(filePath, PedoTransferFormulation=.soilParams$PedoTra
   
   colnames(io) <- c("Name", "Value")
   ## Setting common parameters for WB_soil (regardless of the options)
-  if(PedoTransferFormulation=="VG") {
+  if(modeling_options$PedoTransferFormulation=="VG") {
   params <- c(
     "RFC_1",
     "RFC_2",
@@ -236,7 +214,7 @@ read.soil.file <- function(filePath, PedoTransferFormulation=.soilParams$PedoTra
     "gSoil0")
   }
 
-if(PedoTransferFormulation=="Campbell") {  
+else if(modeling_options$PedoTransferFormulation=="Campbell") {  
   params <- c(
     "RFC_1",
     "RFC_2",
@@ -250,8 +228,7 @@ if(PedoTransferFormulation=="Campbell") {
     "saturation_capacity_campbell",
     "b_camp",
     "psie",
-    "gSoil0",
-    "offSetPsoil"
+    "gSoil0"
   )
 }
   

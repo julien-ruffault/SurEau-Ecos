@@ -594,12 +594,12 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
     cavitationWellComputed = (deltaPLCMax<1) # 1%
     WBveg_np1$Diag_timeStepInHours = Nhours/nts
     
-    if (nwhilecomp==length(opt$nsmalltimesteps)&deltaRegulMax>0.05) {
-      warning(paste0('regulation inacurate(deltaRegulMax=',signif(deltaRegulMax, digits = 3),'; please reduce the time step, currently=',Nhours/nts))
-    }
-    if (nwhilecomp==length(opt$nsmalltimesteps)&deltaPLCMax>1) {# 1%
-      warning(paste0('water release from cavitation inacurate(deltaPLCMax(%)=',signif(deltaPLCMax, digits = 3),'; please reduce the time step, currently=',Nhours/nts))
-    }
+    # if (nwhilecomp==length(opt$nsmalltimesteps)&deltaRegulMax>0.05) {
+    #   warning(paste0('regulation inacurate(deltaRegulMax=',signif(deltaRegulMax, digits = 3),'; please reduce the time step, currently=',Nhours/nts))
+    # }
+    # if (nwhilecomp==length(opt$nsmalltimesteps)&deltaPLCMax>1) {# 1%
+    #   warning(paste0('water release from cavitation inacurate(deltaPLCMax(%)=',signif(deltaPLCMax, digits = 3),'; please reduce the time step, currently=',Nhours/nts))
+    # }
   } # end while
   # B. SAVING SOLUTION AT NEXT TIME STEP IN WBveg
   WBveg = WBveg_np1

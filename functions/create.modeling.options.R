@@ -102,6 +102,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
 
   compOptionsForEvapo <- match.arg(compOptionsForEvapo)
   stomatalRegFormulation <- match.arg(stomatalRegFormulation)
+  transpirationModel <-  match.arg(transpirationModel)
 
   numericalScheme <-  match.arg(numericalScheme)
   

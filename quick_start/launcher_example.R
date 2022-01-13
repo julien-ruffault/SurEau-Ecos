@@ -1,8 +1,9 @@
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
-# Example launcher to run SurEau-Ecos
-
+# Launcher to run SurEau-Ecos on an exemple case
+# date : 13/01/2022
+# authors : Julien Ruffault (julien.ruff@gmail.com)
+#           Nicolas Martin  (nicolas.martin@inrae.fr)
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### ##
-
 
 # Initialization ---------------------------------------------------------------
 rm(list = ls()) # Clear environment
@@ -27,17 +28,16 @@ simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990
                                                       overWrite = T,
                                                       outputPath = output_path)
 
-
 climate_data          <- create.climate.data(filePath = climateData_path, 
                                         modeling_options = modeling_options,
                                         simulation_parameters = simulation_parameters) #
-stand_parameters      <- create.stand.parameters(LAImax = 3, lat = 48.73, lon = 6.23)
-soil_parameters       <- create.soil.parameters(filePath=soilParameters_path) 
+stand_parameters      <- create.stand.parameters(LAImax = 4, lat = 48.73, lon = 6.23)
+soil_parameters       <- create.soil.parameters(filePath = soilParameters_path, 
+                                                modeling_options = modeling_options) 
 vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParameters_path, 
                                                       stand_parameters = stand_parameters, 
                                                       soil_parameter = soil_parameters,
                                                       modeling_options = modeling_options)
-
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -47,20 +47,20 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
                 soil_parameters = soil_parameters,
                 vegetation_parameters = vegetation_parameters)
 
-# Example output loading an plotting  ------------------------------------------
+# loadoutput file   ------------------------------------------
 filename  = paste0(mainDir,"/quick_start/example_output_subdaily.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
 DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 
-# plot Psis
+# plot Plant water potentials
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-4,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
 lines(DATA$Time,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
 lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
-legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
+legend('bottomright',
+       legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
-
 
 
 # plot meteorological conditions 
