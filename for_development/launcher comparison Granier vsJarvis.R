@@ -234,7 +234,7 @@ plot(DATA_granier$transpiration_mm[1:24])
 # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='springgreen4')
-lines(DATA$DD,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$DD,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
 lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil'),

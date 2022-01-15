@@ -63,6 +63,7 @@ write.WBoutput <- function(WBoutput,Date,WBveg,WBsoil,WBclim){
   df2= NULL
   for(i in (1:length(WBoutput$contingencyTable[,1])))
   {
+    # The two following lines can be  used or debugging output
     #print(WBoutput$contingencyTable[i,]) #// for debugging only
     #browser()
     df2[i] <- unlist(get(WBoutput$contingencyTable[[i,2]])[WBoutput$contingencyTable[[i,3]]])[[as.numeric(WBoutput$contingencyTable[[i,4]])]]
@@ -110,13 +111,13 @@ new.WBdaily  <- function(){
   WBdaily$Psi_LApoMin = 0
   WBdaily$Psi_LApoMax = 0
   
-  WBdaily$Psi_TSymMin = 0
-  WBdaily$Psi_TSymMax = 0
-  WBdaily$Psi_TApoMin = 0
-  WBdaily$Psi_TApoMax = 0
+  WBdaily$Psi_SSymMin = 0
+  WBdaily$Psi_SSymMax = 0
+  WBdaily$Psi_SApoMin = 0
+  WBdaily$Psi_SApoMax = 0
   
   WBdaily$PLC_Leaf_max   = 0
-  WBdaily$PLC_Trunk_max = 0
+  WBdaily$PLC_Stem_max = 0
   
   WBdaily$temperature  = NA
   WBdaily$RH = NA
@@ -146,13 +147,13 @@ new.WByearly <- function(){
   WByearly$Psi_LApoMin = 0
   WByearly$Psi_LApoMax = 0
   
-  WByearly$Psi_TSymMin = 0
-  WByearly$Psi_TSymMax = 0
-  WByearly$Psi_TApoMin = 0
-  WByearly$Psi_TApoMax = 0
+  WByearly$Psi_SSymMin = 0
+  WByearly$Psi_SSymMax = 0
+  WByearly$Psi_SApoMin = 0
+  WByearly$Psi_SApoMax = 0
   
   WByearly$PLC_Leaf_max   = 0
-  WByearly$PLC_Trunk_max = 0
+  WByearly$PLC_Stem_max = 0
   
   WByearly$temperature = NA
   WByearly$RH = NA
@@ -181,13 +182,13 @@ update.WBdaily <- function(WBdaily,WBveg,WBclim,WBsoil){
   WBdaily$Psi_LSymMax = max(WBdaily$Psi_LSymMax,WBveg$Psi_LSym)
   WBdaily$Psi_LApoMin = min(WBdaily$Psi_LApoMin,WBveg$Psi_LApo)
   WBdaily$Psi_LApoMax = max(WBdaily$Psi_LApoMax,WBveg$Psi_LApo)
-  WBdaily$Psi_TSymMin = min(WBdaily$Psi_TSymMin,WBveg$Psi_TSym)
-  WBdaily$Psi_TSymMax = max(WBdaily$Psi_TSymMax,WBveg$Psi_TSym)
-  WBdaily$Psi_TApoMin = min(WBdaily$Psi_TApoMin,WBveg$Psi_TApo)
-  WBdaily$Psi_TApoMax = max(WBdaily$Psi_TApoMax,WBveg$Psi_TApo)
+  WBdaily$Psi_SSymMin = min(WBdaily$Psi_SSymMin,WBveg$Psi_SSym)
+  WBdaily$Psi_SSymMax = max(WBdaily$Psi_SSymMax,WBveg$Psi_SSym)
+  WBdaily$Psi_SApoMin = min(WBdaily$Psi_SApoMin,WBveg$Psi_SApo)
+  WBdaily$Psi_SApoMax = max(WBdaily$Psi_SApoMax,WBveg$Psi_SApo)
 
   WBdaily$PLC_Leaf_max   = max(WBdaily$PLC_LEaf_max,WBveg$PLC_Leaf)
-  WBdaily$PLC_Trunk_max = max(WBdaily$PLC_Trunk_max,WBveg$PLC_Trunk)
+  WBdaily$PLC_Stem_max = max(WBdaily$PLC_Stem_max,WBveg$PLC_Stem)
   
   WBdaily$temperature  = WBclim$Tair_mean
   WBdaily$RH = WBclim$RHair_mean
@@ -215,13 +216,13 @@ update.WByearly <- function(WByearly,WBdaily,dayOfDeath,WBveg,DAY){
   WByearly$Psi_LSymMax = max(WByearly$Psi_LSymMax, WBdaily$Psi_LSymMax)
   WByearly$Psi_LApoMin = min(WByearly$Psi_LApoMin, WBdaily$Psi_LApoMin)
   WByearly$Psi_LApoMax = max(WByearly$Psi_LApoMax, WBdaily$Psi_LApoMax)
-  WByearly$Psi_TSymMin = min(WByearly$Psi_TSymMin, WBdaily$Psi_TSymMin)
-  WByearly$Psi_TSymMax = max(WByearly$Psi_TSymMax, WBdaily$Psi_TSymMax)
-  WByearly$Psi_TApoMin = min(WByearly$Psi_TApoMin, WBdaily$Psi_TApoMin)
-  WByearly$Psi_TApoMax = max(WByearly$Psi_TApoMax, WBdaily$Psi_TApoMax)
+  WByearly$Psi_SSymMin = min(WByearly$Psi_SSymMin, WBdaily$Psi_SSymMin)
+  WByearly$Psi_SSymMax = max(WByearly$Psi_SSymMax, WBdaily$Psi_SSymMax)
+  WByearly$Psi_SApoMin = min(WByearly$Psi_SApoMin, WBdaily$Psi_SApoMin)
+  WByearly$Psi_SApoMax = max(WByearly$Psi_SApoMax, WBdaily$Psi_SApoMax)
   
   WByearly$PLC_Leaf_max   = max(WByearly$PLC_Leaf_max,WBdaily$PLC_Leaf_max)
-  WByearly$PLC_Trunk_max = max(WByearly$PLC_Trunk_max,WBdaily$PLC_Trunk_max)
+  WByearly$PLC_Stem_max = max(WByearly$PLC_Stem_max,WBdaily$PLC_Stem_max)
   
   WByearly$temperature_max = max(WByearly$temperature_max,WBdaily$temperature)
   WByearly$RH_min = min(WByearly$RH_min,WBdaily$RH)

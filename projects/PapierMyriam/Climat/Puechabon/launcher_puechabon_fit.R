@@ -42,13 +42,13 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 vegetation_parameters$gsMax = 220
 vegetation_parameters$gCrown0 = 150
 
-vegetation_parameters$kPlantInit
+vegetation_parameters$k_PlantInit
 vegetation_parameters$gsMax
 
 
 vegetation_parameters$k_LSymInit
 
-vegetation_parameters$k_RTInit
+vegetation_parameters$k_RSApoInit
 
 vegetation_parameters$Lv
 
@@ -75,9 +75,9 @@ DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # # plot Psis
 # plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-8,0),xlab='Time',ylab='Psi (MPa)')
 # lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
-# lines(DATA$Time,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
+# lines(DATA$Time,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
 # 
-# lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
+# lines(DATA$Time,DATA$Psi_SApo,type='l',col='firebrick4')
 # lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 # 
 # 
@@ -108,7 +108,7 @@ DATA_day= aggregate(DATA$Psi_LSym,by=list(yday(DATA$Time),year(DATA$Time)),min)
 colnames(DATA_day) <- c('DOY','YEAR','Psi_min')
 DATA_day$Psi_base = aggregate(DATA$Psi_LSym,by=list(yday(DATA$Time),year(DATA$Time)),max)$x
 DATA_day$transpiration_mm = aggregate(DATA$transpiration_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
-DATA_day$evapotranspiration_mm = aggregate(DATA$transpiration_mm+DATA$SoilEvaporation_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
+DATA_day$evapotranspiration_mm = aggregate(DATA$transpiration_mm+DATA$soilEvaporation_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
 DATA_day$PPT= aggregate(DATA$PPT,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
 DATA_day$Date = as.Date(paste(DATA_day$DOY,DATA_day$YEAR,sep='/'),format='%j/%Y')
   
@@ -192,9 +192,9 @@ axis(4,col='blue',col.ticks='blue')
 grid()
 
 
-plot(DATA$fluxSoilToCollar1_mm[io],type='l',lwd=0.2)
-lines(DATA$fluxSoilToCollar2_mm[io],type='l',col=2,lwd=0.2)
-lines(DATA$fluxSoilToCollar3_mm[io],type='l',col=3,lwd=0.3)
+plot(DATA$fluxSoilToStem1_mm[io],type='l',lwd=0.2)
+lines(DATA$fluxSoilToStem2_mm[io],type='l',col=2,lwd=0.2)
+lines(DATA$fluxSoilToStem3_mm[io],type='l',col=3,lwd=0.3)
 
 plot(DATA$PsiSoil1[io],type='l',lwd=0.5)
 lines(DATA$PsiSoil2[io],type='l',col=2,lwd=0.5)
@@ -424,18 +424,18 @@ legend('bottomleft', col=c(1,2,3),c('layer1', 'layer2', 'layer3'),lty=1,cex=1.5)
 # #lines(DATA$Time,DATA$transpiration_mm,col='blue')
 # DATA$Date = DATA$Time
 # 
-# AAA = merge(FTH,DATA[,c('Date','transpiration_mm','SoilEvaporation_mm')],by='Date',all.x=T)
+# AAA = merge(FTH,DATA[,c('Date','transpiration_mm','soilEvaporation_mm')],by='Date',all.x=T)
 # head(AAA)
-# # plot(AAA$transpiration_mm+AAA$SoilEvaporation_mm,AAA$LE_F_MDS*1e-3*1800/2257)
+# # plot(AAA$transpiration_mm+AAA$soilEvaporation_mm,AAA$LE_F_MDS*1e-3*1800/2257)
 # # abline(0,1,col=2)
 # # cor(AAA$x,AAA$transpiration_mm)
 # 
 # ######
-# AAA$evapotranspiration  = AAA$transpiration_mm+AAA$SoilEvaporation_mm
+# AAA$evapotranspiration  = AAA$transpiration_mm+AAA$soilEvaporation_mm
 # plot(AAA$evapotranspiration,AAA$LE_F_MDS*2*1e-3*1800/2257,cex=0.5)
 # 
 # abline(0,1,col=2)
-# cor(AAA$LE_F_MDS*1e-3*1800/2257,AAA$transpiration_mm+AAA$SoilEvaporation_mm,use='complete.obs')^2
+# cor(AAA$LE_F_MDS*1e-3*1800/2257,AAA$transpiration_mm+AAA$soilEvaporation_mm,use='complete.obs')^2
 # 
 # 
 # # 

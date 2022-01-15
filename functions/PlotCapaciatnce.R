@@ -26,39 +26,39 @@
 #   K_L_td = Eprime_n + C_LApo/dt + 1/(1/K_LSym + dt/C_LSym) + delta_L_cav*K_L_Cav  
 #   Psi_L_td = ((Eprime_n + C_LApo/dt)*Psi_LApo_n + (1 /(1/K_LSym + dt/C_LSym))*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_mem)/(K_L_td + dbxmin) # dbxmin to avoid 0/0
 #   
-#   K_T_td = C_TApo/dt + 1/(1/K_TSym + dt/C_TSym) + sum(WBveg$kSoilToCollar)  + delta_T_cav*K_T_Cav 
+#   K_T_td = C_SApo/dt + 1/(1/K_TSym + dt/C_SSym) + sum(WBveg$k_SoilToStem)  + delta_T_cav*K_T_Cav 
 #   #Erreur dans psi_T_td, FP: A supprimer ?
-#   Psi_T_td = (C_TApo/dt*Psi_TApo_n + 1/(1/K_TSym + dt/C_TSym)*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_TApo_mem) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
+#   Psi_T_td = (C_SApo/dt*Psi_SApo_n + 1/(1/K_TSym + dt/C_SSym)*Psi_SSym_n + sum(WBveg$k_SoilToStem * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_SApo_mem) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
 #   
 #   # 3. Compute Psi_LApo_np1
-#   Eleaks = E_n + Emin_L_np1/(1+(C_LSym+dbxmin)/(K_LSym*dt)) + K_TL/(K_TL + K_T_td) * Emin_T_np1/(1+(C_TSym + dbxmin)/(K_TSym *dt))  # dbxmin to avoid 0/0  FP ATTENTION BUG SUR EMIN!!!!
+#   Eleaks = E_n + Emin_L_np1/(1+(C_LSym+dbxmin)/(K_LSym*dt)) + K_TL/(K_TL + K_T_td) * Emin_T_np1/(1+(C_SSym + dbxmin)/(K_TSym *dt))  # dbxmin to avoid 0/0  FP ATTENTION BUG SUR EMIN!!!!
 #   Psi_LApo_np1_Num = kseriesum(K_TL , K_T_td + dbxmin)*Psi_T_td + K_L_td*Psi_L_td - Eleaks
 #   Psi_LApo_np1_Denom = kseriesum(K_TL, K_T_td + dbxmin) + K_L_td + dbxmin # dbxmin to avoid 0/0
 #   Psi_LApo_np1 = Psi_LApo_np1_Num/Psi_LApo_np1_Denom
 #   
-#   # 4. Compute Psi_TApo_np1
-#   Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_n + Emin_L_np1 / (1+(C_LSym + dbxmin)/(K_LSym*dt)))/(K_TL+ dbxmin) #   FP ATTENTION BUG SUR EMIN!!!!
+#   # 4. Compute Psi_SApo_np1
+#   Psi_SApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_n + Emin_L_np1 / (1+(C_LSym + dbxmin)/(K_LSym*dt)))/(K_TL+ dbxmin) #   FP ATTENTION BUG SUR EMIN!!!!
 #   
 #   # 5. Compute Psi_Symp_np1 (L and T)
 #   Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + C_LSym/dt*Psi_LSym_n - Emin_L_np1) / (K_LSym + C_LSym/dt + dbxmin) # dbxmin to avoid 0/0
-#   Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_np1) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
+#   Psi_SSym_np1 = (K_TSym*Psi_SApo_np1 + C_SSym/dt*Psi_SSym_n - Emin_T_np1) / (K_TSym + C_SSym/dt + dbxmin) # dbxmin to avoid 0/0
 #   
 #   
-#   if(Psi_TApo_np1 > Psi_TApo_mem & !delta_T_cav) {Tcav_well_computed=1}
-#   if(Psi_TApo_np1 < Psi_TApo_mem & !delta_T_cav) {Tcav_well_computed=0}
-#   if(Psi_TApo_np1 < Psi_TApo_mem & delta_T_cav) {Tcav_well_computed=1}
-#   #Tcav_well_computed = (Psi_TApo_np1 > Psi_TApo_mem)*delta_T_cav  # 1 if OK
-#   computeNotOK = 1 -  Tcav_well_computed
+#   if(Psi_SApo_np1 > Psi_SApo_mem & !delta_T_cav) {Scav_well_computed=1}
+#   if(Psi_SApo_np1 < Psi_SApo_mem & !delta_T_cav) {Scav_well_computed=0}
+#   if(Psi_SApo_np1 < Psi_SApo_mem & delta_T_cav) {Scav_well_computed=1}
+#   #Scav_well_computed = (Psi_SApo_np1 > Psi_SApo_mem)*delta_T_cav  # 1 if OK
+#   computeNotOK = 1 -  Scav_well_computed
 #   #print(computeNotOK)
-#   if (computeNotOK==0) { # we update Psi_TApo_mem if needed before leaving the while loop
-#     if (Psi_TApo_np1 < Psi_TApo_mem) {Psi_TApo_mem = Psi_TApo_np1}
+#   if (computeNotOK==0) { # we update Psi_SApo_mem if needed before leaving the while loop
+#     if (Psi_SApo_np1 < Psi_SApo_mem) {Psi_SApo_mem = Psi_SApo_np1}
 #   } else { # trunk cavitation is not well computed in the first path so a second is needed with T cavitation 
-#     delta_T_cav = 1 # in the next step of the while, we do the computation with Tcavit activated
+#     delta_T_cav = 1 # in the next step of the while, we do the computation with Scavit activated
 #   }
 #   
-#   F_T_Cav = K_T_Cav * (Psi_TApo_mem-Psi_TApo_np1) * dt
-#   print(F_T_Cav)
-#   Q_TApo_mmol <- WBveg$Q_TApo_mmol - max(F_T_Cav,0)
+#   F_S_Cav = K_T_Cav * (Psi_SApo_mem-Psi_SApo_np1) * dt
+#   print(F_S_Cav)
+#   Q_SApo_mmol <- WBveg$Q_SApo_mmol - max(F_S_Cav,0)
 #   
 #   
 #   
@@ -70,7 +70,7 @@
 # ComputeCapaSymp <- function(Q_LSym_sat_mmol, PiFullTurgor, EpsilonSymp, Psi)
 # {
 #   
-#   PsiTlp <- PiFullTurgor*EpsilonSymp/(PiFullTurgor+EpsilonSymp)
+#   PsiTLP <- PiFullTurgor*EpsilonSymp/(PiFullTurgor+EpsilonSymp)
 #   dbxmin = 1e-100 # NM minimal double to avoid-INF
 #   Psi=Psi-dbxmin
 #   Rs1 <- (-1 * (Psi + PiFullTurgor - EpsilonSymp) - sqrt((Psi + PiFullTurgor - EpsilonSymp)^2 + 4 * (Psi * EpsilonSymp))) / (2 * EpsilonSymp)
@@ -84,7 +84,7 @@
 #   RWC_LSym_prime1 = RWC_LSym/(-PiFullTurgor- Psi- EpsilonSymp+2*EpsilonSymp*RWC_LSym)
 #   RWC_LSym_prime2 = -(PiFullTurgor)/Psi^2
 #   #Compute the leaf capacitance (mmol/MPa/m2_sol)
-#   RWC_LSym_prime1[Psi<PsiTlp]<-RWC_LSym_prime2[Psi<PsiTlp]
+#   RWC_LSym_prime1[Psi<PsiTLP]<-RWC_LSym_prime2[Psi<PsiTLP]
 #   
 #   C_LSym <- Q_LSym_sat_mmol*RWC_LSym_prime1
 #   return(list("C_LSym"=C_LSym, "RWC_LSym_prime1"=RWC_LSym_prime1,"RWC_LSym"=RWC_LSym))

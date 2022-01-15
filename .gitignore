@@ -3,12 +3,13 @@
 .RData
 .Ruserdata
 .DS_Store
-projects/Puechabon_fit
 projects/sensitivity_analysis
-projects/sensitivity_analysis2/Results_new_simu_2
+projects/sensitivity_analysis2
+projects/Compar_SurEauC
 projects/different_tests
 projects/test_resolution_scheme
 projects/Shiny_POC
 projects/PapierMyriam
 projects/Forgenius
 projects/Cours_StCharles
+projects/Simu_ICOS

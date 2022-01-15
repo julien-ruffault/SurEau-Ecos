@@ -95,13 +95,13 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   TTT$La = RAI*TTT$rootDistribution / (2*pi*TTT$rootRadius)
   TTT$Lv = TTT$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
   
-  ##### calculate the different conductance of the plant from kPlantInit 
-  conduc <- distribute.conductances(kPlantInit=TTT$kPlantInit, ri = TTT$rootDistribution, fracLeafSym = TTT$fracLeafSym) 
-  TTT$k_TLInit <- conduc$k_TLInit
-  TTT$k_RTInit <- conduc$k_RTInit 
+  ##### calculate the different conductance of the plant from k_PlantInit 
+  conduc <- distribute.conductances(k_PlantInit=TTT$k_PlantInit, ri = TTT$rootDistribution, fracLeafSym = TTT$fracLeafSym) 
+  TTT$k_SLApoInit <- conduc$k_SLApoInit
+  TTT$k_RSApoInit <- conduc$k_RSApoInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
-  TTT$kPlantInit <- conduc$kPlantInit
-  TTT$VolumeLiving_TRB = TTT$VolumeLiving_TRB
+  TTT$k_PlantInit <- conduc$k_PlantInit
+  TTT$Vol_Stem = TTT$Vol_Stem
   
   
   return(TTT)
@@ -124,33 +124,33 @@ read.vegetation.file <- function(filePath, modeling_options)
   params <- c(
     "P50_VC_Leaf", # [MPa] / Water potential causing 50% Cavitation in the vulnerability curve
     "slope_VC_Leaf", # [%/MPa]             / Slope of the vulnerability curve
-    "P50_VC_Trunk",
-    "slope_VC_Trunk",
+    "P50_VC_Stem",
+    "slope_VC_Stem",
     "EpsilonSymp_Leaf", # [MPa]            / Modulus of elasticity in leaves
     "PiFullTurgor_Leaf", # [MPa]           / Osmotic Potential at full turgor in leaves
-    "ApoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
+    "apoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
     "LDMC", # [mgMS/g]                     / Leaf dry matter content (measured for fully watered leaves)
     "LMA", # [g/m2leaf]                   / Leaf mass per area
     "K", # [-]                            / Light extinction coefficient of the vegetation layer
-    "kPlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
+    "k_PlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
     "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
-    "gmin_T",     #  conductance (gmin) of the trunk
+    "gmin_S",      #  conductance (gmin) of the stem
     "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
-    "k_TSymInit",
+    "k_SSymInit",
     "fRootToLeaf", # root to leaf ratio 
     "rootRadius",  #  radius of roots (m)
     "betaRootProfile", # parameter for the distribution of roots in the soil 
-    "PiFullTurgor_Trunk",
-    "EpsilonSymp_Trunk",
-    "ApoplasmicFrac_Trunk",
-    "SymplasmicFrac_Trunk",
-    "VolumeLiving_TRB",
+    "PiFullTurgor_Stem",
+    "EpsilonSymp_Stem",
+    "ApoplasmicFrac_Stem",
+    "SymplasmicFrac_Stem",
+    "Vol_Stem",
     "fTRBToLeaf",
     "C_LApoInit",
-    "C_TApoInit"
+    "C_SApoInit"
   )
   
   for (i in 1:length(params)) {
@@ -266,7 +266,7 @@ read.vegetation.file <- function(filePath, modeling_options)
   }
   
   if (TTT$Foliage == "Deciduous") {
-    params_Decid <- c("Tbase", "Fcrit", "DayStart", "nbdayLAI")
+    params_Decid <- c("Tbase", "Fcrit", "dayStart", "nbdayLAI")
     for (i in 1:length(params_Decid))
     {
       AAA <- which(io$Name == params_Decid[i]) ## line number of the variable

@@ -32,7 +32,7 @@ TODO list for SurEau  (mise à jour le 28/05/2021 par JR)
 - In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
 - regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation
 ## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
-- TODO FP would suggest to move compute fluxSoilToCollar_mm directly in the main loop, as it is the coupling between the two models...(JR) 
+- TODO FP would suggest to move compute fluxSoilToStem_mm directly in the main loop, as it is the coupling between the two models...(JR) 
 
 
 --------------------------------------------------------------------------------

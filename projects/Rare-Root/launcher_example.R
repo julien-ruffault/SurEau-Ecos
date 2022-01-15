@@ -55,8 +55,8 @@ DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # plot Psis
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-4,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
-lines(DATA$Time,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
-lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
+lines(DATA$Time,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$Time,DATA$Psi_SApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
@@ -73,15 +73,15 @@ axis(4,col='blue',col.ticks='blue')
 # plot water fluxes 
 plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='water fluxes (mm/timestep)')
 lines(DATA$Time,DATA$Emin_mm,col='forestgreen')
-lines(DATA$Time,DATA$EminT_mm,col='brown4')
-lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='grey30')
-legend('topright',legend=c('Transpiration','Emin','EminT','Soil'),
+lines(DATA$Time,DATA$Emin_S_mm,col='brown4')
+lines(DATA$Time,DATA$soilEvaporation_mm,type='l',col='grey30')
+legend('topright',legend=c('Transpiration','Emin','Emin_S','Soil'),
        col=c('blue','forestgreen','brown4','grey30'),lty=1,lwd=2,cex=0.8)
 
 # plot cavitation 
 plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,70),xlab='Time',ylab='PLC')
-lines(DATA$Time,DATA$PLC_Trunk,type='l',col='brown')
-legend('topleft',legend=c('PLC_Leaf','PLC_Trunk'),
+lines(DATA$Time,DATA$PLC_Stem,type='l',col='brown')
+legend('topleft',legend=c('PLC_Leaf','PLC_Stem'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
 
 # plot fuel moisture 

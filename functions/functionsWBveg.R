@@ -4,7 +4,7 @@
 # Authors : Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
 #           Julien Ruffault (julien.ruff@gmail.com)
 #           Francois Pimont (francois.pimont@inrae.fr)
-### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
+### ### ### ### ### ### P### ### ### ### ### ### ### ### ### ### ### ### ### ##
 
 
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
@@ -16,65 +16,58 @@ new.WBveg <- function(veg_params) {
   
   WBveg$params <- veg_params # assign parameters 
   
+  WBveg$params$PsiTLP_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
+  WBveg$params$PsiTLP_Stem  <-  WBveg$params$PiFullTurgor_Stem*WBveg$params$EpsilonSymp_Stem/(WBveg$params$PiFullTurgor_Stem+WBveg$params$EpsilonSymp_Stem)
   
-  WBveg$params$PsiTlp_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
-  WBveg$params$PsiTlp_Trunk <-  WBveg$params$PiFullTurgor_Trunk*WBveg$params$EpsilonSymp_Trunk/(WBveg$params$PiFullTurgor_Trunk+WBveg$params$EpsilonSymp_Trunk)
-  
-
   # potentials 
   WBveg$Psi_LApo = 0
-  WBveg$Psi_TApo = 0
+  WBveg$Psi_SApo = 0
   WBveg$Psi_LSym = 0
-  WBveg$Psi_TSym = 0 
+  WBveg$Psi_SSym = 0 
   WBveg$Psi_LApo_cav = 0 # FP replaced "mem" by "cav" (when cavitation starts)
-  WBveg$Psi_TApo_cav = 0
+  WBveg$Psi_SApo_cav = 0
   WBveg$Psi_AllSoil = 0
   #----Conductance & capacitance (mmol/m2/s/MPa) Here on leaf area basis but they are to be updated as a function symplasm conductance and leaf area
   # hydraulic conductances
-  WBveg$k_Plant <-  WBveg$params$kPlantInit  # constant value during simulation  
-  WBveg$k_LSym <-  WBveg$params$k_LSymInit  # constant value during simulation   
-  WBveg$k_TSym <-  WBveg$params$k_TSymInit  # constant value during simulation 
-  WBveg$k_RT   <-  NA # is updated in compute.kplant.WBveg
-  WBveg$k_TL   <-  NA # is updated in compute.kplant.WBveg
-  WBveg$kSoilToCollar <- c("NA","NA","NA") # / conductance rhisophere for each soil layer
+  WBveg$k_Plant <-  WBveg$params$k_PlantInit  # constant value during simulation  
+  WBveg$k_LSym  <-  WBveg$params$k_LSymInit  # constant value during simulation   
+  WBveg$k_SSym  <-  WBveg$params$k_SSymInit  # constant value during simulation 
+  WBveg$k_RSApo    <-  NA # is updated in compute.kplant.WBveg
+  WBveg$k_SLApo    <-  NA # is updated in compute.kplant.WBveg
+  WBveg$k_SoilToStem <- c("NA","NA","NA") # / conductance rhisophere for each soil layer
   
   #Capacitances 
   #Symplasm capacitance updated as a function of water content and Leaf area (mmol/m2leaf/MPa) /updated in update.capacitancesSymAndApo()  (NM : 25/10/2021)
   WBveg$C_LSym = NA 
-  WBveg$C_TSym = NA
+  WBveg$C_SSym = NA
   
   #Symplasm capacitance are initialised per m2sol and are updated acording to LAI for conversion in m2leaf (updated in update.capacitancesSymAndApo())  (NM : 25/10/2021)
   WBveg$C_LApo = NA 
-  WBveg$C_TApo = NA
+  WBveg$C_SApo = NA
   
-  # WBveg$C_LApo <- WBveg$params$C_LApoInit     # Capacitance apop Leaf (mmol/m2leaf/s/MPA) 
-  # WBveg$C_TApo <- WBveg$params$C_TApoInit     # Capacitance apo Trunk (mmol/m2leaf/s/MPA) 
-  
-
   # Leaf and canopy conductance
   WBveg$gmin <- 0 # initialised at 0 to compute Tleaf on first time step considering gs =0 and not NA s
-  WBveg$gmin_T <- WBveg$params$gmin_T #Gmin for trunk and branches
+  WBveg$gmin_S <- WBveg$params$gmin_S #Gmin for stem and branches
   WBveg$regulFact <- 0.01 #  TODO voir si y'a besoin d'initialiser 
   
   # TODO voir pour mettre tout en NA si TranspirationMod = 0 
   WBveg$gs_bound <- NA
   WBveg$gs_lim   <- 0 # initialised to 0 to compute Tleaf on first time step considering gs = 0 and not NA 
-  WBveg$gcanopy_Bound <- NA
+  WBveg$gcanopy_bound <- NA
   WBveg$gcanopy_lim <- NA
   WBveg$gBL <- NA
   WBveg$gCrown <- NA
 
-  
   # Fluxes
   WBveg$Eprime = 0
   WBveg$Emin <- 0
-  WBveg$EminT <- 0
+  WBveg$Emin_S <- 0
   WBveg$Ebound <- 0
   WBveg$Elim <- 0
-  WBveg$fluxSoilToCollar_mm <- numeric(3)
+  WBveg$fluxSoilToStem <- numeric(3)
   WBveg$transpiration_mm<- 0
   WBveg$Emin_mm <- 0
-  WBveg$EminT_mm <- 0
+  WBveg$Emin_S_mm <- 0
   
   # LAI and LAI-dependent variables
   WBveg$LAIpheno <- numeric(1)
@@ -92,7 +85,7 @@ new.WBveg <- function(veg_params) {
   
   # Cavitation
   WBveg$PLC_Leaf     <- 0  # percent loss of conductivity [%]/ 
-  WBveg$PLC_Trunk       <- 0  # percent loss of conductivity [%] /
+  WBveg$PLC_Stem       <- 0  # percent loss of conductivity [%] /
   
   # leaf temp
   WBveg$leafTemperature <- NA
@@ -119,33 +112,33 @@ new.WBveg <- function(veg_params) {
   WBveg$Q_LApo_sat_mmol  <- 0
   WBveg$Q_LApo_sat_L <- 0
 
-  # Q trunk apo  (mol/m2leaf)
-  WBveg$Q_TApo_sat_mmol <- 0
-  WBveg$Q_TApo_sat_L <- 0
+  # Q stem apo  (mol/m2leaf)
+  WBveg$Q_SApo_sat_mmol <- 0
+  WBveg$Q_SApo_sat_L <- 0
 
   # Q leaf symplasm (mol/m2leaf)
   WBveg$Q_LSym_sat_mmol   <- 0
   WBveg$Q_LSym_sat_L      <- 0
 
-  # Q Trunk symplasm (mol/m2leaf)
-  WBveg$Q_TSym_sat_mmol   <- 0
-  WBveg$Q_TSym_sat_L      <- 0
+  # Q Stem symplasm (mol/m2leaf)
+  WBveg$Q_SSym_sat_mmol   <- 0
+  WBveg$Q_SSym_sat_L      <- 0
 
-  # Q Trunk and Leaf apo and symp in liter/kg TODO 13/08/2021: better in mmol?
+  # Q Stem and Leaf apo and symp in liter/kg TODO 13/08/2021: better in mmol?
   WBveg$Q_LApo_L      <- 0
-  WBveg$Q_TApo_L      <- 0
+  WBveg$Q_SApo_L      <- 0
   WBveg$Q_LSym_L      <- 0
-  WBveg$Q_TSym_L      <- 0
+  WBveg$Q_SSym_L      <- 0
   
   WBveg$Delta_Q_LApo_mmol_diag <- 0
   
   WBveg$F_L_Cav <- 0
-  WBveg$F_T_Cav <- 0
+  WBveg$F_S_Cav <- 0
  
   #---------------------#
 
   WBveg$PLC_Leaf  =  PLC.comp(Pmin = WBveg$Psi_LApo, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
-  WBveg$PLC_Trunk = PLC.comp(Pmin = WBveg$Psi_TApo, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
+  WBveg$PLC_Stem = PLC.comp(Pmin = WBveg$Psi_SApo, slope = WBveg$params$slope_VC_Stem, P50 = WBveg$params$P50_VC_Stem)
   
   return(WBveg)
 }
@@ -181,7 +174,7 @@ compute.pheno.WBveg <- function(WBveg, temperature, DOY) {
     {
       
       
-      if (temperature > WBveg$params$Tbase & DOY >= WBveg$params$DayStart) {
+      if (temperature > WBveg$params$Tbase & DOY >= WBveg$params$dayStart) {
         WBveg$sumTemperature <- WBveg$sumTemperature + temperature # update SumTemp si T>tbase
       }
       
@@ -233,23 +226,23 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   WBveg$DMLiveCanopy <- WBveg$LAI * WBveg$params$LMA      # water storing capacities of the living component
   WBveg$DMDeadCanopy <- WBveg$LAIdead * WBveg$params$LMA  # water storing capacities of the dead component
   
-  WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LSym_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (1 - WBveg$params$apoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
-  if(WBveg$LAI) {WBveg$Q_LSym_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
+  if(WBveg$LAI==0) {WBveg$Q_LSym_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
-  WBveg$Q_TSym_sat_L <- WBveg$params$VolumeLiving_TRB *WBveg$params$SymplasmicFrac_Trunk
-  WBveg$Q_TSym_sat_mmol <- WBveg$Q_TSym_sat_L*1000000/18
-  WBveg$Q_TSym_sat_mmol_perLeafArea <- WBveg$Q_TSym_sat_mmol / max(1,WBveg$LAI)  #  used max(1,LAI) to avoid that Q_TSym_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf) 
+  WBveg$Q_SSym_sat_L <- WBveg$params$Vol_Stem *WBveg$params$SymplasmicFrac_Stem
+  WBveg$Q_SSym_sat_mmol <- WBveg$Q_SSym_sat_L*1000000/18
+  WBveg$Q_SSym_sat_mmol_perLeafArea <- WBveg$Q_SSym_sat_mmol / max(1,WBveg$LAI)  #  used max(1,LAI) to avoid that Q_SSym_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf) 
   
 
-  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$ApoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
+  WBveg$Q_LApo_sat_L <- (1 / (WBveg$params$LDMC / 1000) - 1) * WBveg$DMLiveCanopy * (WBveg$params$apoplasmicFrac_Leaf) / 1000 # Leaf symplastic water content in l/m2 (i.e. mm)
   WBveg$Q_LApo_sat_mmol <- WBveg$Q_LApo_sat_L*1000000/18
-  if(WBveg$LAI) {WBveg$Q_LApo_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LApo_sat_mmol_perLeafArea <- WBveg$Q_LApo_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
+  if(WBveg$LAI==0) {WBveg$Q_LApo_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LApo_sat_mmol_perLeafArea <- WBveg$Q_LApo_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
 
-  WBveg$Q_TApo_sat_L <- WBveg$params$VolumeLiving_TRB*WBveg$params$ApoplasmicFrac_Trunk 
-  WBveg$Q_TApo_sat_mmol <- WBveg$Q_TApo_sat_L* 1000000/18
-  WBveg$Q_TApo_sat_mmol_perLeafArea = WBveg$Q_TApo_sat_mmol / max(1,WBveg$LAI) #used max(1,LAI) to avoid that Q_TApo_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf)  modified by NM (25/10/2021)
+  WBveg$Q_SApo_sat_L <- WBveg$params$Vol_Stem*WBveg$params$ApoplasmicFrac_Stem 
+  WBveg$Q_SApo_sat_mmol <- WBveg$Q_SApo_sat_L* 1000000/18
+  WBveg$Q_SApo_sat_mmol_perLeafArea = WBveg$Q_SApo_sat_mmol / max(1,WBveg$LAI) #used max(1,LAI) to avoid that Q_SApo_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf)  modified by NM (25/10/2021)
   
   
   WBveg <- update.capacitancesApoAndSym.WBveg(WBveg)
@@ -293,24 +286,24 @@ compute.waterStorage.WBveg <- function(WBveg, VPD)
   RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
   Q_LSym <- max(0,  RWC_LSym) * WBveg$Q_LSym_sat_L
   WBveg$Q_LSym_L <- Q_LSym
-  WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$ApoplasmicFrac_Leaf) / 1000))
+  WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$apoplasmicFrac_Leaf) / 1000))
   
   #---Apoplasmic water content of the leaves-------------------------------------------------
   Q_LApo = (1-WBveg$PLC_Leaf/100) *  WBveg$Q_LApo_sat_L
   WBveg$Q_LApo_L <- Q_LApo
-  WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$ApoplasmicFrac_Leaf / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
+  WBveg$LFMCApo <- 100 * (Q_LApo / (WBveg$DMLiveCanopy * WBveg$params$apoplasmicFrac_Leaf / 1000)) #  LFMC of Apo (relative moisture content to dry mass), gH20/gMS
   
   #------LFMC leaf total---- (Apo+Symp) --------------------------------------------
   WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
   
-  #----Symplasmic canopy water content of the trunk----
-  RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Trunk, Esymp = WBveg$params$EpsilonSymp_Trunk, Pmin = WBveg$Psi_TSym) # Relative water content (unitless)
-  Q_TSym <- max(0,  RWC_TSym) * WBveg$Q_TSym_sat_L
-  WBveg$Q_TSym_L <- Q_TSym
+  #----Symplasmic canopy water content of the stem----
+  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$EpsilonSymp_Stem, Pmin = WBveg$Psi_SSym) # Relative water content (unitless)
+  Q_SSym <- max(0,  RWC_SSym) * WBveg$Q_SSym_sat_L
+  WBveg$Q_SSym_L <- Q_SSym
   
-  #----Apoplasmic water content of the trunk-----
-  Q_TApo = (1-WBveg$PLC_Trunk/100) *  WBveg$Q_TApo_sat_L
-  WBveg$Q_TApo_L <- Q_TApo
+  #----Apoplasmic water content of the stem-----
+  Q_SApo = (1-WBveg$PLC_Stem/100) *  WBveg$Q_SApo_sat_L
+  WBveg$Q_SApo_L <- Q_SApo
   
   
   #- FMCcanopy
@@ -347,16 +340,16 @@ compute.evapoIntercepted.WBveg <- function(WBveg, ETP) {
 ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ### ##
 update.kplant.WBveg <- function(WBveg, WBsoil) {
   
-  # calculate k_RT and k_TL with cavitation
-  WBveg$k_RT   = WBveg$params$k_RTInit * (1-WBveg$PLC_Trunk/100)
+  # calculate k_RSApo and k_SLApo with cavitation
+  WBveg$k_RSApo   = WBveg$params$k_RSApoInit * (1-WBveg$PLC_Stem/100)
   
-  WBveg$k_TL   = WBveg$params$k_TLInit * (1-WBveg$PLC_Leaf/100)
+  WBveg$k_SLApo   = WBveg$params$k_SLApoInit * (1-WBveg$PLC_Leaf/100)
   
   # Root from root length
-  WBveg$kSoilToCollar    <- kseriesum(WBsoil$kSoil, WBveg$k_RT) # conductance from soil to collar (two resistances in series Rsoil and Rroot)
+  WBveg$k_SoilToStem    <- kseriesum(WBsoil$kSoil, WBveg$k_RSApo) # conductance from soil to collar (two resistances in series Rsoil and Rroot)
   
   # Compute k_plant (from root to leaf) for diagnostic only
-  WBveg$k_Plant <-  1/ (1 /sum(WBveg$k_RT) + 1/WBveg$k_TL + 1/WBveg$k_LSym)
+  WBveg$k_Plant <-  1/ (1 /sum(WBveg$k_RSApo) + 1/WBveg$k_SLApo + 1/WBveg$k_LSym)
   
   return(WBveg) 
 }
@@ -370,7 +363,7 @@ update.capacitancesApoAndSym.WBveg <- function(WBveg) {
   #----Compute the relative water content of the symplasm----
   RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym - dbxmin) 
   #----Compute the derivative of the relative water content of the symplasm----
-  if (WBveg$Psi_LSym > WBveg$params$PsiTlp_Leaf) { # FP derivative of -Pi0- Eps(1-RWC)+Pi0/RWC
+  if (WBveg$Psi_LSym > WBveg$params$PsiTLP_Leaf) { # FP derivative of -Pi0- Eps(1-RWC)+Pi0/RWC
     RWC_LSym_prime <- RWC_LSym / (-WBveg$params$PiFullTurgor_Leaf - WBveg$Psi_LSym - WBveg$params$EpsilonSymp_Leaf + 2 * WBveg$params$EpsilonSymp_Leaf * RWC_LSym)
   } else {
     RWC_LSym_prime <- -WBveg$params$PiFullTurgor_Leaf / WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
@@ -380,26 +373,22 @@ update.capacitancesApoAndSym.WBveg <- function(WBveg) {
   if (WBveg$LAI==0){ WBveg$C_LSym = 0 }else{ WBveg$C_LSym <- WBveg$Q_LSym_sat_mmol_perLeafArea * RWC_LSym_prime} # changed 25/10/2021 by NM 
  
   
-  #----Trunk symplasmic canopy water content----
-  RWC_TSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Trunk, Esymp = WBveg$params$EpsilonSymp_Trunk, Pmin = WBveg$Psi_TSym - dbxmin) 
+  #----Stem symplasmic canopy water content----
+  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$EpsilonSymp_Stem, Pmin = WBveg$Psi_SSym - dbxmin) 
 
   #----Compute the derivative of the relative water content of the symplasm----
-  if (WBveg$Psi_TSym > WBveg$params$PsiTlp_Trunk) {
-    RWC_TSym_prime <- RWC_TSym / (-WBveg$params$PiFullTurgor_Trunk - WBveg$Psi_TSym - WBveg$params$EpsilonSymp_Trunk + 2 * WBveg$params$EpsilonSymp_Trunk * RWC_TSym)
+  if (WBveg$Psi_SSym > WBveg$params$PsiTLP_Stem) {
+    RWC_SSym_prime <- RWC_SSym / (-WBveg$params$PiFullTurgor_Stem - WBveg$Psi_SSym - WBveg$params$EpsilonSymp_Stem + 2 * WBveg$params$EpsilonSymp_Stem * RWC_SSym)
   }
   else {
-    RWC_TSym_prime <- -WBveg$params$PiFullTurgor_Trunk / WBveg$Psi_TSym^2
+    RWC_SSym_prime <- -WBveg$params$PiFullTurgor_Stem / WBveg$Psi_SSym^2
   }
-  # Compute the capacitance (mmol/MPa/m2_sol)
-  #WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol * RWC_TSym_prime
-  WBveg$C_TSym <- WBveg$Q_TSym_sat_mmol_perLeafArea * RWC_TSym_prime #  changed 25/10/2021 by NM. --> Trunk capacitance per leaf area can only decrease with LAI (cannot increase when LAI<1 )
+  # Compute the capacitance (mmol/MPa/m2_leaf)
+  #WBveg$C_SSym <- WBveg$Q_SSym_sat_mmol * RWC_SSym_prime
+  WBveg$C_SSym <- WBveg$Q_SSym_sat_mmol_perLeafArea * RWC_SSym_prime #  changed 25/10/2021 by NM. --> Stem capacitance per leaf area can only decrease with LAI (cannot increase when LAI<1 )
   
-  
-  # update Capacitances Apo (NM : 25/10/2021) --> 
-  # WBveg$C_TApo = WBveg$params$C_TApoInit * (1/max(WBveg$LAI,1))
-  # WBveg$C_LApo = WBveg$params$C_LApoInit * (1/max(WBveg$LAI,1))
-  # 
-  WBveg$C_TApo = WBveg$params$C_TApoInit 
+
+  WBveg$C_SApo = WBveg$params$C_SApoInit 
   WBveg$C_LApo = WBveg$params$C_LApoInit 
   
   
@@ -441,7 +430,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
     WBveg$gmin  <- compute.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
     #TODO : ATTENTION PAS DE CALCUL DE GCROWN ici....:
     WBveg$Emin  <- WBveg$gmin* WBveg$leafVPD /101.3
-    WBveg$EminT <-  WBveg$params$fTRBToLeaf * WBveg$gmin_T* WBveg$leafVPD /101.3
+    WBveg$Emin_S <-  WBveg$params$fTRBToLeaf * WBveg$gmin_S* WBveg$leafVPD /101.3
     #compute current stomatal regulation
     regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
     WBveg$regulFact = regul$regulFact
@@ -482,7 +471,7 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   # Cuticular conductances and transpiration 
   WBveg$gmin <- compute.gmin(leafTemperature = WBveg$leafTemperature,gmin_20 = WBveg$params$gmin20,TPhase = WBveg$params$TPhase_gmin,Q10_1 = WBveg$params$Q10_1_gmin,Q10_2 = WBveg$params$Q10_2_gmin)
   WBveg$Emin <- compute.Emin(gmin = WBveg$gmin, gBL=WBveg$gBL, gCrown = WBveg$gCrown, VPD = WBveg$leafVPD)
-  WBveg$EminT <-  WBveg$params$fTRBToLeaf * compute.Emin(gmin = WBveg$gmin_T,gBL=WBveg$gBL, gCrown=WBveg$gCrown, VPD= WBclim$VPD)
+  WBveg$Emin_S <-  WBveg$params$fTRBToLeaf * compute.Emin(gmin = WBveg$gmin_S,gBL=WBveg$gBL, gCrown=WBveg$gCrown, VPD= WBclim$VPD)
   #compute current stomatal regulation
   regul = compute.regulFact(psi = WBveg$Psi_LSym, params= WBveg$params, regulationType = modeling_options$stomatalRegFormulation)
   WBveg$regulFact = regul$regulFact
@@ -490,8 +479,8 @@ compute.transpiration.WBveg <- function(WBveg, WBclim, Nhours, modeling_options)
   # calculate canopy Transpiration with no regulation
   #if (modeling_options$EboundFormulation == 'Jarvis'){
   WBveg <- calculate.gsJarvis.WBveg(WBveg, PAR = WBclim$PAR) # calculate gs_bound
-  WBveg$gcanopy_Bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
-  WBveg$Ebound   = WBveg$gcanopy_Bound * WBveg$leafVPD / 101.3
+  WBveg$gcanopy_bound  = 1/(1/WBveg$gCrown+1/WBveg$gs_bound+ 1/WBveg$gBL)
+  WBveg$Ebound   = WBveg$gcanopy_bound * WBveg$leafVPD / 101.3
   #}
   
   # else if (modeling_options$EboundFormulation =='Granier1999'){
@@ -551,7 +540,7 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
     
     regulationWellComputed=F;cavitationWellComputed=F;nwhilecomp=nwhilecomp+1;deltaRegulMax = 1e-100;deltaPLCMax = 1e-100
     nts = opt$nsmalltimesteps[nwhilecomp] # number of small time steps
-    fluxSoilToCollarLargeTimeStep = 0
+    fluxSoilToStemLargeTimeStep = 0
     fluxEvaporationSoilLargeTimeStep = 0
     for (its in c(1:nts)) { #INTERNAL LOOP ON SMALL TIME STEPS
       p = (its-0.5)/nts
@@ -571,15 +560,15 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
       regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation)# TODO check why recomputed? should be in WBveg_tmp
       deltaRegulMax = max(deltaRegulMax,abs(regul_np1$regulFact-regul_n$regulFact))
       # 2. PLC at n and np1
-      deltaPLCMax = max(deltaPLCMax,WBveg_np1$PLC_Leaf-WBveg_n$PLC_Leaf,WBveg_np1$PLC_Trunk-WBveg_n$PLC_Trunk)
+      deltaPLCMax = max(deltaPLCMax,WBveg_np1$PLC_Leaf-WBveg_n$PLC_Leaf,WBveg_np1$PLC_Stem-WBveg_n$PLC_Stem)
       WBveg_n = WBveg_np1 # Update WBveg_n
       
       # 3. update of soil on small time step (done by FP in version 16)
-      fluxSoilToCollar = WBveg$kSoilToCollar*(WBsoil_n$PsiSoil-WBveg_np1$Psi_TApo)
-      # NB the time step for fluxSoilToCollar_mm is Nhours/nts!
-      WBveg_np1$fluxSoilToCollar_mm = convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollar, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
-      WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToCollar_mm)
-      fluxSoilToCollarLargeTimeStep = fluxSoilToCollarLargeTimeStep + fluxSoilToCollar/nts # mean flux over one large time step
+      fluxSoilToStem = WBveg$k_SoilToStem*(WBsoil_n$PsiSoil-WBveg_np1$Psi_SApo)
+      # NB the time step for fluxSoilToStem is Nhours/nts!
+      WBveg_np1$fluxSoilToStem = convertFluxFrom_mmolm2s_To_mm(fluxSoilToStem, LAI = WBveg$LAI, timeStep = Nhours/nts) # Quantity from each soil layer to the below part 
+      WBsoil_n <- update.soilWater.WBsoil(WBsoil = WBsoil_n, fluxEvap = WBveg_np1$fluxSoilToStem)
+      fluxSoilToStemLargeTimeStep = fluxSoilToStemLargeTimeStep + fluxSoilToStem/nts # mean flux over one large time step
       
       # if (opt$numericalScheme == "Explicit" ) {
       #   write.WBoutput(Date = NA, WBoutput = WBoutput, WBsoil = WBsoil, WBveg = WBveg_n, WBclim = WBclim_next)
@@ -607,16 +596,16 @@ compute.plantNextTimeStep.WBveg <- function(WBveg, WBsoil, WBclim_current,WBclim
   WBveg <- compute.transpiration.WBveg(WBveg, WBclim_next, Nhours,modeling_options=modeling_options) # final update of transpiration at clim_next (useful for consistency in outputs, but not required for the computations)
   
 
-  # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToCollar_mm is used as input in UpdateSoilWater.WBsoil)
-  #TODO FP suggests moving the computation of  fluxSoilToCollar_mm in the main loop, as it is the coupling between the two models...
+  # C. UPDATING FLUX FROM SOIL (WBveg$fluxSoilToStem is used as input in UpdateSoilWater.WBsoil)
+  #TODO FP suggests moving the computation of  fluxSoilToStem in the main loop, as it is the coupling between the two models...
 
   # mean soil quantities on large time steps
   WBveg$Emin_mm  = convertFluxFrom_mmolm2s_To_mm(WBveg$Emin, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
-  WBveg$EminT_mm = convertFluxFrom_mmolm2s_To_mm(WBveg$EminT, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
+  WBveg$Emin_S_mm = convertFluxFrom_mmolm2s_To_mm(WBveg$Emin_S, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
   
-  WBveg$SumFluxSoilToCollar <- sum(fluxSoilToCollarLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
-  WBveg$fluxSoilToCollar_mm  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToCollarLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part 
-  WBveg$transpiration_mm     <- convertFluxFrom_mmolm2s_To_mm((WBveg$Emin + WBveg$EminT + WBveg$Elim),LAI = WBveg$LAI, timeStep = Nhours) # total flux in mm 
+  WBveg$SumFluxSoilToStem <- sum(fluxSoilToStemLargeTimeStep) # flux total en mmol/m2/s / used for Tleaf 
+  WBveg$fluxSoilToStem_mm  <- convertFluxFrom_mmolm2s_To_mm(fluxSoilToStemLargeTimeStep, LAI = WBveg$LAI, timeStep = Nhours) # Flux from each soil layer to the below part  in mm
+  WBveg$transpiration_mm     <- convertFluxFrom_mmolm2s_To_mm((WBveg$Emin + WBveg$Emin_S + WBveg$Elim),LAI = WBveg$LAI, timeStep = Nhours) # total flux in mm 
 
   return(WBveg)
 }
@@ -628,38 +617,38 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   # 1. Initializing current time step according to computation options (FP)
   dbxmin = 1e-100 # FP minimal double to avoid 0/0
   Psi_LApo_n = WBveg$Psi_LApo
-  Psi_TApo_n = WBveg$Psi_TApo
+  Psi_SApo_n = WBveg$Psi_SApo
   Psi_LSym_n = WBveg$Psi_LSym
-  Psi_TSym_n = WBveg$Psi_TSym
+  Psi_SSym_n = WBveg$Psi_SSym
   Psi_LApo_cav = WBveg$Psi_LApo_cav
-  Psi_TApo_cav = WBveg$Psi_TApo_cav
+  Psi_SApo_cav = WBveg$Psi_SApo_cav
   
   K_LSym = opt$Lsym * WBveg$k_LSym   #
-  K_TSym = opt$Tsym * WBveg$k_TSym   #
+  K_SSym = opt$Ssym * WBveg$k_SSym   #
   C_LSym = opt$Lsym * WBveg$C_LSym   #
-  C_TSym = opt$Tsym * WBveg$C_TSym   #
+  C_SSym = opt$Ssym * WBveg$C_SSym   #
   
   C_LApo = opt$CLapo * WBveg$C_LApo #
-  C_TApo = opt$CTapo * WBveg$C_TApo #
+  C_SApo = opt$CTapo * WBveg$C_SApo #
   
   
-  K_TL = WBveg$k_TL #
+  K_SL = WBveg$k_SLApo #
   E_nph = WBveg$Elim # COMPUTED WITH WBveg$Psi_LSym AND INTERPOLATE CLIMATE 
   Eprime_nph = opt$Eord * WBveg$Eprime
   
   Emin_L_nph = WBveg$Emin 
-  Emin_T_nph = WBveg$EminT
+  Emin_S_nph = WBveg$Emin_S
   
 
   
-  #Compute K_L_Cav et K_T_Cav
+  #Compute K_L_Cav et K_S_Cav
   
   PLC_prime_L = PLCPrime.comp(WBveg$PLC_Leaf,WBveg$params$slope_VC_Leaf)
   #K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol
   K_L_Cav = -opt$Lcav * WBveg$Q_LApo_sat_mmol_perLeafArea * PLC_prime_L / dt  # avec WBveg$Q_LSym_sat en l/m2 sol # changed by NM (25/10/2021)
-  PLC_prime_T = PLCPrime.comp(WBveg$PLC_Trunk,WBveg$params$slope_VC_Trunk)
-  #K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign here
-  K_T_Cav = -opt$Tcav * WBveg$Q_TApo_sat_mmol_perLeafArea * PLC_prime_T / dt  #opt$Tcav * WBveg$K_T_Cav #FP corrected a bug sign herehanged by NM (25/10/2021)
+  PLC_prime_S = PLCPrime.comp(WBveg$PLC_Stem,WBveg$params$slope_VC_Stem)
+  #K_S_Cav = -opt$Scav * WBveg$Q_SApo_sat_mmol * PLC_prime_S / dt  #opt$Scav * WBveg$K_S_Cav #FP corrected a bug sign here
+  K_S_Cav = -opt$Scav * WBveg$Q_SApo_sat_mmol_perLeafArea * PLC_prime_S / dt  #opt$Scav * WBveg$K_S_Cav #FP corrected a bug sign herehanged by NM (25/10/2021)
   
   
   # 2. While loop in order to decide if cavitation or not :
@@ -668,31 +657,31 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   # the appropriate cavitation events when needed (starting assuming no cavit at all...)
   # in case of computational problem, the last case assume no cavitation flux
   LcavitWellComputed=F #initialized to false
-  TcavitWellComputed=F
-  if ((opt$Lcav==0)&(opt$Tcav==0)) { # no cavitation flux computed
+  ScavitWellComputed=F
+  if ((opt$Lcav==0)&(opt$Scav==0)) { # no cavitation flux computed
     delta_L_cavs=c(0)
-    delta_T_cavs=c(0)
-  } else if ((opt$Lcav==0)&(opt$Tcav==1)) {# Tcav only
+    delta_S_cavs=c(0)
+  } else if ((opt$Lcav==0)&(opt$Scav==1)) {# Scav only
     delta_L_cavs=c(0,0,0)
-    delta_T_cavs=c(0,1,0)
-  } else if ((opt$Lcav==0)&(opt$Tcav==1)) {# Lcav only
+    delta_S_cavs=c(0,1,0)
+  } else if ((opt$Lcav==0)&(opt$Scav==1)) {# Lcav only
     delta_L_cavs=c(0,1,0)
-    delta_T_cavs=c(0,0,0)
-  } else { #Lcav=1 and Tcav=1
+    delta_S_cavs=c(0,0,0)
+  } else { #Lcav=1 and Scav=1
     delta_L_cavs=c(0,1,0,1,0) # the fifth case is here in case no solution with others...
-    delta_T_cavs=c(0,0,1,1,0)
+    delta_S_cavs=c(0,0,1,1,0)
   }
   if (opt$numericalScheme=="Explicit"){ # in case of explicit we do the computation only once
     delta_L_cavs=c(opt$Lcav)
-    delta_T_cavs=c(opt$Tcav)
+    delta_S_cavs=c(opt$Scav)
   }
   nwhilecomp = 0 # count the number of step in while loop (if more than 4 no solution and warning)
-  while (((!LcavitWellComputed)|(!TcavitWellComputed))&(nwhilecomp<length(delta_L_cavs))) {
+  while (((!LcavitWellComputed)|(!ScavitWellComputed))&(nwhilecomp<length(delta_L_cavs))) {
     #browser()
     nwhilecomp = nwhilecomp + 1
     #print(paste0('nwhilecomp=',nwhilecomp)) for debugging 
     delta_L_cav = delta_L_cavs[nwhilecomp]
-    delta_T_cav = delta_T_cavs[nwhilecomp]
+    delta_S_cav = delta_S_cavs[nwhilecomp]
    
     if (opt$numericalScheme=="Implicit") {
       # 2.1 Compute intermediates
@@ -703,29 +692,29 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       Psi_L_td = (C_LApo/dt*Psi_LApo_n + klsym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_L_td + dbxmin) # dbxmin to avoid 0/0
       E_L_tilda = (E_nph + Emin_L_nph)/(1+(C_LSym/dt+0.5 * Eprime_nph+dbxmin)/K_LSym)
       
-      # compute Psi_T_tilda and K_T_tilda and E_T_tilda
-      ktsym = kseriesum(K_TSym, C_TSym/dt) # for Psi_TSym_n
-      K_T_td = C_TApo/dt + ktsym + sum(WBveg$kSoilToCollar)  + delta_T_cav*K_T_Cav 
-      Psi_T_td = (C_TApo/dt*Psi_TApo_n + ktsym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_TApo_cav) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
-      E_T_tilda = K_TL/(K_TL + K_T_td) * Emin_T_nph/(1+(C_TSym/dt + dbxmin)/K_TSym)  # dbxmin to avoid 0/0  
+      # compute Psi_S_tilda and K_S_tilda and E_S_tilda
+      kssym = kseriesum(K_SSym, C_SSym/dt) # for Psi_SSym_n
+      K_S_td = C_SApo/dt + kssym + sum(WBveg$k_SoilToStem)  + delta_S_cav*K_S_Cav 
+      Psi_S_Td = (C_SApo/dt*Psi_SApo_n + kssym*Psi_SSym_n + sum(WBveg$k_SoilToStem * WBsoil$PsiSoil) + delta_S_cav*K_S_Cav*Psi_SApo_cav) / (K_S_td + dbxmin) # dbxmin to avoid 0/0
+      E_S_tilda = K_SL/(K_SL + K_S_td) * Emin_S_nph/(1+(C_SSym/dt + dbxmin)/K_SSym)  # dbxmin to avoid 0/0  
       
       # 2.2 Compute Psi_LApo_np1
-      Psi_LApo_np1_Num = kseriesum(K_TL , K_T_td + dbxmin)*Psi_T_td + K_L_td*Psi_L_td - (E_L_tilda + E_T_tilda)
-      Psi_LApo_np1_Denom = kseriesum(K_TL, K_T_td + dbxmin) + K_L_td + dbxmin # dbxmin to avoid 0/0
+      Psi_LApo_np1_Num = kseriesum(K_SL , K_S_td + dbxmin)*Psi_S_Td + K_L_td*Psi_L_td - (E_L_tilda + E_S_tilda)
+      Psi_LApo_np1_Denom = kseriesum(K_SL, K_S_td + dbxmin) + K_L_td + dbxmin # dbxmin to avoid 0/0
       Psi_LApo_np1 = Psi_LApo_np1_Num/Psi_LApo_np1_Denom
       
-      # 2.3 Compute Psi_TApo_np1
-      Psi_TApo_np1 = ((K_L_td + K_TL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_TL+ dbxmin) 
+      # 2.3 Compute Psi_SApo_np1
+      Psi_SApo_np1 = ((K_L_td + K_SL)*Psi_LApo_np1 - K_L_td*Psi_L_td + E_L_tilda)/(K_SL+ dbxmin) 
     } else if (opt$numericalScheme=="Semi-Implicit") {
       # 2.1 LApo
-      alpha = exp(-(K_TL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
-      Psi_td = (K_TL*Psi_TApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_TL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
+      alpha = exp(-(K_SL+K_LSym+delta_L_cav*K_L_Cav)/C_LApo*dt)
+      Psi_td = (K_SL*Psi_SApo_n + K_LSym*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_cav)/(K_SL + K_LSym+delta_L_cav*K_L_Cav + dbxmin) # dbxmin to avoid 0/0
       Psi_LApo_np1 = alpha * Psi_LApo_n +(1-alpha) * Psi_td
         
-      # 2.2. TApo
-      alpha = exp(-(K_TL+K_TSym + sum(WBveg$kSoilToCollar)+delta_T_cav*K_T_Cav)/C_TApo*dt)
-      Psi_td = (K_TL*Psi_LApo_n + K_TSym*Psi_TSym_n + sum(WBveg$kSoilToCollar * WBsoil$PsiSoil)+ delta_T_cav*K_T_Cav*Psi_TApo_cav)/(K_TL + K_TSym+sum(WBveg$kSoilToCollar)+delta_T_cav*K_T_Cav + dbxmin) # dbxmin to avoid 0/0
-      Psi_TApo_np1 = alpha * Psi_TApo_n +(1-alpha) * Psi_td
+      # 2.2. SApo
+      alpha = exp(-(K_SL+K_SSym + sum(WBveg$k_SoilToStem)+delta_S_cav*K_S_Cav)/C_SApo*dt)
+      Psi_td = (K_SL*Psi_LApo_n + K_SSym*Psi_SSym_n + sum(WBveg$k_SoilToStem * WBsoil$PsiSoil)+ delta_S_cav*K_S_Cav*Psi_SApo_cav)/(K_SL + K_SSym+sum(WBveg$k_SoilToStem)+delta_S_cav*K_S_Cav + dbxmin) # dbxmin to avoid 0/0
+      Psi_SApo_np1 = alpha * Psi_SApo_n +(1-alpha) * Psi_td
       
     } else if (opt$numericalScheme=="Explicit"){
       # NB for cavitation we use the min(cav-current) because here cav is at time n-1
@@ -733,42 +722,42 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
       # if (Psi_LApo_cav > Psi_LApo_n) {
       #   print(paste0("Lcav",opt$Lcav))
       # }
-      # if (Psi_TApo_cav > Psi_TApo_n) {
-      #   print(paste0("Tcav",opt$Tcav))
+      # if (Psi_SApo_cav > Psi_SApo_n) {
+      #   print(paste0("Scav",opt$Scav))
       # }
-      Psi_LApo_np1 = Psi_LApo_n + (dt/C_LApo) * (K_TL * (Psi_TApo_n - Psi_LApo_n) + K_LSym * (Psi_LSym_n - Psi_LApo_n) + delta_L_cav*K_L_Cav * max(Psi_LApo_cav - Psi_LApo_n,0))
+      Psi_LApo_np1 = Psi_LApo_n + (dt/C_LApo) * (K_SL * (Psi_SApo_n - Psi_LApo_n) + K_LSym * (Psi_LSym_n - Psi_LApo_n) + delta_L_cav*K_L_Cav * max(Psi_LApo_cav - Psi_LApo_n,0))
       # psi T_apo
-      Psi_TApo_np1 = Psi_TApo_n + (dt/C_TApo) * (K_TL * (Psi_LApo_n - Psi_TApo_n) + K_TSym * (Psi_TSym_n - Psi_TApo_n) + delta_T_cav*K_T_Cav * max(Psi_TApo_cav - Psi_TApo_n,0) + sum(WBveg$kSoilToCollar * (WBsoil$PsiSoil - Psi_TApo_n)))
+      Psi_SApo_np1 = Psi_SApo_n + (dt/C_SApo) * (K_SL * (Psi_LApo_n - Psi_SApo_n) + K_SSym * (Psi_SSym_n - Psi_SApo_n) + delta_S_cav*K_S_Cav * max(Psi_SApo_cav - Psi_SApo_n,0) + sum(WBveg$k_SoilToStem * (WBsoil$PsiSoil - Psi_SApo_n)))
       
     # determine the cfl for each cell 
-      cfl_LApo = C_LApo/(2*max(K_TL,K_LSym,K_L_Cav))
-      #cfl_LApo = C_LApo/(2*max(K_TL,K_LSym))
-      cfl_TApo = C_TApo/(2*max(K_TL,K_TSym,K_T_Cav,max(WBveg$kSoilToCollar)))
+      cfl_LApo = C_LApo/(2*max(K_SL,K_LSym,K_L_Cav))
+      #cfl_LApo = C_LApo/(2*max(K_SL,K_LSym))
+      cfl_SApo = C_SApo/(2*max(K_SL,K_SSym,K_S_Cav,max(WBveg$k_SoilToStem)))
     
   
     }
       
     # 2.4 check if cavitation is well computed according to delta_cav, np1 and "cav"
     LcavitWellComputed = (delta_L_cav==(Psi_LApo_np1 < Psi_LApo_cav))|(opt$Lcav==0)
-    TcavitWellComputed = (delta_T_cav==(Psi_TApo_np1 < Psi_TApo_cav))|(opt$Tcav==0)
+    ScavitWellComputed = (delta_S_cav==(Psi_SApo_np1 < Psi_SApo_cav))|(opt$Scav==0)
     if ((length(delta_L_cavs)>1)&(nwhilecomp==length(delta_L_cavs))) { # we tried the normal cases and the computation is still not ok so we have done a last one desactivating cavitation water source (delta_cav=0)
       warning(paste0("water flux due to Cavitation ignored with time step, no solution from the implicit solver=",dt))
     }
   } # end of the while loop with check on cavitation options
   WBveg$Diag_nwhile_cavit = nwhilecomp  # Diagnostic step to track cavit event and eventual errors (corresponding to nwhilecomp==5)
   
-  # 3. Compute Psi_Symp_np1 (L and T)
+  # 3. Compute Psi_Symp_np1 (L and S)
   if (opt$numericalScheme=="Implicit") {
     klsym = C_LSym/dt+0.5 * Eprime_nph # for Psi_LSym_n
     Psi_LSym_np1 = (K_LSym*Psi_LApo_np1 + klsym*Psi_LSym_n - (E_nph + Emin_L_nph)) / (K_LSym + klsym + dbxmin) # dbxmin to avoid 0/0
-    Psi_TSym_np1 = (K_TSym*Psi_TApo_np1 + C_TSym/dt*Psi_TSym_n - Emin_T_nph) / (K_TSym + C_TSym/dt + dbxmin) # dbxmin to avoid 0/0
+    Psi_SSym_np1 = (K_SSym*Psi_SApo_np1 + C_SSym/dt*Psi_SSym_n - Emin_S_nph) / (K_SSym + C_SSym/dt + dbxmin) # dbxmin to avoid 0/0
   } else if (opt$numericalScheme=="Semi-Implicit") {
     alpha = exp(-K_LSym/C_LSym*dt)
     Psi_td = (K_LSym*Psi_LApo_n - (E_nph + Emin_L_nph))/(K_LSym + dbxmin) # dbxmin to avoid 0/0
     Psi_LSym_np1 = alpha * Psi_LSym_n +(1-alpha) * Psi_td
-    alpha = exp(-K_TSym/C_TSym*dt)
-    Psi_td = (K_TSym*Psi_TApo_n - Emin_T_nph)/(K_TSym + dbxmin) # dbxmin to avoid 0/0
-    Psi_TSym_np1 = alpha * Psi_TSym_n +(1-alpha) * Psi_td
+    alpha = exp(-K_SSym/C_SSym*dt)
+    Psi_td = (K_SSym*Psi_SApo_n - Emin_S_nph)/(K_SSym + dbxmin) # dbxmin to avoid 0/0
+    Psi_SSym_np1 = alpha * Psi_SSym_n +(1-alpha) * Psi_td
   } else if (opt$numericalScheme=="Explicit"){
     # psi L_Sym_np1 and cfl
 
@@ -779,18 +768,18 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     cfl_LSym = C_LSym/(2*K_LSym)}
    
     # psi T_Sym_np1 and cfls
-    if (C_TSym==0){Psi_TSym_np1 = ((K_TSym * Psi_TApo_n) - Emin_T_nph)/(K_TSym )# cas stationnaire lorsque C_Lsymp=0
-    cfl_TSym = 10 # cfl non limitante
-    }else{Psi_TSym_np1 =  Psi_TSym_n + (dt/(C_TSym)) * (K_TSym * (Psi_TApo_n - Psi_TSym_n) - Emin_T_nph)
-    cfl_TSym = C_TSym/(2*K_TSym)}
+    if (C_SSym==0){Psi_SSym_np1 = ((K_SSym * Psi_SApo_n) - Emin_S_nph)/(K_SSym )# cas stationnaire lorsque C_Lsymp=0
+    cfl_SSym = 10 # cfl non limitante
+    }else{Psi_SSym_np1 =  Psi_SSym_n + (dt/(C_SSym)) * (K_SSym * (Psi_SApo_n - Psi_SSym_n) - Emin_S_nph)
+    cfl_SSym = C_SSym/(2*K_SSym)}
   
 
     # print(paste0("cfl_LSym = ",cfl_LSym))
-    # print(paste0("cfl_TSym = ",cfl_TSym))
+    # print(paste0("cfl_SSym = ",cfl_SSym))
     # print(paste0("cfl_LApo = ",cfl_LApo))
-    # print(paste0("cfl_TApo = ",cfl_TApo))
+    # print(paste0("cfl_SApo = ",cfl_SApo))
     
-    cfl_all = min(cfl_LSym,cfl_TSym,cfl_LApo,cfl_TApo)
+    cfl_all = min(cfl_LSym,cfl_SSym,cfl_LApo,cfl_SApo)
     #print(paste0("cfl_all = ",cfl_all))
     # if (cfl_all<=dt)
     #   {
@@ -801,9 +790,9 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
   
   #Step 4 : set computed values in WBveg and update Psi_cav, PLC and Psi_AllSoil
   WBveg$Psi_LApo<-min(-0.00001,Psi_LApo_np1)
-  WBveg$Psi_TApo<-min(-0.00001,Psi_TApo_np1)
+  WBveg$Psi_SApo<-min(-0.00001,Psi_SApo_np1)
   WBveg$Psi_LSym<-min(-0.00001,Psi_LSym_np1)
-  WBveg$Psi_TSym<-min(-0.00001,Psi_TSym_np1)
+  WBveg$Psi_SSym<-min(-0.00001,Psi_SSym_np1)
   
   # Cavitation
   if (opt$numericalScheme=="Explicit"){
@@ -816,17 +805,17 @@ implicit.temporal.integration.atnp1 <- function(WBveg, WBsoil, dt, opt) {
     WBveg$PLC_Leaf = PLC.comp(Pmin = psiref, slope = WBveg$params$slope_VC_Leaf, P50 = WBveg$params$P50_VC_Leaf)
   }
   if (opt$numericalScheme=="Explicit"){
-    psiref = min(-0.00001,Psi_TApo_n)  # the reference is at previous time step
+    psiref = min(-0.00001,Psi_SApo_n)  # the reference is at previous time step
   } else {
-    psiref = WBveg$Psi_TApo  # the reference is at current time step for other modes
+    psiref = WBveg$Psi_SApo  # the reference is at current time step for other modes
   }
-  if (psiref < Psi_TApo_cav) {
-    WBveg$Psi_TApo_cav = psiref
-    WBveg$PLC_Trunk = PLC.comp(Pmin = psiref, slope = WBveg$params$slope_VC_Trunk, P50 = WBveg$params$P50_VC_Trunk)
+  if (psiref < Psi_SApo_cav) {
+    WBveg$Psi_SApo_cav = psiref
+    WBveg$PLC_Stem = PLC.comp(Pmin = psiref, slope = WBveg$params$slope_VC_Stem, P50 = WBveg$params$P50_VC_Stem)
   }
   
  # browser()
-  WBveg$Psi_AllSoil <- sum (WBveg$kSoilToCollar * WBsoil$PsiSoil)/sum (WBveg$kSoilToCollar)
+  WBveg$Psi_AllSoil <- sum (WBveg$k_SoilToStem * WBsoil$PsiSoil)/sum (WBveg$k_SoilToStem)
   return(WBveg)
 }
 
@@ -874,12 +863,12 @@ compute.regulFact <- function(psi, params, regulationType) {
 
 yearlyInitialisation.WBveg <- function(WBveg){
   
-  if(WBveg$PLC_Trunk >85 | WBveg$PLC_Leaf >85)
+  if(WBveg$PLC_Stem >85 | WBveg$PLC_Leaf >85)
   {
   WBveg <- new.WBveg(WBveg$params) 
   }
   
-  WBveg$PLC_Trunk  <- 0 
+  WBveg$PLC_Stem  <- 0 
   WBveg$PLC_Leaf   <- 0 
   
 return(WBveg)

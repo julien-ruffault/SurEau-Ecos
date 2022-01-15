@@ -74,7 +74,7 @@ DATA$DD= as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='springgreen4')
-lines(DATA$DD,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$DD,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
 lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
 legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil'),
@@ -83,11 +83,11 @@ legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil
 
 
 plot(DATA$DD, DATA$transpiration_mm,type='l')
-lines(DATA$DD, DATA$SoilEvaporation_mm,type='l',col='blue')
+lines(DATA$DD, DATA$soilEvaporation_mm,type='l',col='blue')
 lines(DATA$DD,DATA$Emin_mm,type='l',col='red')
-lines(DATA$DD,DATA$EminT_mm,type='l',col='green')
+lines(DATA$DD,DATA$Emin_S_mm,type='l',col='green')
 
-plot(DATA$DD,DATA$transpiration_mm+DATA$SoilEvaporation_mm+DATA$Emin_mm+DATA$EminT_mm,type='l')
+plot(DATA$DD,DATA$transpiration_mm+DATA$soilEvaporation_mm+DATA$Emin_mm+DATA$Emin_S_mm,type='l')
 
 
 
@@ -101,11 +101,11 @@ plot(DATA$DD,DATA$transpiration_mm+DATA$SoilEvaporation_mm+DATA$Emin_mm+DATA$Emi
 # DATA = read.csv(filename,header=T, dec='.',sep="")
 # plot(DATA$daily_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
 # lines(DATA$daily_Psi_LApoMin,type='l',col='firebrick4')
-# plot(DATA$daily_Psi_TSymMin)
-# plot(DATA$daily_Psi_TApoMin)
+# plot(DATA$daily_Psi_SSymMin)
+# plot(DATA$daily_Psi_SApoMin)
 # plot(DATA$daily_evaporation_mm)
 # plot(DATA$daily_transpiration_mm)
-# plot(DATA$daily_PLC_Trunk_max)
+# plot(DATA$daily_PLC_Stem_max)
 # plot(DATA$daily_PLC_Leaf_max)
 
 

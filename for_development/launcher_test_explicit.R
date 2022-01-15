@@ -35,7 +35,7 @@ modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                              numericalScheme = 'Explicit',
                                              compOptionsForEvapo = "Custom" ,
                                              Lcav=0,
-                                             Tcav=0,
+                                             Scav=0,
                                              customSmallTimeStepInSec = SECONDS,
                                              defoliation = F,
                                              resetSWC=T)
@@ -71,11 +71,11 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 # 
 # 
  vegetation_parameters$C_LApoInit  = 10
- vegetation_parameters$C_TApoInit  = 10
+ vegetation_parameters$C_SApoInit  = 10
 
 
  # vegetation_parameters$C_LApoInit  = 1e-100
- # vegetation_parameters$C_TApoInit  = 1e-100
+ # vegetation_parameters$C_SApoInit  = 1e-100
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -99,7 +99,7 @@ modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                              numericalScheme = 'Implicit',
                                              defoliation = F,
                                              Lcav=0,
-                                             Tcav=0,
+                                             Scav=0,
                                              resetSWC=T)
 
 
@@ -133,11 +133,11 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 # 
 # 
 vegetation_parameters$C_LApoInit  = 10
-vegetation_parameters$C_TApoInit  = 10
+vegetation_parameters$C_SApoInit  = 10
 
 
 # vegetation_parameters$C_LApoInit  = 1e-100
-# vegetation_parameters$C_TApoInit  = 1e-100
+# vegetation_parameters$C_SApoInit  = 1e-100
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -191,12 +191,12 @@ SECONDS = c(5,10,15,20,30,50)
 legend('topright',col=c(1:6,8),      legend=  c('implicit',paste0(' explicit:',SECONDS,'s')),lty=1)
 
 # plot(DATA$Psi_LApo,type='l')
-# lines(DATA$Psi_TApo,type='l',col='red')
+# lines(DATA$Psi_SApo,type='l',col='red')
 
 # # plot Psis
 plot(DATA$DD,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-6,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='springgreen4')
-lines(DATA$DD,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$DD,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
 lines(DATA$DD,DATA$Psi_LApo,type='l',col='firebrick4')
 lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
 # legend('topright',legend=c('Psi_Lsym','Psi_Lapo','Psi_Tsym','Psi_Tapo','Psi_Soil'),
@@ -205,11 +205,11 @@ lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
 # 
 # 
 # plot(DATA$DD, DATA$transpiration_mm,type='l')
-# lines(DATA$DD, DATA$SoilEvaporation_mm,type='l',col='blue')
+# lines(DATA$DD, DATA$soilEvaporation_mm,type='l',col='blue')
 # lines(DATA$DD,DATA$Emin_mm,type='l',col='red')
-# lines(DATA$DD,DATA$EminT_mm,type='l',col='green')
+# lines(DATA$DD,DATA$Emin_S_mm,type='l',col='green')
 # 
-# plot(DATA$DD,DATA$transpiration_mm+DATA$SoilEvaporation_mm+DATA$Emin_mm+DATA$EminT_mm,type='l')
+# plot(DATA$DD,DATA$transpiration_mm+DATA$soilEvaporation_mm+DATA$Emin_mm+DATA$Emin_S_mm,type='l')
 # 
 # 
 # 
@@ -223,11 +223,11 @@ lines(DATA$DD,DATA$Psi_AllSoil,col='grey20',lwd=2)
 # # DATA = read.csv(filename,header=T, dec='.',sep="")
 # # plot(DATA$daily_Psi_LSymMin,type='l',col='firebrick1',ylim=c(-6,0))
 # # lines(DATA$daily_Psi_LApoMin,type='l',col='firebrick4')
-# # plot(DATA$daily_Psi_TSymMin)
-# # plot(DATA$daily_Psi_TApoMin)
+# # plot(DATA$daily_Psi_SSymMin)
+# # plot(DATA$daily_Psi_SApoMin)
 # # plot(DATA$daily_evaporation_mm)
 # # plot(DATA$daily_transpiration_mm)
-# # plot(DATA$daily_PLC_Trunk_max)
+# # plot(DATA$daily_PLC_Stem_max)
 # # plot(DATA$daily_PLC_Leaf_max)
 # 
 # 

@@ -54,7 +54,7 @@ create.modeling.options <- function(timeStepForEvapo = 1,
                                     compOptionsForEvapo = c("Normal", "Accurate","Fast", "Custom"),
                                     customSmallTimeStepInSec = 600,
                                     Lcav = 1,
-                                    Tcav = 1,
+                                    Scav = 1,
                                     Eord=1,
                                     numericalScheme = c("Implicit","Semi-Implicit","Explicit"),
                                     stomatalRegFormulation = c("Sigmoid","PiecewiseLinear", "Turgor"),
@@ -110,16 +110,16 @@ create.modeling.options <- function(timeStepForEvapo = 1,
   
   
   if (compOptionsForEvapo == "Normal") { # every 10 min, 6 min, 3min, 1min
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(6, 10, 20, 60), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(6, 10, 20, 60), "Lsym" = 1, "Ssym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Scav" = Scav, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Accurate") { # every 10 s
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(600), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(600), "Lsym" = 1, "Ssym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Scav" = Scav, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Fast") { # every hours, every 10 min
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(1, 6), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = timeStepForEvapo*c(1, 6), "Lsym" = 1, "Ssym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Scav" = Scav, "CLapo" = 1, "CTapo" = 1)
   }
   if (compOptionsForEvapo == "Custom") { # every customSmallTimeStepInSec 
-    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(timeStepForEvapo*3600/customSmallTimeStepInSec), "Lsym" = 1, "Tsym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Tcav" = Tcav, "CLapo" = 1, "CTapo" = 1)
+    compOptions <- list("numericalScheme"=numericalScheme,"nsmalltimesteps" = c(timeStepForEvapo*3600/customSmallTimeStepInSec), "Lsym" = 1, "Ssym" = 1, "Eord" = Eord, "Lcav" = Lcav, "Scav" = Scav, "CLapo" = 1, "CTapo" = 1)
   }
   
 

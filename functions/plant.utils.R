@@ -191,26 +191,26 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
 
 #' calcultate hydraulic conductances in the different portions of the plant 
 #' (trunk, leaf and root) according to predetermined rules 
-#' @param kPlantInit conductance of the plant from root to leaf 
+#' @param k_PlantInit conductance of the plant from root to leaf 
 #' @param ri root distribution within the soil layers.
-#' @param fractLeafSym proportion of kPlantInit assigned to the leaf (apoplasm to symplasm pathway)
+#' @param fractLeafSym proportion of k_PlantInit assigned to the leaf (apoplasm to symplasm pathway)
 #' @return
 #' @export
 #'
 #' @examples
-distribute.conductances <- function(kPlantInit,ri,fracLeafSym = 0.4)
+distribute.conductances <- function(k_PlantInit,ri,fracLeafSym = 0.4)
 {
   
   fracRT   = (2/3)*(1-fracLeafSym)
   fractTL  =  (1/3)*(1-fracLeafSym)
   
-  k_RTInit   = 1 /(fracRT / kPlantInit) *ri
-  k_TLInit = 1/(fractTL/kPlantInit)
-  k_LSymInit = 1/(fracLeafSym/kPlantInit)
+  k_RSApoInit   = 1 /(fracRT / k_PlantInit) *ri
+  k_SLApoInit = 1/(fractTL/k_PlantInit)
+  k_LSymInit = 1/(fracLeafSym/k_PlantInit)
   
   #TODO: AJOUTE UN CALCUL DES CONDUCTANCE ICI POUR CHECK DU CALCUL? e.g.:
-  #kPlantInit <-  1/ (1 /sum(k_RTInit) + 1/k_TLInit + 1/k_LSymInit)
-  return(list( k_TLInit =  k_TLInit, k_LSymInit = k_LSymInit ,  k_RTInit=k_RTInit, kPlantInit=kPlantInit))
+  #k_PlantInit <-  1/ (1 /sum(k_RSApoInit) + 1/k_SLApoInit + 1/k_LSymInit)
+  return(list( k_SLApoInit =  k_SLApoInit, k_LSymInit = k_LSymInit ,  k_RSApoInit=k_RSApoInit, k_PlantInit=k_PlantInit))
 }
 
 

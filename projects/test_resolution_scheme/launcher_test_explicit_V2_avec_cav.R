@@ -39,7 +39,7 @@ vegetationParameters_path <- paste0(mainDir,'/projects/Compar_SurEauC/Vegetation
                                                numericalScheme = 'Explicit',
                                                compOptionsForEvapo = "Custom" ,
                                                Lcav=1,
-                                               Tcav=1,
+                                               Scav=1,
                                                customSmallTimeStepInSec = SECONDS,
                                                defoliation = F,
                                                resetSWC=T)
@@ -75,11 +75,11 @@ vegetationParameters_path <- paste0(mainDir,'/projects/Compar_SurEauC/Vegetation
   # 
   # 
   vegetation_parameters$C_LApoInit  = 10000
-  vegetation_parameters$C_TApoInit  = 10000
+  vegetation_parameters$C_SApoInit  = 10000
   
   
   # vegetation_parameters$C_LApoInit  = 1e-100
-  # vegetation_parameters$C_TApoInit  = 1e-100
+  # vegetation_parameters$C_SApoInit  = 1e-100
   
   # run SurEau-Ecos --------------------------------------------------------------
   run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -117,7 +117,7 @@ vegetationParameters_path <- paste0(mainDir,'/projects/Compar_SurEauC/Vegetation
                                                numericalScheme = 'Explicit',
                                                compOptionsForEvapo = "Custom" ,
                                                Lcav=0,
-                                               Tcav=0,
+                                               Scav=0,
                                                customSmallTimeStepInSec = SECONDS,
                                                defoliation = F,
                                                resetSWC=T)
@@ -153,11 +153,11 @@ vegetationParameters_path <- paste0(mainDir,'/projects/Compar_SurEauC/Vegetation
   # 
   # 
   vegetation_parameters$C_LApoInit  = 10000
-  vegetation_parameters$C_TApoInit  = 10000
+  vegetation_parameters$C_SApoInit  = 10000
   
   
   # vegetation_parameters$C_LApoInit  = 1e-100
-  # vegetation_parameters$C_TApoInit  = 1e-100
+  # vegetation_parameters$C_SApoInit  = 1e-100
   
   # run SurEau-Ecos --------------------------------------------------------------
   run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -207,11 +207,11 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 # 
 # 
 vegetation_parameters$C_LApoInit  = 10000
-vegetation_parameters$C_TApoInit  = 10000
+vegetation_parameters$C_SApoInit  = 10000
 
 
 # vegetation_parameters$C_LApoInit  = 1e-100
-# vegetation_parameters$C_TApoInit  = 1e-100
+# vegetation_parameters$C_SApoInit  = 1e-100
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,
@@ -236,7 +236,7 @@ modeling_options  <- create.modeling.options(timeStepForEvapo=1,
                                              stomatalRegFormulation = "Sigmoid",
                                              thresholdMortality = 99,
                                              Lcav=0,
-                                             Tcav=0,
+                                             Scav=0,
                                              numericalScheme = 'Implicit',
                                              defoliation = F,
                                              resetSWC=T)
@@ -263,11 +263,11 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 # 
 # 
 vegetation_parameters$C_LApoInit  = 10000
-vegetation_parameters$C_TApoInit  = 10000
+vegetation_parameters$C_SApoInit  = 10000
 
 
 # vegetation_parameters$C_LApoInit  = 1e-100
-# vegetation_parameters$C_TApoInit  = 1e-100
+# vegetation_parameters$C_SApoInit  = 1e-100
 
 # run SurEau-Ecos --------------------------------------------------------------
 run.SurEau_Ecos(modeling_options = modeling_options ,

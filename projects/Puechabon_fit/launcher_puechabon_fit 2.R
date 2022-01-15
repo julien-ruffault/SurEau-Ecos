@@ -95,7 +95,7 @@ colnames(DATA_day) <- c('DOY','YEAR','Psi_min')
 DATA_day$Psi_base = aggregate(DATA$Psi_LSym,by=list(yday(DATA$Time),year(DATA$Time)),max)$x
 DATA_day$LAI = aggregate(DATA$LAI,by=list(yday(DATA$Time),year(DATA$Time)),max)$x
 DATA_day$transpiration_mm = aggregate(DATA$transpiration_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
-DATA_day$evapotranspiration_mm = aggregate(DATA$transpiration_mm+DATA$SoilEvaporation_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
+DATA_day$evapotranspiration_mm = aggregate(DATA$transpiration_mm+DATA$soilEvaporation_mm,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
 
 DATA_day$PPT= aggregate(DATA$PPT,by=list(yday(DATA$Time),year(DATA$Time)),sum)$x
 DATA_day$Date = as.Date(paste(DATA_day$DOY,DATA_day$YEAR,sep='/'),format='%j/%Y')
@@ -212,9 +212,9 @@ axis(4,col='blue',col.ticks='blue')
 grid()
 
 
-plot(DATA$fluxSoilToCollar1_mm[io],type='l',lwd=0.2)
-lines(DATA$fluxSoilToCollar2_mm[io],type='l',col=2,lwd=0.2)
-lines(DATA$fluxSoilToCollar3_mm[io],type='l',col=3,lwd=0.3)
+plot(DATA$fluxSoilToStem1_mm[io],type='l',lwd=0.2)
+lines(DATA$fluxSoilToStem2_mm[io],type='l',col=2,lwd=0.2)
+lines(DATA$fluxSoilToStem3_mm[io],type='l',col=3,lwd=0.3)
 
 plot(DATA$PsiSoil1[io],type='l',lwd=0.5)
 lines(DATA$PsiSoil2[io],type='l',col=2,lwd=0.5)

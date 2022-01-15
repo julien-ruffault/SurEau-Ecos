@@ -1,3 +1,3 @@
-LAI;SWS1;SWS2;SWS3;transpiration_mm;SoilEvaporation_mm;Psi_LApo;Psi_LSym;Psi_TSym;Psi_TApo;Psi_AllSoil;PPT;ETP;VPD;RG;Tair;Rn;PAR;WS;RH;PLC_Trunk;PLC_Leaf
+LAI;SWS1;SWS2;SWS3;transpiration_mm;soilEvaporation_mm;Psi_LApo;Psi_LSym;Psi_SSym;Psi_SApo;Psi_AllSoil;PPT;ETP;VPD;RG;Tair;Rn;PAR;WS;RH;PLC_Stem;PLC_Leaf
 
 

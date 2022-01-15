@@ -16,14 +16,14 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
   abline(h=DepthLayers)
   barplot(vegetation_parameters$rootDistribution, ylab='root fraction per layer')
   barplot(soil_parameters$V_field_capacity, ylab="Vol. field capacity")
-  barplot(vegetation_parameters$k_RTInit, ylab="soil-root conductance per layer")
+  barplot(vegetation_parameters$k_RSApoInit, ylab="soil-root conductance per layer")
   
   if(openWindow==T){
     quartz()}
   
   par(mfrow=c(2,2), pty='s')
   curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Leaf,P50=vegetation_parameters$P50_VC_Leaf),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", xlab="Psi")
-  curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Trunk,P50=vegetation_parameters$P50_VC_Trunk),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", lty=3, add=T, col=2, lwd=2)
+  curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Stem,P50=vegetation_parameters$P50_VC_Stem),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", lty=3, add=T, col=2, lwd=2)
   par(new=T)
   
   curve(GsCurve(
@@ -42,14 +42,14 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
     axis(4,  col = 4)
     mtext("gs",4,1.8,cex=.8, col=4)
   
-  barplot(c(vegetation_parameters$kPlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kp", "LAI", "gmin"), cex.lab=0.8)
+  barplot(c(vegetation_parameters$k_PlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kp", "LAI", "gmin"), cex.lab=0.8)
   if(modeling_options$stomatalRegFormulation=="Sigmoid"){
   barplot(c(vegetation_parameters$P50_gs,vegetation_parameters$P50_VC_Leaf), names.arg = c("P50gs", "P50x"), cex.lab=0.8)}
   if(modeling_options$stomatalRegFormulation=="PiecewiseLinear"){
     barplot(c(vegetation_parameters$PsiClose,vegetation_parameters$P50_VC_Leaf), names.arg = c("PClose", "P50x"), cex.lab=0.8)}
   if(modeling_options$stomatalRegFormulation=="Turgor"){
     tlp = (vegetation_parameters$PiFullTurgor_Leaf *vegetation_parameters$EpsilonSymp_Leaf)/(vegetation_parameters$PiFullTurgor_Leaf + vegetation_parameters$EpsilonSymp_Leaf)
-    barplot(c(vegetation_parameters$PiFullTurgor_Leaf ,tlp, vegetation_parameters$P50_VC_Leaf,vegetation_parameters$P50_VC_Trunk), names.arg = c("Pi0","TLP", "P50L","P50S" ), col = c(4,3,2,1), cex.lab = 0.5)}
+    barplot(c(vegetation_parameters$PiFullTurgor_Leaf ,tlp, vegetation_parameters$P50_VC_Leaf,vegetation_parameters$P50_VC_Stem), names.arg = c("Pi0","TLP", "P50L","P50S" ), col = c(4,3,2,1), cex.lab = 0.5)}
   
   
 #  barplot(soil_parameters$V_soil_storage_capacity, names.arg="TAW", density=10, ylim=c(0, soil_parameters$V_soil_storage_capacity+50))

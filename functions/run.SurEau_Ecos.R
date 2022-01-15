@@ -53,7 +53,6 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
       veg_var_list <- updateLAIandStocks.WBveg(WBveg = veg_var_list, modeling_options = modeling_options) # update reservoirs, Q and C 
       climDay <- compute.RnAndETP.WBclim(WBclim = climDay, WBveg = veg_var_list, RnFormulation = modeling_options$RnFormulation, ETPFormulation = modeling_options$ETPFormulation) # calculate Rn and ETP
       veg_var_list <- compute.interception.WBveg(WBveg = veg_var_list, ppt = climDay$PPT) # vegetation interceptedWaterAmount  and pptSoil with Interpception by the canopy
-      #browser()
       veg_var_list$interceptedWaterAmount = 0
       soil_var_list <- compute.infiltration.WBsoil(WBsoil = soil_var_list, pptSoil = veg_var_list$pptSoil) # Infiltration / update soil water stocks / PsiSoil and KSoil
       climHour <- new.WBclimHour(WBclim = climDay, WBveg = veg_var_list, modeling_options = modeling_options, lat = stand_parameters$lat, lon = stand_parameters$lon, PTcoeff = veg_var_list$params$PTcoeff)
@@ -86,7 +85,7 @@ run.SurEau_Ecos <- function(modeling_options, simulation_parameters, climate_dat
         if(modeling_options$soilEvap) {
           soil_var_list <- compute.evaporationG.WBsoil(WBsoil = soil_var_list, ETP = Clim_mid$ETP, Tair = Clim_mid$Tair_mean, RHair = Clim_mid$RHair, K = veg_var_list$params$K, LAI = veg_var_list$LAI, Nhours = Clim_next$nHours)  
           }
-        soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToCollar_mm)
+        soil_var_list <- update.soilWater.WBsoil(WBsoil = soil_var_list, fluxEvap = veg_var_list$fluxSoilToStem_mm)
 
         if (veg_var_list$PLC_Leaf >= modeling_options$thresholdMortatliy) {
           print("The plant is dead...")

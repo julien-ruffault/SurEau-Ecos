@@ -87,18 +87,18 @@ plot(fractionofRoot, depthvec*100, type='l', ylim=c(400,0), xlim=c(1,0), ylab="d
 abline(h=DepthLayers)
 barplot(vegetation_parameters$rootDistribution, ylab='root fraction per layer')
 barplot(soil_parameters$V_field_capacity, ylab="Vol. field capacity")
-barplot(vegetation_parameters$k_RTInit, ylab="soil-root conductance per layer")
+barplot(vegetation_parameters$k_RSApoInit, ylab="soil-root conductance per layer")
 
 curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Leaf,P50=vegetation_parameters$P50_VC_Leaf),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", xlab="Psi")
-curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Trunk,P50=vegetation_parameters$P50_VC_Trunk),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", lty=3, add=T, col=2, lwd=2)
+curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Stem,P50=vegetation_parameters$P50_VC_Stem),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", lty=3, add=T, col=2, lwd=2)
 par(new=T)
 curve(GsCurve(x, slope=vegetation_parameters$slope_gs,P50=vegetation_parameters$P50_gs, gsmax=vegetation_parameters$gsMax),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , col=4, yaxt="n", ylab="",xlab="")
 axis(4)
 mtext("gs",4,1.8,cex=.8)
-barplot(c(vegetation_parameters$kPlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kplant", "LAI", "gmin"))
+barplot(c(vegetation_parameters$k_PlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kplant", "LAI", "gmin"))
 
 
-#barplot(vegetation_parameters$k_RTInit/sum(vegetation_parameters$k_RTInit)*100, ylab="relative soil-root conductance")
+#barplot(vegetation_parameters$k_RSApoInit/sum(vegetation_parameters$k_RSApoInit)*100, ylab="relative soil-root conductance")
 
 
 
@@ -122,8 +122,8 @@ quartz()
 par(new=F, mfrow=c(1,1))
 plot(DATA$Time,DATA$Psi_LSym,type='l', col='springgreen2',ylim=c(-5,0),xlab='Time',ylab='Psi (MPa)')
 lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
-lines(DATA$Time,DATA$Psi_TSym,type='l',col='firebrick1',ylim=c(-6,0))
-lines(DATA$Time,DATA$Psi_TApo,type='l',col='firebrick4')
+lines(DATA$Time,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
+lines(DATA$Time,DATA$Psi_SApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 par(new=T)
 plot(DATA$Time,DATA$PPT,type='h', col='black',xlab='',ylab='',yaxt="n")
@@ -132,9 +132,9 @@ legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.5)
 
 #Water extraction from the different layers
-plot(DATA$fluxSoilToCollar1_mm, type='l', ylim=c(-0.1,0.2))
-lines(DATA$fluxSoilToCollar2_mm, type='l', col=2)
-lines(DATA$fluxSoilToCollar3_mm, type='l', col=4)
+plot(DATA$fluxSoilToStem1_mm, type='l', ylim=c(-0.1,0.2))
+lines(DATA$fluxSoilToStem2_mm, type='l', col=2)
+lines(DATA$fluxSoilToStem3_mm, type='l', col=4)
 legend('bottomleft',legend=c('first layer','second layer','third layer'),
        col=c(1,2,4),lty=1,lwd=1,cex=0.8)
 
@@ -158,13 +158,13 @@ axis(4,col='blue',col.ticks='blue')
 # plot water fluxes 
 plot(DATA$Time,DATA$transpiration_mm,type='l',col='blue',xlab='Time',ylab='water fluxes (mm/timestep)')
 lines(DATA$Time,DATA$Emin_mm,col='forestgreen')
-lines(DATA$Time,DATA$EminT_mm,col='brown4')
-lines(DATA$Time,DATA$SoilEvaporation_mm,type='l',col='grey30')
-legend('topright',legend=c('Transpiration','Emin','EminT','Soil'),
+lines(DATA$Time,DATA$Emin_S_mm,col='brown4')
+lines(DATA$Time,DATA$soilEvaporation_mm,type='l',col='grey30')
+legend('topright',legend=c('Transpiration','Emin','Emin_S','Soil'),
        col=c('blue','forestgreen','brown4','grey30'),lty=1,lwd=2,cex=0.8)
 
 # plot cavitation 
 plot(DATA$Time,DATA$PLC_Leaf,type='l', col='springgreen4',ylim=c(0,70),xlab='Time',ylab='PLC')
-lines(DATA$Time,DATA$PLC_Trunk,type='l',col='brown')
-legend('topleft',legend=c('PLC_Leaf','PLC_Trunk'),
+lines(DATA$Time,DATA$PLC_Stem,type='l',col='brown')
+legend('topleft',legend=c('PLC_Leaf','PLC_Stem'),
        col=c('springgreen4','brown'),lty=1,lwd=2,cex=0.8)
