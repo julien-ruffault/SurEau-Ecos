@@ -1,15 +1,15 @@
 Name;Value;Value;Value;;;Unit;;;Name_2;Value_2
 P50_VC_Leaf;  -4.84; -6.66; -5.22;;;Mpa;;;P50_VC_Leaf;-3.4
 slope_VC_Leaf;41.5;29.5;37.5;;;%/Mpa;;;slope_VC_Leaf;60
-EpsilonSymp_Leaf;5.98;12;11.4;;;Mpa;;;EpsilonSymp_Leaf;10
+epsilonSym_Leaf;5.98;12;11.4;;;Mpa;;;epsilonSym_Leaf;10
 PiFullTurgor_Leaf; -1.7; -2.8; -2.9;;;Mpa;;;PiFullTurgor_Leaf;-2.1
 apoplasmicFrac_Leaf;0.68;0.45;0.25;;;-;;;apoplasmicFrac_Leaf;0.4
 P50_VC_Stem;  -4.84; -6.66; -5.22;;;Mpa;;;P50_VC_Stem;-3.4
 slope_VC_Stem;41.5;29.5;37.5;;;%/Mpa;;;slope_VC_Stem;60
-EpsilonSymp_Stem;5.98;12;11.4;;;Mpa/%;;;EpsilonSymp_Stem;10
+epsilonSym_Stem;5.98;12;11.4;;;Mpa/%;;;epsilonSym_Stem;10
 PiFullTurgor_Stem; -1.7; -2.8; -2.9;;;Mpa;;;PiFullTurgor_Stem;-2.1
-ApoplasmicFrac_Stem;0.4;0.4;0.4;;;-;;;ApoplasmicFrac_Stem;0.4
-SymplasmicFrac_Stem;0.2;0.2;0.2;;;-;;;SymplasmicFrac_Stem;0.2
+apoFrac_Stem;0.4;0.4;0.4;;;-;;;apoFrac_Stem;0.4
+symFrac_Stem;0.2;0.2;0.2;;;-;;;symFrac_Stem;0.2
 LDMC;500;500;500;;;fraction;;;LDMC;570
 Succulence;100;100;100;;;g/m2;;;;
 LMA;252;182;110;;;g/m2;;;LMA;106
@@ -42,6 +42,6 @@ Tbase;3;3;3;;;¡C;;;Tbase;3
 Fcrit;450;450;450;;;¡C;;;DayStart;55
 nbdayLAI;21;21;21;;;;;;nbdayLAI;21
 PTcoeff;1.14;1.14;1.14;;;-;;;PTcoeff;1.14
-CanopyStorageParam;1.5;1.5;1.5;;;mm/m2 leaf;;;CanopyStorageParam;1.5
+canopyStorageParam;1.5;1.5;1.5;;;mm/m2 leaf;;;canopyStorageParam;1.5
 K;0.5;0.5;0.5;;;-;;;K;0.5
 Species;Pinus halepensis;Quercus ilex;Quercus pubescens;;;;;;;

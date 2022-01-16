@@ -41,7 +41,7 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   TTT$rootDistribution[2] = (1-TTT$betaRootProfile^(soil_parameters$depth[2]*100))-TTT$rootDistribution[1]
   TTT$rootDistribution[3] = 1-(TTT$rootDistribution[1]+TTT$rootDistribution[2] )
   
-  TLP = TTT$PiFullTurgor_Leaf*TTT$EpsilonSymp_Leaf/(TTT$PiFullTurgor_Leaf+TTT$EpsilonSymp_Leaf)
+  TLP = TTT$PiFullTurgor_Leaf*TTT$epsilonSym_Leaf/(TTT$PiFullTurgor_Leaf+TTT$epsilonSym_Leaf)
   
   # Compute TAW @Tlp @P12 & @P50 (Diagnoostic)
   
@@ -101,7 +101,7 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   TTT$k_RSApoInit <- conduc$k_RSApoInit 
   TTT$k_LSymInit <- conduc$k_LSymInit
   TTT$k_PlantInit <- conduc$k_PlantInit
-  TTT$Vol_Stem = TTT$Vol_Stem
+  TTT$vol_Stem = TTT$vol_Stem
   
   
   return(TTT)
@@ -126,7 +126,7 @@ read.vegetation.file <- function(filePath, modeling_options)
     "slope_VC_Leaf", # [%/MPa]             / Slope of the vulnerability curve
     "P50_VC_Stem",
     "slope_VC_Stem",
-    "EpsilonSymp_Leaf", # [MPa]            / Modulus of elasticity in leaves
+    "epsilonSym_Leaf", # [MPa]            / Modulus of elasticity in leaves
     "PiFullTurgor_Leaf", # [MPa]           / Osmotic Potential at full turgor in leaves
     "apoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
     "LDMC", # [mgMS/g]                     / Leaf dry matter content (measured for fully watered leaves)
@@ -138,16 +138,16 @@ read.vegetation.file <- function(filePath, modeling_options)
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
     "gmin_S",      #  conductance (gmin) of the stem
-    "CanopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
+    "canopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
     "k_SSymInit",
     "fRootToLeaf", # root to leaf ratio 
     "rootRadius",  #  radius of roots (m)
     "betaRootProfile", # parameter for the distribution of roots in the soil 
     "PiFullTurgor_Stem",
-    "EpsilonSymp_Stem",
-    "ApoplasmicFrac_Stem",
-    "SymplasmicFrac_Stem",
-    "Vol_Stem",
+    "epsilonSym_Stem",
+    "apoFrac_Stem",
+    "symFrac_Stem",
+    "vol_Stem",
     "fTRBToLeaf",
     "C_LApoInit",
     "C_SApoInit"

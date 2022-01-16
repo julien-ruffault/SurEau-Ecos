@@ -17,6 +17,7 @@ output_path               <-  paste0(mainDir,'/quick_start/example_output_subdai
 # Load model -------------------------------------------------------------------
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R')) # do not modify 
 # Create input list files and define options -----------------------------------
+modeling_options <- create.modeling.options()    
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                       
                                                       endYearSimulation = 1990,
                                                       mainDir = mainDir,
@@ -82,5 +83,5 @@ legend('topleft',legend=c('PLC_Leaf','PLC_Stem'),
 plot(DATA$Time,DATA$LFMCSymp,type='l', col='springgreen4',xlab='Time',ylab='Fuel moisture content (% dry weight)',ylim=c(20,80))
 lines(DATA$Time,DATA$LFMCApo,type='l',col='brown3',lwd=2)
 lines(DATA$Time,DATA$LFMC,col='grey30')
-legend('bottomleft',legend=c('LFMC_Symplasm','LFMC_Apoplasm','LFMC'),
+legend('bottomleft',legend=c('LFMC_Symplasm','LFMC_Apoplasm','FMC_Canopy'),
        col=c('springgreen4','brown3','grey30'),lty=1,lwd=2,cex=0.8)

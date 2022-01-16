@@ -33,7 +33,7 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
     PsiStartClosing = vegetation_parameters$PsiStartClosing,
     PsiClose = vegetation_parameters$PsiClose, 
     PiFT = vegetation_parameters$PiFullTurgor_Leaf, 
-    Esymp = vegetation_parameters$EpsilonSymp_Leaf, 
+    Esymp = vegetation_parameters$epsilonSym_Leaf, 
     turgorPressureAtGsMax = vegetation_parameters$turgorPressureAtGsMax, 
     gsmax = vegetation_parameters$gsMax, 
     stomatalRegFormulation = modeling_options$stomatalRegFormulation), 
@@ -48,7 +48,7 @@ PlotTheStandAndPlant <- function(vegetation_parameters, soil_parameters, modelin
   if(modeling_options$stomatalRegFormulation=="PiecewiseLinear"){
     barplot(c(vegetation_parameters$PsiClose,vegetation_parameters$P50_VC_Leaf), names.arg = c("PClose", "P50x"), cex.lab=0.8)}
   if(modeling_options$stomatalRegFormulation=="Turgor"){
-    tlp = (vegetation_parameters$PiFullTurgor_Leaf *vegetation_parameters$EpsilonSymp_Leaf)/(vegetation_parameters$PiFullTurgor_Leaf + vegetation_parameters$EpsilonSymp_Leaf)
+    tlp = (vegetation_parameters$PiFullTurgor_Leaf *vegetation_parameters$epsilonSym_Leaf)/(vegetation_parameters$PiFullTurgor_Leaf + vegetation_parameters$epsilonSym_Leaf)
     barplot(c(vegetation_parameters$PiFullTurgor_Leaf ,tlp, vegetation_parameters$P50_VC_Leaf,vegetation_parameters$P50_VC_Stem), names.arg = c("Pi0","TLP", "P50L","P50S" ), col = c(4,3,2,1), cex.lab = 0.5)}
   
   

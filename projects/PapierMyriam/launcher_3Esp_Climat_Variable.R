@@ -58,8 +58,8 @@ vegetation_parameters <- create.vegetation.parameters(listOfParameters=TTT, stan
 
 #On mets le gmin Tronc à 0 pour limiter les interférence avec gmin root+Trunk+Branch
 vegetation_parameters$vol_Stem <- 39.9 # 18.2 #/20
-vegetation_parameters$SymplasmicFrac_Stem <- 0.213 #0.0917 # # # #0.0917 #0.213 # 0.0917 #  0.0975 #Trunk 0.0917
-vegetation_parameters$SymplasmicFrac_Stem * vegetation_parameters$vol_Stem
+vegetation_parameters$symFrac_Stem <- 0.213 #0.0917 # # # #0.0917 #0.213 # 0.0917 #  0.0975 #Trunk 0.0917
+vegetation_parameters$symFrac_Stem * vegetation_parameters$vol_Stem
 
 
 # Run SurEau-Ecos ---------------------------------------------------------

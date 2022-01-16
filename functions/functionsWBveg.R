@@ -16,8 +16,8 @@ new.WBveg <- function(veg_params) {
   
   WBveg$params <- veg_params # assign parameters 
   
-  WBveg$params$PsiTLP_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$EpsilonSymp_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$EpsilonSymp_Leaf)
-  WBveg$params$PsiTLP_Stem  <-  WBveg$params$PiFullTurgor_Stem*WBveg$params$EpsilonSymp_Stem/(WBveg$params$PiFullTurgor_Stem+WBveg$params$EpsilonSymp_Stem)
+  WBveg$params$PsiTLP_Leaf  <-  WBveg$params$PiFullTurgor_Leaf*WBveg$params$epsilonSym_Leaf/(WBveg$params$PiFullTurgor_Leaf+WBveg$params$epsilonSym_Leaf)
+  WBveg$params$PsiTLP_Stem  <-  WBveg$params$PiFullTurgor_Stem*WBveg$params$epsilonSym_Stem/(WBveg$params$PiFullTurgor_Stem+WBveg$params$epsilonSym_Stem)
   
   # potentials 
   WBveg$Psi_LApo = 0
@@ -230,7 +230,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   WBveg$Q_LSym_sat_mmol <- WBveg$Q_LSym_sat_L*1000000/18
   if(WBveg$LAI==0) {WBveg$Q_LSym_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LSym_sat_mmol_perLeafArea <- WBveg$Q_LSym_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
-  WBveg$Q_SSym_sat_L <- WBveg$params$Vol_Stem *WBveg$params$SymplasmicFrac_Stem
+  WBveg$Q_SSym_sat_L <- WBveg$params$vol_Stem *WBveg$params$symFrac_Stem
   WBveg$Q_SSym_sat_mmol <- WBveg$Q_SSym_sat_L*1000000/18
   WBveg$Q_SSym_sat_mmol_perLeafArea <- WBveg$Q_SSym_sat_mmol / max(1,WBveg$LAI)  #  used max(1,LAI) to avoid that Q_SSym_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf) 
   
@@ -240,7 +240,7 @@ updateLAIandStocks.WBveg <- function(WBveg,modeling_options) {
   if(WBveg$LAI==0) {WBveg$Q_LApo_sat_mmol_perLeafArea <- 0} else {WBveg$Q_LApo_sat_mmol_perLeafArea <- WBveg$Q_LApo_sat_mmol / max(1,WBveg$LAI)  } # modified by NM (10/12/2021)
   
 
-  WBveg$Q_SApo_sat_L <- WBveg$params$Vol_Stem*WBveg$params$ApoplasmicFrac_Stem 
+  WBveg$Q_SApo_sat_L <- WBveg$params$vol_Stem*WBveg$params$apoFrac_Stem 
   WBveg$Q_SApo_sat_mmol <- WBveg$Q_SApo_sat_L* 1000000/18
   WBveg$Q_SApo_sat_mmol_perLeafArea = WBveg$Q_SApo_sat_mmol / max(1,WBveg$LAI) #used max(1,LAI) to avoid that Q_SApo_sat_mmol_perLeafArea--> inF when LAI --> 0 (limit imposed by computing water fluxes by m2leaf)  modified by NM (25/10/2021)
   
@@ -283,7 +283,7 @@ compute.waterStorage.WBveg <- function(WBveg, VPD)
   
   
   #----Symplasmic canopy water content of the leaves----
-  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
+  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$epsilonSym_Leaf, Pmin = WBveg$Psi_LSym) # Relative water content (unitless)
   Q_LSym <- max(0,  RWC_LSym) * WBveg$Q_LSym_sat_L
   WBveg$Q_LSym_L <- Q_LSym
   WBveg$LFMCSymp <- 100 * (Q_LSym / (WBveg$DMLiveCanopy * (1 - WBveg$params$apoplasmicFrac_Leaf) / 1000))
@@ -297,7 +297,7 @@ compute.waterStorage.WBveg <- function(WBveg, VPD)
   WBveg$LFMC <- 100 * (Q_LApo + Q_LSym) / (WBveg$DMLiveCanopy / 1000)
   
   #----Symplasmic canopy water content of the stem----
-  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$EpsilonSymp_Stem, Pmin = WBveg$Psi_SSym) # Relative water content (unitless)
+  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$epsilonSym_Stem, Pmin = WBveg$Psi_SSym) # Relative water content (unitless)
   Q_SSym <- max(0,  RWC_SSym) * WBveg$Q_SSym_sat_L
   WBveg$Q_SSym_L <- Q_SSym
   
@@ -361,10 +361,10 @@ update.capacitancesApoAndSym.WBveg <- function(WBveg) {
   dbxmin <- 1e-100 # NM minimal double to avoid-INF
 
   #----Compute the relative water content of the symplasm----
-  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$EpsilonSymp_Leaf, Pmin = WBveg$Psi_LSym - dbxmin) 
+  RWC_LSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Leaf, Esymp = WBveg$params$epsilonSym_Leaf, Pmin = WBveg$Psi_LSym - dbxmin) 
   #----Compute the derivative of the relative water content of the symplasm----
   if (WBveg$Psi_LSym > WBveg$params$PsiTLP_Leaf) { # FP derivative of -Pi0- Eps(1-RWC)+Pi0/RWC
-    RWC_LSym_prime <- RWC_LSym / (-WBveg$params$PiFullTurgor_Leaf - WBveg$Psi_LSym - WBveg$params$EpsilonSymp_Leaf + 2 * WBveg$params$EpsilonSymp_Leaf * RWC_LSym)
+    RWC_LSym_prime <- RWC_LSym / (-WBveg$params$PiFullTurgor_Leaf - WBveg$Psi_LSym - WBveg$params$epsilonSym_Leaf + 2 * WBveg$params$epsilonSym_Leaf * RWC_LSym)
   } else {
     RWC_LSym_prime <- -WBveg$params$PiFullTurgor_Leaf / WBveg$Psi_LSym^2 # FP derivative of Pi0/Psi
   }
@@ -374,11 +374,11 @@ update.capacitancesApoAndSym.WBveg <- function(WBveg) {
  
   
   #----Stem symplasmic canopy water content----
-  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$EpsilonSymp_Stem, Pmin = WBveg$Psi_SSym - dbxmin) 
+  RWC_SSym <- 1 - Rs.Comp(PiFT = WBveg$params$PiFullTurgor_Stem, Esymp = WBveg$params$epsilonSym_Stem, Pmin = WBveg$Psi_SSym - dbxmin) 
 
   #----Compute the derivative of the relative water content of the symplasm----
   if (WBveg$Psi_SSym > WBveg$params$PsiTLP_Stem) {
-    RWC_SSym_prime <- RWC_SSym / (-WBveg$params$PiFullTurgor_Stem - WBveg$Psi_SSym - WBveg$params$EpsilonSymp_Stem + 2 * WBveg$params$EpsilonSymp_Stem * RWC_SSym)
+    RWC_SSym_prime <- RWC_SSym / (-WBveg$params$PiFullTurgor_Stem - WBveg$Psi_SSym - WBveg$params$epsilonSym_Stem + 2 * WBveg$params$epsilonSym_Stem * RWC_SSym)
   }
   else {
     RWC_SSym_prime <- -WBveg$params$PiFullTurgor_Stem / WBveg$Psi_SSym^2
@@ -847,8 +847,8 @@ compute.regulFact <- function(psi, params, regulationType) {
     # regulFactPrime = al*exp(-al*(psi-P50_gs)) / ((1+exp(-al*(psi-P50_gs)))^2) # formulation in psi (same but slower to compute)
   } else if (regulationType == "Turgor") {
     stomatalClosure <- NA # stomatalClosure not relevant for Turgor
-    rs <- Rs.Comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$EpsilonSymp_Leaf, Pmin = psi)
-    turgor <- turgor.comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$EpsilonSymp_Leaf, Rstemp = rs)
+    rs <- Rs.Comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$epsilonSym_Leaf, Pmin = psi)
+    turgor <- turgor.comp(PiFT = params$PiFullTurgor_Leaf, Esymp = params$epsilonSym_Leaf, Rstemp = rs)
     regulFact <- max(0, min(1, turgor / params$turgorPressureAtGsMax))
     #regulFact <- max(0, min(1, turgor / params$minTurgorAtGsMax))
 
