@@ -142,7 +142,7 @@ compute.infiltration.WBsoil <- function(WBsoil, pptSoil, cstinfil = 0.7) {
 
   # Updating water stocks (after precipitation)
 
-  SWST1[1] <- SWStemp[1] + pptSoil # Prcecipitioatn
+  SWST1[1] <- SWStemp[1] + pptSoil # Precipitation 
 
   # fluxes layer1 --> layer 2
   if (SWST1[1] > LALA$params$V_saturation_capacity[1]) {
@@ -211,8 +211,8 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
        REW[REW>1] <- 1 #Added NM 12/12/2021 to avoid issues when influx to the soil lead to REW >1
        
        Ks <- WBsoil$params$Ksat_campbell * WBsoil$params$B_GC
-       WBsoil$kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^(WBsoil$params$b_camp * 2 + 2)
-       WBsoil$PsiSoil <- (WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^WBsoil$params$b_camp))
+       WBsoil$kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^(-WBsoil$params$b_camp * 2 + 2)
+       WBsoil$PsiSoil <- (-WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^-WBsoil$params$b_camp)) - WBsoil$params$offSetPsoil
        WBsoil$REW <- REW
     }
   
