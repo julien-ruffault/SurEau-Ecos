@@ -5,6 +5,7 @@ SurEau-Ecos is a mechanistic plant water model designed plant hydraulic failure.
 Authors : Julien Ruffault (julien.ruff@gmail.com)
                 François Pimont (francois.pimont@inrae.fr)
                 Hervé Cochard (herve.cochard@inrae.fr)
+                Jean-Luc Dupuy (jean-luc.dupuy@inrae.fr)
                 Nicolas Martin-StPaul (nicolas.martin@inrae.fr)
           
 Please, download the last release.           
