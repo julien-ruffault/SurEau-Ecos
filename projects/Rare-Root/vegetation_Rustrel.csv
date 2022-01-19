@@ -8,11 +8,11 @@ P12_gs;-2.07
 P88_gs; -3.1
 epsilonSym_Leaf;10
 PiFullTurgor_Leaf; -2.7
-apoplasmicFrac_Leaf;0.4
+apoFrac_Leaf;0.4
 LDMC;570
 LMA;106
-k_PlantInit;0.62
-k_SSymInit;0.26
+K_PlantInit;0.62
+K_SSymInit;0.26
 canopyStorageParam;1.5
 K;0.5
 Tbase;3

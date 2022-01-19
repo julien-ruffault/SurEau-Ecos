@@ -59,8 +59,8 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
                                             thetaSat=soil_parameters$saturation_capacity_vg,
                                             alpha_vg=soil_parameters$alpha_vg, n_vg=soil_parameters$n_vg) 
   
-  TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
-  TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+  TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rocK_fragment_content, soil_parameters$layer_thickness))
+  TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rocK_fragment_content, soil_parameters$layer_thickness))
   
   print(paste0("Available water capacity @Tlp (VG): ", TTT$TAW_AtTLP, ' mm'))
   print(paste0("Available water capacity @P50 (VG): ", TTT$TAW_AtP50, ' mm'))
@@ -70,19 +70,18 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   if(modeling_options$PedoTransferFormulation=="Campbell")
   {
     
+    theta_AtTLP <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TLP, 
+                                                   thetaSat=soil_parameters$saturation_capacity_campbell, 
+                                                   psie=soil_parameters$psie, 
+                                                   b_camp=soil_parameters$b_camp)
     
-    theta_AtTLP <- .soilParams$wilting_point <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TLP, 
-                                                                                thetaSat=soil_parameters$saturation_capacity_campbell, 
-                                                                                psie=soil_parameters$psie, 
-                                                                                b_camp=soil_parameters$b_camp)
+    theta_AtP50 <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TTT$P50_VC_Leaf, 
+                                                   thetaSat=soil_parameters$saturation_capacity_campbell, 
+                                                   psie=soil_parameters$psie, 
+                                                   b_camp=soil_parameters$b_camp)
     
-    theta_AtP50 <- .soilParams$wilting_point <- compute.thetaAtGivenPSoil.Camp (PsiTarget = TTT$P50_VC_Leaf, 
-                                                                                thetaSat=soil_parameters$saturation_capacity_campbell, 
-                                                                                psie=soil_parameters$psie, 
-                                                                                b_camp=soil_parameters$b_camp)
-    
-    TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
-    TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rock_fragment_content, soil_parameters$layer_thickness))
+    TTT$TAW_AtTLP = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtTLP, soil_parameters$rocK_fragment_content, soil_parameters$layer_thickness))
+    TTT$TAW_AtP50 = sum(soil_parameters$V_field_capacity - convert.FtoV(theta_AtP50, soil_parameters$rocK_fragment_content, soil_parameters$layer_thickness))
     
     print(paste0("Available water capacity @Tlp (Campbell): ", TTT$TAW_AtTLP, ' mm'))
     print(paste0("Available water capacity @P50  (Campbell): ", TTT$TAW_AtP50, ' mm'))
@@ -93,14 +92,14 @@ create.vegetation.parameters <- function(filePath, listOfParameters, stand_param
   RAI = TTT$LAImax*TTT$fRootToLeaf
   
   TTT$La = RAI*TTT$rootDistribution / (2*pi*TTT$rootRadius)
-  TTT$Lv = TTT$La/(soil_parameters$layer_thickness*(1-soil_parameters$rock_fragment_content/100))
+  TTT$Lv = TTT$La/(soil_parameters$layer_thickness*(1-soil_parameters$rocK_fragment_content/100))
   
-  ##### calculate the different conductance of the plant from k_PlantInit 
-  conduc <- distribute.conductances(k_PlantInit=TTT$k_PlantInit, ri = TTT$rootDistribution, fracLeafSym = TTT$fracLeafSym) 
-  TTT$k_SLApoInit <- conduc$k_SLApoInit
-  TTT$k_RSApoInit <- conduc$k_RSApoInit 
-  TTT$k_LSymInit <- conduc$k_LSymInit
-  TTT$k_PlantInit <- conduc$k_PlantInit
+  ##### calculate the different conductance of the plant from K_PlantInit 
+  conduc <- distribute.conductances(K_PlantInit=TTT$K_PlantInit, ri = TTT$rootDistribution, fracLeafSym = TTT$fracLeafSym) 
+  TTT$K_SLApoInit <- conduc$K_SLApoInit
+  TTT$K_RSApoInit <- conduc$K_RSApoInit 
+  TTT$K_LSymInit <- conduc$K_LSymInit
+  TTT$K_PlantInit <- conduc$K_PlantInit
   TTT$vol_Stem = TTT$vol_Stem
   
   
@@ -128,18 +127,18 @@ read.vegetation.file <- function(filePath, modeling_options)
     "slope_VC_Stem",
     "epsilonSym_Leaf", # [MPa]            / Modulus of elasticity in leaves
     "PiFullTurgor_Leaf", # [MPa]           / Osmotic Potential at full turgor in leaves
-    "apoplasmicFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
+    "apoFrac_Leaf", # [-]           / Apoplasmic Fraction in leaves
     "LDMC", # [mgMS/g]                     / Leaf dry matter content (measured for fully watered leaves)
     "LMA", # [g/m2leaf]                   / Leaf mass per area
     "K", # [-]                            / Light extinction coefficient of the vegetation layer
-    "k_PlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
+    "K_PlantInit", # [mmol/MPa/s/m2leaf]  / Hydaulic conductance of the plant from soil to leaves
     "gmin20", # [mmol/m2leaf/s]         / Minimum conductance (gmin) at the reference temperature
     "TPhase_gmin", # [degC]            / Temperature for phase transition of minimum conductance
     "Q10_1_gmin", # [-]                 / Q10 value for gmin = f(T) <= Tphase_gmin
     "Q10_2_gmin", # [-]                 / Q10 value for gmin = f(T)  > Tphase_gmin
     "gmin_S",      #  conductance (gmin) of the stem
     "canopyStorageParam", # [l/m2leaf]    / Depth of water that can be retained by leaves and trunks per unit of leaf area index (used to compute the canopy water storage capacity as a function of LAI)
-    "k_SSymInit",
+    "K_SSymInit",
     "fRootToLeaf", # root to leaf ratio 
     "rootRadius",  #  radius of roots (m)
     "betaRootProfile", # parameter for the distribution of roots in the soil 

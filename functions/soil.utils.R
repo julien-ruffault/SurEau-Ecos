@@ -66,7 +66,7 @@ compute.KSoil.Camp <- function(SWS, tsc, b_camp, Ksat_campbell) {
 
 compute.thetaAtGivenPSoil.Camp <- function(thetaSat, PsiTarget, psie, b_camp) {
   
-  thetaAtGivenPSoil =  thetaSat*(PsiTarget/psie)^(1/b_camp)
+  thetaAtGivenPSoil =  thetaSat*(PsiTarget/-psie)^(1/-b_camp)
   
   return(thetaAtGivenPSoil)
 }

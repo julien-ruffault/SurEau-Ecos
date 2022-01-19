@@ -191,26 +191,26 @@ compute.DFMC <- function(VPD, FM0 = 5.43, FM1 = 52.91, m = 0.64) {
 
 #' calcultate hydraulic conductances in the different portions of the plant 
 #' (trunk, leaf and root) according to predetermined rules 
-#' @param k_PlantInit conductance of the plant from root to leaf 
+#' @param K_PlantInit conductance of the plant from root to leaf 
 #' @param ri root distribution within the soil layers.
-#' @param fractLeafSym proportion of k_PlantInit assigned to the leaf (apoplasm to symplasm pathway)
+#' @param fractLeafSym proportion of K_PlantInit assigned to the leaf (apoplasm to symplasm pathway)
 #' @return
 #' @export
 #'
 #' @examples
-distribute.conductances <- function(k_PlantInit,ri,fracLeafSym = 0.4)
+distribute.conductances <- function(K_PlantInit,ri,fracLeafSym = 0.4)
 {
   
   fracRT   = (2/3)*(1-fracLeafSym)
   fractTL  =  (1/3)*(1-fracLeafSym)
   
-  k_RSApoInit   = 1 /(fracRT / k_PlantInit) *ri
-  k_SLApoInit = 1/(fractTL/k_PlantInit)
-  k_LSymInit = 1/(fracLeafSym/k_PlantInit)
+  K_RSApoInit   = 1 /(fracRT / K_PlantInit) *ri
+  K_SLApoInit = 1/(fractTL/K_PlantInit)
+  K_LSymInit = 1/(fracLeafSym/K_PlantInit)
   
   #TODO: AJOUTE UN CALCUL DES CONDUCTANCE ICI POUR CHECK DU CALCUL? e.g.:
-  #k_PlantInit <-  1/ (1 /sum(k_RSApoInit) + 1/k_SLApoInit + 1/k_LSymInit)
-  return(list( k_SLApoInit =  k_SLApoInit, k_LSymInit = k_LSymInit ,  k_RSApoInit=k_RSApoInit, k_PlantInit=k_PlantInit))
+  #K_PlantInit <-  1/ (1 /sum(K_RSApoInit) + 1/K_SLApoInit + 1/K_LSymInit)
+  return(list( K_SLApoInit =  K_SLApoInit, K_LSymInit = K_LSymInit ,  K_RSApoInit=K_RSApoInit, K_PlantInit=K_PlantInit))
 }
 
 
@@ -289,15 +289,15 @@ kseriesum<-function(k1,k2) {return(1/(1/k1+1/k2))}
 #' Convert soil parameter from from cm3.cm-3 to mm according to thickness and
 #' rock fragment content 
 #' @param x the soil value to be converted (in m3.m-3)
-#' @param rock_fragment_content rock fragment content of the soil layer (%)
+#' @param rocK_fragment_content rock fragment content of the soil layer (%)
 #' @param layer_thickness thickness of the soil layer (in m)
 #'
 #' @return y soil parameter in mm 
 #' @export
 #'
 #' @examples
-convert.FtoV <- function(x, rock_fragment_content = 0, layer_thickness) {
-  y <- x * (1 - (rock_fragment_content / 100)) * layer_thickness * 1000
+convert.FtoV <- function(x, rocK_fragment_content = 0, layer_thickness) {
+  y <- x * (1 - (rocK_fragment_content / 100)) * layer_thickness * 1000
   return(y)
 }
 

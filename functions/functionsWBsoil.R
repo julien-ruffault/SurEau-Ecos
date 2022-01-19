@@ -195,7 +195,7 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
        PsiSoil <- (-1 * ((((1 / REW)^(1 / WBsoil$params$m)) - 1)^(1 / WBsoil$params$n)) / WBsoil$params$alpha_vg / 10000) - WBsoil$params$offSetPsoil  # diviser par 10000 pour passer de cm à MPa
     
        # Compute Soil conductance
-       WBsoil$kSoil <- 1000 * WBsoil$params$Ksat_vg * WBsoil$params$B_GC * KSoil_temp
+       WBsoil$kSoil <- 1000 * WBsoil$params$ksat_vg * WBsoil$params$B_GC * KSoil_temp
        WBsoil$PsiSoil <- PsiSoil
        WBsoil$REW <- REW
      }
@@ -210,7 +210,7 @@ compute.soilConductanceAndPsi.WBsoil <- function(WBsoil) {
        REW[REW <= 0.0001] <- 0.0001
        REW[REW>1] <- 1 #Added NM 12/12/2021 to avoid issues when influx to the soil lead to REW >1
        
-       Ks <- WBsoil$params$Ksat_campbell * WBsoil$params$B_GC
+       Ks <- WBsoil$params$ksat_campbell * WBsoil$params$B_GC
        WBsoil$kSoil <- (WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^(-WBsoil$params$b_camp * 2 + 2)
        WBsoil$PsiSoil <- (-WBsoil$params$psie * ((WBsoil$soilWaterStock / WBsoil$params$V_saturation_capacity_campbell)^-WBsoil$params$b_camp)) - WBsoil$params$offSetPsoil
        WBsoil$REW <- REW

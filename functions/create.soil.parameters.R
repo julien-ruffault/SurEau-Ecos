@@ -35,7 +35,7 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       warning("Default soil used (Van-Genuchten Formulation)")
       
       .soilParams$PedoTransferFormulation <- "VG"
-      .soilParams$rock_fragment_content <- c(40, 75, 90)
+      .soilParams$rocK_fragment_content <- c(40, 75, 90)
       .soilParams$depth = c(0.3, 1, 4)
       .soilParams$layer_thickness <- numeric(3)
       .soilParams$layer_thickness[1] <- .soilParams$depth[1]
@@ -48,7 +48,7 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       .soilParams$n_vg <- rep(1.55, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
       .soilParams$m <- (1 - 1 / .soilParams$n_vg) #m parameters Van Genuchten equations
       .soilParams$I_vg <- rep(0.5, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
-      .soilParams$Ksat_vg <- rep(1.69, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
+      .soilParams$ksat_vg <- rep(1.69, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
       .soilParams$saturation_capacity_vg <- c(0.5, 0.5, 0.5) # Fraction of water at saturation capacity (cm3/cm3)
       .soilParams$residual_capacity_vg <- c(0.1, 0.1, 0.1) # Fraction of residual water  (cm3/cm3)
     
@@ -106,7 +106,7 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       .soilParams$layer_thickness[2] <- .soilParams$depth[2] - .soilParams$depth[1]
       .soilParams$layer_thickness[3] <- .soilParams$depth[3] - .soilParams$depth[2]
       .soilParams$gSoil0 <- TTT$gSoil0
-      .soilParams$rock_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
+      .soilParams$rocK_fragment_content <- c(TTT$RFC_1, TTT$RFC_2, TTT$RFC_3)
       
       
       if(.soilParams$PedoTransferFormulation == "VG")
@@ -115,7 +115,7 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       .soilParams$alpha_vg <- rep(TTT$alpha_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
       .soilParams$n_vg <- rep(TTT$n_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
       .soilParams$I_vg <- rep(TTT$I_vg, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
-      .soilParams$Ksat_vg <- rep(TTT$Ksat_vg, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
+      .soilParams$ksat_vg <- rep(TTT$ksat_vg, 3) # Soil conductivity at saturation (mol/m/s/Mpa)
       .soilParams$m <- (1 - 1 / .soilParams$n_vg)
       
       .soilParams$saturation_capacity_vg <- rep(TTT$saturation_capacity_vg, 3) # Fraction of water at saturation capacity (cm3/cm3)
@@ -126,12 +126,12 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       .soilParams$field_capacity <- compute.thetaAtGivenPSoil (PsiTarget=0.033,  thetaRes=.soilParams$residual_capacity_vg , thetaSat=.soilParams$saturation_capacity_vg, alpha_vg=.soilParams$alpha_vg, n_vg=.soilParams$n_vg) 
       
       #--
-      .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
-      .soilParams$V_saturation_capacity_vg <- convert.FtoV(.soilParams$saturation_capacity_vg, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
-      #.soilParams$V_saturation_capacity_camp <- convert.FtoV(.soilParams$saturation_capacity_camp, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
+      .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
+      .soilParams$V_saturation_capacity_vg <- convert.FtoV(.soilParams$saturation_capacity_vg, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
+      #.soilParams$V_saturation_capacity_camp <- convert.FtoV(.soilParams$saturation_capacity_camp, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
       #warning("Developer note (NM, 05/01/2021); Saturation capacity camp is not provided'")
-      .soilParams$V_residual_capacity_vg <- convert.FtoV(.soilParams$residual_capacity_vg, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
-      .soilParams$V_wilting_point <- convert.FtoV(.soilParams$wilting_point, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
+      .soilParams$V_residual_capacity_vg <- convert.FtoV(.soilParams$residual_capacity_vg, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
+      .soilParams$V_wilting_point <- convert.FtoV(.soilParams$wilting_point, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
       .soilParams$V_saturation_capacity <- .soilParams$V_saturation_capacity_vg
       
       # For diagnositc (RU)
@@ -140,8 +140,8 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       .soilParams$V_soil_storage_capacity <- .soilParams$V_soil_storage_capacity_wilt
       
       
-   #   print(paste0("Available water capacity Wilting: ", .soilParams$V_soil_storage_capacity_wilt, ' mm'))
-    #  print(paste0("Available water capacity Residual: ", .soilParams$V_soil_storage_capacity_res, ' mm'))
+     print(paste0("Available water capacity Wilting: ", .soilParams$V_soil_storage_capacity_wilt, ' mm'))
+     print(paste0("Available water capacity Residual: ", .soilParams$V_soil_storage_capacity_res, ' mm'))
       }
   
       if(.soilParams$PedoTransferFormulation == "Campbell") 
@@ -150,7 +150,7 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
   
         .soilParams$b_camp <- rep(TTT$b_camp, 3) # Shape parameters of the relationship betwen soil water content and soil water potential [-]
         .soilParams$psie <- rep(TTT$psie, 3) # Shape parameters of the relationship betwen soil water content and soil water potential  [-]
-        .soilParams$Ksat_campbell <- TTT$Ksat_campbell
+        .soilParams$ksat_campbell <- TTT$ksat_campbell
         .soilParams$saturation_capacity_campbell <- rep(TTT$saturation_capacity_campbell, 3) # Fraction of water at saturation capacity (cm3/cm3)
         .soilParams$wilting_point <- compute.thetaAtGivenPSoil.Camp (PsiTarget = -1.5, thetaSat=.soilParams$saturation_capacity_campbell, psie=.soilParams$psie, b_camp=.soilParams$b_camp)
         #NM 03/01/2022 TODO : check if there is a mistake here : where is the field capacity @-.33 or @ -.033 MPa ?
@@ -159,11 +159,11 @@ create.soil.parameters <- function(filePath, listOfParameters, modeling_options,
       
         #Water volumes
       
-        .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
-        .soilParams$V_saturation_capacity_campbell <- convert.FtoV(.soilParams$saturation_capacity_campbell, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
+        .soilParams$V_field_capacity <- convert.FtoV(.soilParams$field_capacity, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
+        .soilParams$V_saturation_capacity_campbell <- convert.FtoV(.soilParams$saturation_capacity_campbell, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
        
-        .soilParams$V_residual_capacity_campbell <- convert.FtoV(.soilParams$residual_capacity_camp, .soilParams$rock_fragment_content, .soilParams$layer_thickness) #There is no residual capacity for campbell model : 0.1 by default
-        .soilParams$V_wilting_point <- convert.FtoV(.soilParams$wilting_point, .soilParams$rock_fragment_content, .soilParams$layer_thickness)
+        .soilParams$V_residual_capacity_campbell <- convert.FtoV(.soilParams$residual_capacity_camp, .soilParams$rocK_fragment_content, .soilParams$layer_thickness) #There is no residual capacity for campbell model : 0.1 by default
+        .soilParams$V_wilting_point <- convert.FtoV(.soilParams$wilting_point, .soilParams$rocK_fragment_content, .soilParams$layer_thickness)
         .soilParams$V_saturation_capacity <- .soilParams$V_saturation_capacity_campbell
         
         # For diagnostic (TAW)
@@ -207,7 +207,7 @@ read.soil.file <- function(filePath, modeling_options)
     "alpha_vg",
     "n_vg",
     "I_vg",
-    "Ksat_vg",
+    "ksat_vg",
     "saturation_capacity_vg",
     "residual_capacity_vg",
     "gSoil0")
@@ -222,7 +222,7 @@ else if(modeling_options$PedoTransferFormulation=="Campbell") {
     "depth2",
     "depth3",
     "wilting_point",
-    "Ksat_campbell",
+    "ksat_campbell",
     "saturation_capacity_campbell",
     "b_camp",
     "psie",

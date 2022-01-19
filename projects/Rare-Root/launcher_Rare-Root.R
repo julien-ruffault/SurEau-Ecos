@@ -87,9 +87,9 @@ plot(fractionofRoot, depthvec*100, type='l', ylim=c(400,0), xlim=c(1,0), ylab="d
 abline(h=DepthLayers)
 barplot(vegetation_parameters$rootDistribution, ylab='root fraction per layer')
 barplot(soil_parameters$V_field_capacity, ylab="Vol. field capacity")
-barplot(vegetation_parameters$k_RSApoInit, ylab="soil-root conductance per layer")
+barplot(vegetation_parameters$K_RSApoInit, ylab="soil-root conductance per layer")
 
-#barplot(vegetation_parameters$k_RSApoInit/sum(vegetation_parameters$k_RSApoInit)*100, ylab="relative soil-root conductance")
+#barplot(vegetation_parameters$K_RSApoInit/sum(vegetation_parameters$K_RSApoInit)*100, ylab="relative soil-root conductance")
 
 
 
@@ -118,7 +118,7 @@ lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 par(new=T)
 plot(DATA$Time,DATA$PPT,type='h', col='black',xlab='',ylab='',yaxt="n")
 axis(4)
-legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
+legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_TrunK_Symplasm','Psi_TrunK_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.5)
 
 #Water extraction from the different layers

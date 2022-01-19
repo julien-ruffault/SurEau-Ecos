@@ -87,7 +87,7 @@ plot(fractionofRoot, depthvec*100, type='l', ylim=c(400,0), xlim=c(1,0), ylab="d
 abline(h=DepthLayers)
 barplot(vegetation_parameters$rootDistribution, ylab='root fraction per layer')
 barplot(soil_parameters$V_field_capacity, ylab="Vol. field capacity")
-barplot(vegetation_parameters$k_RSApoInit, ylab="soil-root conductance per layer")
+barplot(vegetation_parameters$K_RSApoInit, ylab="soil-root conductance per layer")
 
 curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Leaf,P50=vegetation_parameters$P50_VC_Leaf),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", xlab="Psi")
 curve(VCCurve(x,slope=vegetation_parameters$slope_VC_Stem,P50=vegetation_parameters$P50_VC_Stem),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , ylab="PLC", lty=3, add=T, col=2, lwd=2)
@@ -95,10 +95,10 @@ par(new=T)
 curve(GsCurve(x, slope=vegetation_parameters$slope_gs,P50=vegetation_parameters$P50_gs, gsmax=vegetation_parameters$gsMax),from=0, to=vegetation_parameters$P50_VC_Leaf-3 , col=4, yaxt="n", ylab="",xlab="")
 axis(4)
 mtext("gs",4,1.8,cex=.8)
-barplot(c(vegetation_parameters$k_PlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kplant", "LAI", "gmin"))
+barplot(c(vegetation_parameters$K_PlantInit ,vegetation_parameters$LAImax,vegetation_parameters$gmin20), names.arg = c("Kplant", "LAI", "gmin"))
 
 
-#barplot(vegetation_parameters$k_RSApoInit/sum(vegetation_parameters$k_RSApoInit)*100, ylab="relative soil-root conductance")
+#barplot(vegetation_parameters$K_RSApoInit/sum(vegetation_parameters$K_RSApoInit)*100, ylab="relative soil-root conductance")
 
 
 
@@ -128,7 +128,7 @@ lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 par(new=T)
 plot(DATA$Time,DATA$PPT,type='h', col='black',xlab='',ylab='',yaxt="n")
 axis(4)
-legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
+legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_TrunK_Symplasm','Psi_TrunK_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.5)
 
 #Water extraction from the different layers

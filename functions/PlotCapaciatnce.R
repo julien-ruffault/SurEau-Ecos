@@ -26,9 +26,9 @@
 #   K_L_td = Eprime_n + C_LApo/dt + 1/(1/K_LSym + dt/C_LSym) + delta_L_cav*K_L_Cav  
 #   Psi_L_td = ((Eprime_n + C_LApo/dt)*Psi_LApo_n + (1 /(1/K_LSym + dt/C_LSym))*Psi_LSym_n + delta_L_cav*K_L_Cav*Psi_LApo_mem)/(K_L_td + dbxmin) # dbxmin to avoid 0/0
 #   
-#   K_T_td = C_SApo/dt + 1/(1/K_TSym + dt/C_SSym) + sum(WBveg$k_SoilToStem)  + delta_T_cav*K_T_Cav 
+#   K_T_td = C_SApo/dt + 1/(1/K_TSym + dt/C_SSym) + sum(WBveg$K_SoilToStem)  + delta_T_cav*K_T_Cav 
 #   #Erreur dans psi_T_td, FP: A supprimer ?
-#   Psi_T_td = (C_SApo/dt*Psi_SApo_n + 1/(1/K_TSym + dt/C_SSym)*Psi_SSym_n + sum(WBveg$k_SoilToStem * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_SApo_mem) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
+#   Psi_T_td = (C_SApo/dt*Psi_SApo_n + 1/(1/K_TSym + dt/C_SSym)*Psi_SSym_n + sum(WBveg$K_SoilToStem * WBsoil$PsiSoil) + delta_T_cav*K_T_Cav*Psi_SApo_mem) / (K_T_td + dbxmin) # dbxmin to avoid 0/0
 #   
 #   # 3. Compute Psi_LApo_np1
 #   Eleaks = E_n + Emin_L_np1/(1+(C_LSym+dbxmin)/(K_LSym*dt)) + K_TL/(K_TL + K_T_td) * Emin_T_np1/(1+(C_SSym + dbxmin)/(K_TSym *dt))  # dbxmin to avoid 0/0  FP ATTENTION BUG SUR EMIN!!!!

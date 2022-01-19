@@ -13,10 +13,10 @@ mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))        
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R'))                                   # do not modify 
 
 # set paths
-climateData_path          <- paste0(mainDir,'/quick_start/climat_example.csv')
-soilParameters_path       <- paste0(mainDir,'/quick_start/soil_example.csv')
-vegetationParameters_path <- paste0(mainDir,'/quick_start/vegetation_example.csv')
-output_path               <-  paste0(mainDir,'/quick_start/example_output_subdaily.csv')
+climateData_path          <- paste0(mainDir,'/quicK_start/climat_example.csv')
+soilParameters_path       <- paste0(mainDir,'/quicK_start/soil_example.csv')
+vegetationParameters_path <- paste0(mainDir,'/quicK_start/vegetation_example.csv')
+output_path               <-  paste0(mainDir,'/quicK_start/example_output_subdaily.csv')
 
 # Create input files and run SurEau-Ecos
 modeling_options      <- create.modeling.options()  
@@ -48,7 +48,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
                 vegetation_parameters = vegetation_parameters)
 
 # Example output loading an plotting  ------------------------------------------
-filename  = paste0(mainDir,"/quick_start/example_output_subdaily.csv")
+filename  = paste0(mainDir,"/quicK_start/example_output_subdaily.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
 DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 
@@ -58,7 +58,7 @@ lines(DATA$Time,DATA$Psi_LApo,type='l',col='springgreen4')
 lines(DATA$Time,DATA$Psi_SSym,type='l',col='firebrick1',ylim=c(-6,0))
 lines(DATA$Time,DATA$Psi_SApo,type='l',col='firebrick4')
 lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
-legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
+legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_TrunK_Symplasm','Psi_TrunK_Apoplasm','Psi_Soil'),
        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 
 

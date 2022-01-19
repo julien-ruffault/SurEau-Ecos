@@ -1,7 +1,7 @@
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### 
 # Launcher to run SurEau-Ecos on an exemple case
-# date : 14/01/2022
-# authors : Julien Ruffault (julien.ruff@gmail.com)
+# Date : 19/01/2022
+# Authors : Julien Ruffault (julien.ruff@gmail.com)
 #           Nicolas Martin  (nicolas.martin@inrae.fr)
 # ### ### ### ### ### ### #s## ### ### ### ### ### ### ### ### ### ### ### ### 
 
@@ -10,10 +10,10 @@ rm(list = ls()) # Clear environment
 gc()            # Clear memory
 # Set paths  -----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))  
-climateData_path          <- paste0(mainDir,'/quick_start/climat_example.csv')
-soilParameters_path       <- paste0(mainDir,'/quick_start/soil_example.csv')
-vegetationParameters_path <- paste0(mainDir,'/quick_start/vegetation_example.csv')
-output_path               <-  paste0(mainDir,'/quick_start/example_output_subdaily.csv')
+climateData_path          <- paste0(mainDir,'/quicK_start/climat_example.csv')
+soilParameters_path       <- paste0(mainDir,'/quicK_start/soil_example.csv')
+vegetationParameters_path <- paste0(mainDir,'/quicK_start/vegetation_example.csv')
+output_path               <-  paste0(mainDir,'/quicK_start/example_output_subdaily.csv')
 # Load model -------------------------------------------------------------------
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R')) # do not modify 
 # Create input list files and define options -----------------------------------
@@ -21,7 +21,7 @@ modeling_options <- create.modeling.options()
 simulation_parameters <- create.simulation.parameters(startYearSimulation = 1990,                       
                                                       endYearSimulation = 1990,
                                                       mainDir = mainDir,
-                                                      outputType = 'diagnostic_subdaily',
+                                                      outputType = 'LFMC_subdaily',
                                                       overWrite = T,
                                                       outputPath = output_path)
 
@@ -46,7 +46,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 
 # Plot outputs -----------------------------------------------------------------
 # load output file   
-filename  = paste0(mainDir,"/quick_start/example_output_subdaily.csv")
+filename  = paste0(mainDir,"/quicK_start/example_output_subdaily.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
 DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # plot Plant water potentials
@@ -85,3 +85,4 @@ lines(DATA$Time,DATA$LFMCApo,type='l',col='brown3',lwd=2)
 lines(DATA$Time,DATA$LFMC,col='grey30')
 legend('bottomleft',legend=c('LFMC_Symplasm','LFMC_Apoplasm','FMC_Canopy'),
        col=c('springgreen4','brown3','grey30'),lty=1,lwd=2,cex=0.8)
+

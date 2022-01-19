@@ -182,7 +182,7 @@
 # # Also computes soil parameters based on soil texture, depth, stone content & according to different models
 # #----------------------------------------------------------------------------
 # 
-# # K at saturation Ksat (mol/m/s/Mpa)
+# # K at saturation ksat (mol/m/s/Mpa)
 # # REW
 # # REW.Comp <- function(WR = WR, SV = SV, TetaWilt = TetaWilt, TetaSat = TetaSat) {
 # # 
@@ -314,13 +314,13 @@
 #   # compute soil conductance from soil water content 
 # 
 #   # Compute soil conductivity (mmol/m/s/MPa)
-#   # Soil Ks (mmol/m/s/MPa) computed from Ksat and the conductance factor (cond fac)
+#   # Soil Ks (mmol/m/s/MPa) computed from ksat and the conductance factor (cond fac)
 #   # CondFac upscaling factors at the rhizophere with roots dimensions
 #   # CondFac depends on b (root radius) r (distance between roots) and La (root length per area)
 #   # Generic conductance factor for upsacling conductivity to rhizophere (gardner cowan 1960 model)
 # 
 #   CondFac <- 1000 * La * 2 * 3.14 / log(b / r) # Soil Ks (mmol/m/s/MPa)
-#   Ks <- Ksat * CondFac
+#   Ks <- ksat * CondFac
 #   # Compute soil hydraulic conductivity with Van Genuchten
 #   if (method == "VG") {
 #     TotalAvailWater <- (tsc - twp)

@@ -42,13 +42,13 @@ vegetation_parameters <- create.vegetation.parameters(filePath = vegetationParam
 vegetation_parameters$gsMax = 220
 vegetation_parameters$gCrown0 = 150
 
-vegetation_parameters$k_PlantInit
+vegetation_parameters$K_PlantInit
 vegetation_parameters$gsMax
 
 
-vegetation_parameters$k_LSymInit
+vegetation_parameters$K_LSymInit
 
-vegetation_parameters$k_RSApoInit
+vegetation_parameters$K_RSApoInit
 
 vegetation_parameters$Lv
 
@@ -81,7 +81,7 @@ DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # lines(DATA$Time,DATA$Psi_AllSoil,col='grey20',lwd=2)
 # 
 # 
-# legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_Trunk_Symplasm','Psi_Trunk_Apoplasm','Psi_Soil'),
+# legend('bottomright',legend=c('Psi_Leaf_Symplasm','Psi_Leaf_Apoplasm','Psi_TrunK_Symplasm','Psi_TrunK_Apoplasm','Psi_Soil'),
 #        col=c('springgreen2','springgreen4','firebrick1','firebrick4','grey30'),lty=1,lwd=2,cex=0.8)
 # 
 # 

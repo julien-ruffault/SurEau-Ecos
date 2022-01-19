@@ -3,7 +3,7 @@ P50_VC_Leaf; -6.66;  -4.84; -5.22;;;Mpa;;;P50_VC_Leaf;-3.4
 slope_VC_Leaf;29.5;41.5;37.5;;;%/Mpa;;;slope_VC_Leaf;60
 epsilonSym_Leaf;12;5.98;11.4;;;Mpa;;;epsilonSym_Leaf;10
 PiFullTurgor_Leaf; -2.8; -1.7; -2.9;;;Mpa;;;PiFullTurgor_Leaf;-2.1
-apoplasmicFrac_Leaf;0.45;0.68;0.25;;;-;;;apoplasmicFrac_Leaf;0.4
+apoFrac_Leaf;0.45;0.68;0.25;;;-;;;apoFrac_Leaf;0.4
 P50_VC_Stem; -6.66;  -4.84; -5.22;;;Mpa;;;P50_VC_Stem;-3.4
 slope_VC_Stem;29.5;41.5;37.5;;;%/Mpa;;;slope_VC_Stem;60
 epsilonSym_Stem;12;5.98;11.4;;;Mpa/%;;;epsilonSym_Stem;10
@@ -13,8 +13,8 @@ symFrac_Stem;0.2;0.2;0.2;;;-;;;symFrac_Stem;0.2
 LDMC;500;500;500;;;fraction;;;LDMC;570
 Succulence;100;100;100;;;g/m2;;;;
 LMA;182;252;110;;;g/m2;;;LMA;106
-k_PlantInit;0.62;0.62;0.62;;;mmol/m2/s/Mpa;;;k_PlantInit;0.62
-k_SSymInit;0.26;0.26;0.26;;;mmol/m2/s/Mpa;;;k_SSymInit;0.26
+K_PlantInit;0.62;0.62;0.62;;;mmol/m2/s/Mpa;;;K_PlantInit;0.62
+K_SSymInit;0.26;0.26;0.26;;;mmol/m2/s/Mpa;;;K_SSymInit;0.26
 vol_Stem;18.2;18.2;18.2;;;(mm or sapwood litre/m2 of soil);;;vol_Stem;5
 fRootToLeaf;1;1;1;;;-;;;fRootToLeaf;1
 rootRadius;0.0002;0.0002;0.0002;;;m;;;rootRadius;0.0002
