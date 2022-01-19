@@ -1,0 +1,54 @@
+
+TODO list for SurEau  (mise à jour le 28/05/2021 par JR) 
+
+# TODO before release 
+=======
+
+- faire la list des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
+- faire un guide général de l'utilisation de SUREAU (JR) --> use RmarkDown/knitr  
+- check LFMC results (JR and NM)
+- voir la relation Tsoil vs Tair pour l'instant codee en dur dans Gsoil selon la relation fittée sur O3HP (JR)
+- Implementer une option pour eviter les flux entre les couches : avoidSoilTransfertBetweenSoilLayers (FP)
+<<<<<<< HEAD
+- Faire la liste des parametres avec les unités et la significaiton et un commentaire  (NM and JR) 
+=======
+- Calculer la derivee de la fonction de turgescences (pour regulation option : modeling_options$stomatalRegFormulation) --> (FP)
+- faire une section dans le doc de relase comment calculer le volume_livingTRB (NM)
+- finir le Jarvis vs Granier1999 (JR) 
+- rajouter la succulence dans les parametres --> (NM, JR)
+- Dans le doc de release, expliquer la calibration des traits de végétation . --> --> comment les determiner (NM)
+
+
+>>>>>>> 5b8785b52ca592ab3e2c8f91f395c2aa110b9c22
+
+# Optional
+- Un script de comparaison et de plot de la simulation reference (JR, NM and FP)/ attendre que le modele soit stabilisé
+- implementer la possibilte de rentrer du climat horaire : option dans modeling_options + modif dans create.cllimat.data + modifs dans WBclim
+- voir  pour specifire les conditions de mort de la plante/  quand arreter la simulation et eventullement proposer que la simu continue même si la plante est morte en enlevant les processus  -
+-- implementer dans modeling_options (code en dur pour l'instant -> PLC >= 90 (JR, NM)
+ - implementer d'autres options de Jarvis / remonter le CA dans les parameters si l'on met  des optins dependant de CA -
+ - cleaner Gbl and Tleaf 
+- TODO with assign the values of the small time step could be updated exactly so that these final updates of soil could be removed
+- In theory the updatSoilWater is already consistent between the small time step and the large time step but it is not the case for soil evaporation
+- regul_n   = compute.regulFact(psi = WBveg_n$Psi_LSym  , params = WBveg_n$params  ,regulationType=modeling_options$stomatalRegFormulation
+## TODO check why recomputed? should be in WBveg_tmp (FP and NM)
+- TODO FP would suggest to move compute fluxSoilToStem_mm directly in the main loop, as it is the coupling between the two models...(JR) 
+
+
+--------------------------------------------------------------------------------
+# ENSUITE, pour papier presentation du modele : 
+# - Comparaison avec SUREAU.C (NM)
+# - Test de sensibilité des processus à la résolution temporelle (FP) 
+# - Test de comparaison des schémas de résolution : explicit, semi-implicit vs implicit (FP)
+# - Test de l'apport des differents mécanismes dans les résultats du modèle
+# - Test de sensibilité aux parametres de vegetation et sol (JR) --> en cours 
+# - Faire tourner avec climat non constant et autre végétation (JR)  
+# - Faire un script pour produire des cartes sur le sud de la France (JR) --> preparer les scripts rapidement 
+
+# AUTRES , par la suite 
+# - Sites fluxnet et comparaison aux données (JR)
+# - Essai d'inversion pour la RU (JR)
+
+
+
+s

@@ -20,11 +20,11 @@ compute.B_GC <- function (La, b, rootRadius) {
   }
 
 
-compute.KSoil <- function(REW, I_vg, n_vg, Ksat_vg, B_GC) {
+compute.KSoil <- function(REW, I_vg, n_vg, ksat_vg, B_GC) {
   
   m <- (1 - 1 / n_vg)
   
-  KSoil = Ksat_vg* REW^(I_vg) * (1 - (1 - REW^(1 / m))^m)^2
+  KSoil = ksat_vg* REW^(I_vg) * (1 - (1 - REW^(1 / m))^m)^2
   
   kSoil_GC = 1000  * B_GC * KSoil
   return(c(KSoil, kSoil_GC))
@@ -57,8 +57,8 @@ compute.PSoil.Camp <- function(SWS, tsc, b_camp, psie) {
 }
 
 
-compute.KSoil.Camp <- function(SWS, tsc, b_camp, Ksat_campbell) {
-  ksoil <- Ksat_campbell*(SWS / tsc)^(-b_camp * 2 + 2)
+compute.KSoil.Camp <- function(SWS, tsc, b_camp, ksat_campbell) {
+  ksoil <- ksat_campbell*(SWS / tsc)^(-b_camp * 2 + 2)
   return(ksoil)
 }
 

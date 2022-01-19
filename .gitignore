@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 .DS_Store
+'documentation/output_description.xlsx'
 projects/sensitivity_analysis
 projects/sensitivity_analysis2
 projects/Compar_SurEauC
@@ -13,3 +14,6 @@ projects/PapierMyriam
 projects/Forgenius
 projects/Cours_StCharles
 projects/Simu_ICOS
+projects
+for_developement
+
