@@ -10,10 +10,10 @@ rm(list = ls()) # Clear environment
 gc()            # Clear memory
 # Set paths  -----------------------------------------------------------------
 mainDir <- dirname(dirname(rstudioapi::getActiveDocumentContext()$path))  
-climateData_path          <- paste0(mainDir,'/quicK_start/climat_example.csv')
-soilParameters_path       <- paste0(mainDir,'/quicK_start/soil_example.csv')
-vegetationParameters_path <- paste0(mainDir,'/quicK_start/vegetation_example.csv')
-output_path               <-  paste0(mainDir,'/quicK_start/example_output_subdaily.csv')
+climateData_path          <- paste0(mainDir,'/quick_start/climat_example.csv')
+soilParameters_path       <- paste0(mainDir,'/quick_start/Soil_example.csv')
+vegetationParameters_path <- paste0(mainDir,'/quick_start/vegetation_example.csv')
+output_path               <- paste0(mainDir,'/quick_start/example_output_subdaily.csv')
 # Load model -------------------------------------------------------------------
 source(paste0(mainDir,'/functions/load.SurEau_Ecos.R')) # do not modify 
 # Create input list files and define options -----------------------------------
@@ -46,7 +46,7 @@ run.SurEau_Ecos(modeling_options = modeling_options ,
 
 # Plot outputs -----------------------------------------------------------------
 # load output file   
-filename  = paste0(mainDir,"/quicK_start/example_output_subdaily.csv")
+filename  = paste0(mainDir,"/quick_start/example_output_subdaily.csv")
 DATA      = read.csv(filename,header=T, dec='.', sep="")
 DATA$Time = as.POSIXct(DATA$Time,format='%Y-%m-%d/%H:%M:%S')
 # plot Plant water potentials

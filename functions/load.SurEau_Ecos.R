@@ -8,7 +8,7 @@ library(lubridate)
 # load functions ----------------------------------------------------------
 source(paste0(mainDir, "/functions/run.SurEau_Ecos.R"))  
 source(paste0(mainDir, "/functions/functionsWBveg.R"))
-source(paste0(mainDir, "/functions/functionsWBOutput.R"))
+source(paste0(mainDir, "/functions/functionsWBoutput.R"))
 source(paste0(mainDir, "/functions/functionsWBsoil.R"))
 source(paste0(mainDir, "/functions/functionsWBclim.R"))
 
