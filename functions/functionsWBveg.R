@@ -863,13 +863,10 @@ compute.regulFact <- function(psi, params, regulationType) {
 
 yearlyInitialisation.WBveg <- function(WBveg){
   
-  if(WBveg$PLC_Stem >85 | WBveg$PLC_Leaf >85)
-  {
-  WBveg <- new.WBveg(WBveg$params) 
-  }
+  #nm 23/09/2022 correct a bug : yearly is  done  for all variables (not only PLC, before)
   
-  WBveg$PLC_Stem  <- 0 
-  WBveg$PLC_Leaf   <- 0 
+  WBveg <- new.WBveg(WBveg$params) 
+  
   
 return(WBveg)
   }
